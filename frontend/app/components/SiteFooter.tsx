@@ -11,7 +11,7 @@ const LINKS = [
     label: "Google Scholar",
   },
   { href: "https://github.com/MoeBuTa", icon: FaGithub, label: "GitHub" },
-  { href: "https://linkedin.com/in/wenxiao-zhang", icon: FaLinkedin, label: "LinkedIn" },
+  { href: "https://www.linkedin.com/in/wenxiao-zhang-a0801b206/", icon: FaLinkedin, label: "LinkedIn" },
 ];
 
 export function SiteFooter() {

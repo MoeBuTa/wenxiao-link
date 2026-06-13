@@ -7,10 +7,10 @@ export default function AdminNewsPage() {
     <CrudEditor
       resource="news"
       title="News"
-      description="Newest items show first (sorted by date). Use the link button to add inline links."
+      description="Newest items show first (sorted by date). Write inline links directly as [text](url)."
       fields={[
         { key: "date", label: "Date", type: "text", placeholder: "2026-04", help: "YYYY-MM" },
-        { key: "text", label: "Text", type: "markdown", rows: 2, help: "Supports [text](url) links." },
+        { key: "text", label: "Text", type: "textarea", rows: 6, help: "Plain text; write links as [text](url)." },
         { key: "order", label: "Order", type: "number", help: "Tiebreaker within the same date." },
       ]}
       makeEmpty={() => ({ date: "", text: "", order: 0 })}

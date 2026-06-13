@@ -1,18 +1,9 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  HStack,
-  Input,
-  Textarea,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, Button, HStack, Link, Text, Textarea, VStack } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-
-import { Link, Text } from "@chakra-ui/react";
 
 const mdComponents = {
   p: (props: any) => <Text color="fg.default" lineHeight="1.7" mb={2} {...props} />,
@@ -32,81 +23,74 @@ export function MarkdownField({
   rows?: number;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
-  const [linkOpen, setLinkOpen] = useState(false);
-  const [linkText, setLinkText] = useState("");
-  const [linkUrl, setLinkUrl] = useState("");
   const [showPreview, setShowPreview] = useState(false);
 
-  const openLink = () => {
+  // Wrap the current selection (or a placeholder) with markdown markers and
+  // keep the inner text selected.
+  const surround = (before: string, after: string, placeholder: string) => {
     const el = ref.current;
-    if (el) {
-      const sel = value.slice(el.selectionStart, el.selectionEnd);
-      setLinkText(sel);
-    }
-    setLinkUrl("");
-    setLinkOpen(true);
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const sel = value.slice(start, end) || placeholder;
+    onChange(value.slice(0, start) + before + sel + after + value.slice(end));
+    requestAnimationFrame(() => {
+      const p1 = start + before.length;
+      el.setSelectionRange(p1, p1 + sel.length);
+      el.focus();
+    });
   };
 
+  // Insert [text](url) and select the "url" so it's ready to type over.
   const insertLink = () => {
     const el = ref.current;
-    const md = `[${linkText || "link"}](${linkUrl || "https://"})`;
-    const start = el ? el.selectionStart : value.length;
-    const end = el ? el.selectionEnd : value.length;
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const sel = value.slice(start, end) || "text";
+    const md = `[${sel}](url)`;
     onChange(value.slice(0, start) + md + value.slice(end));
-    setLinkOpen(false);
-    setLinkText("");
-    setLinkUrl("");
+    requestAnimationFrame(() => {
+      const urlStart = start + md.lastIndexOf("(") + 1;
+      el.setSelectionRange(urlStart, urlStart + 3);
+      el.focus();
+    });
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!(e.metaKey || e.ctrlKey) || e.altKey) return;
+    const k = e.key.toLowerCase();
+    if (k === "b") {
+      e.preventDefault();
+      surround("**", "**", "bold");
+    } else if (k === "i") {
+      e.preventDefault();
+      surround("*", "*", "italic");
+    } else if (k === "k") {
+      e.preventDefault();
+      insertLink();
+    } else if (k === "e") {
+      e.preventDefault();
+      surround("`", "`", "code");
+    }
   };
 
   return (
     <VStack align="stretch" spacing={2}>
-      <HStack>
-        <Button size="xs" variant="outline" onClick={openLink}>
-          🔗 Insert link
-        </Button>
+      <HStack justify="space-between">
+        <Text fontSize="xs" color="fg.faint">
+          ⌘/Ctrl+B bold · +I italic · +K link · +E code
+        </Text>
         <Button size="xs" variant="ghost" onClick={() => setShowPreview((p) => !p)}>
           {showPreview ? "Hide preview" : "Preview"}
         </Button>
       </HStack>
 
-      {linkOpen ? (
-        <HStack
-          bg="bg.subtle"
-          p={2}
-          borderRadius="md"
-          spacing={2}
-          align="end"
-          flexWrap="wrap"
-        >
-          <Input
-            size="sm"
-            placeholder="Link text"
-            value={linkText}
-            onChange={(e) => setLinkText(e.target.value)}
-            maxW="200px"
-            bg="bg.surface"
-          />
-          <Input
-            size="sm"
-            placeholder="https://…"
-            value={linkUrl}
-            onChange={(e) => setLinkUrl(e.target.value)}
-            maxW="280px"
-            bg="bg.surface"
-          />
-          <Button size="sm" colorScheme="orange" onClick={insertLink}>
-            Insert
-          </Button>
-          <Button size="sm" variant="ghost" onClick={() => setLinkOpen(false)}>
-            Cancel
-          </Button>
-        </HStack>
-      ) : null}
-
       <Textarea
         ref={ref}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
         rows={rows}
         bg="bg.surface"
         fontFamily="mono"
@@ -114,14 +98,7 @@ export function MarkdownField({
       />
 
       {showPreview ? (
-        <Box
-          borderWidth="1px"
-          borderColor="border.muted"
-          borderRadius="md"
-          bg="bg.card"
-          px={4}
-          py={3}
-        >
+        <Box borderWidth="1px" borderColor="border.muted" borderRadius="md" bg="bg.card" px={4} py={3}>
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={mdComponents}>
             {value || "_Nothing to preview_"}
           </ReactMarkdown>

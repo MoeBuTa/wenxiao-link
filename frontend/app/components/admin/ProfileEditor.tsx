@@ -5,6 +5,7 @@ import {
   Button,
   Flex,
   FormLabel,
+  HStack,
   Heading,
   Input,
   SimpleGrid,
@@ -49,9 +50,11 @@ function Labeled({ label, help, children }: { label: string; help?: string; chil
 
 export function ProfileEditor({
   onSaved,
+  onCancel,
   embedded,
 }: {
   onSaved?: () => void;
+  onCancel?: () => void;
   embedded?: boolean;
 } = {}) {
   const [data, setData] = useState<ProfileData | null>(null);
@@ -125,11 +128,11 @@ export function ProfileEditor({
       </Labeled>
 
       <Labeled label="About summary" help="Separate paragraphs with a blank line.">
-        <Textarea {...inputBg} rows={10} value={data.summaryText} onChange={(e) => set({ summaryText: e.target.value })} />
+        <Textarea {...inputBg} rows={14} value={data.summaryText} onChange={(e) => set({ summaryText: e.target.value })} />
       </Labeled>
 
       <Labeled label="Research interests" help="Comma-separated.">
-        <TagsInput value={data.interests} onChange={(v) => set({ interests: v })} rows={2} />
+        <TagsInput value={data.interests} onChange={(v) => set({ interests: v })} rows={5} />
       </Labeled>
 
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
@@ -147,11 +150,16 @@ export function ProfileEditor({
         </Labeled>
       </SimpleGrid>
 
-      <Box>
+      <HStack>
         <Button colorScheme="orange" onClick={() => void save()} isLoading={busy}>
           Save profile
         </Button>
-      </Box>
+        {onCancel ? (
+          <Button variant="outline" onClick={onCancel} isDisabled={busy}>
+            Cancel
+          </Button>
+        ) : null}
+      </HStack>
     </VStack>
   );
 

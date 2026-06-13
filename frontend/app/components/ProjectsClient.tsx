@@ -31,8 +31,8 @@ import {
 } from "react-icons/fa";
 
 import type { Project } from "../lib/types";
-import { PaginatedGrid } from "./PaginatedGrid";
 import { AddNewButton, EditableItem } from "./edit-mode/EditableItem";
+import { Reorderable } from "./edit-mode/Reorderable";
 
 // SVG cover icon chosen per project — name first, then a tag keyword.
 function iconForProject(p: Project): IconType {
@@ -69,8 +69,9 @@ const COVERS = [
   "linear(135deg, #ea580c, #9a3412)",
 ];
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
+function ProjectCard({ project }: { project: Project }) {
   const CoverIcon = iconForProject(project);
+  const cover = COVERS[(project.id ?? 0) % COVERS.length];
   return (
     <Link href={project.repoUrl} isExternal _hover={{ textDecoration: "none" }}>
       <Box
@@ -83,7 +84,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         _hover={{ borderColor: "accent", boxShadow: "0 0 0 1px rgba(249,115,22,0.25)" }}
         transition="all 0.15s ease"
       >
-        <Flex h="84px" align="center" justify="center" bgGradient={COVERS[index % COVERS.length]}>
+        <Flex h="84px" align="center" justify="center" bgGradient={cover}>
           <Icon as={CoverIcon} boxSize={9} color="whiteAlpha.900" />
         </Flex>
         <VStack align="stretch" spacing={2} p={4}>
@@ -118,8 +119,8 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 }
 
 export function ProjectsClient({ projects }: { projects: Project[] }) {
-  // Most-starred first; unstarred (null/0) fall to the end.
-  const sorted = [...projects].sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0));
+  // Display order is the (drag-controlled) `order` field.
+  const sorted = [...projects].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   return (
     <Container maxW="6xl" py={{ base: 8, md: 12 }} px={{ base: 6, md: 10 }}>
@@ -134,11 +135,13 @@ export function ProjectsClient({ projects }: { projects: Project[] }) {
         </Link>
         .
       </Text>
-      <PaginatedGrid
+      <Reorderable
+        resource="projects"
         items={sorted}
-        renderItem={(p, i) => (
-          <EditableItem key={p.id} resource="projects" id={p.id} seed={p}>
-            <ProjectCard project={p} index={i} />
+        layout="grid"
+        renderItem={(p) => (
+          <EditableItem resource="projects" id={p.id} seed={p}>
+            <ProjectCard project={p} />
           </EditableItem>
         )}
       />

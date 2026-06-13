@@ -4,6 +4,7 @@ import {
   Button,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
@@ -86,6 +87,7 @@ export function EditDrawer() {
     <Drawer isOpen={target !== null} placement="right" onClose={closeDrawer} size="md">
       <DrawerOverlay />
       <DrawerContent bg="bg.surface">
+        <DrawerCloseButton />
         <DrawerHeader borderBottomWidth="1px" borderColor="border.muted" textTransform="capitalize">
           {heading}
         </DrawerHeader>
@@ -93,6 +95,7 @@ export function EditDrawer() {
           {target?.mode === "profile" ? (
             <ProfileEditor
               embedded
+              onCancel={closeDrawer}
               onSaved={async () => {
                 await revalidateContent();
                 router.refresh();
@@ -118,7 +121,7 @@ export function EditDrawer() {
                     Delete
                   </Button>
                 ) : null}
-                <Button variant="ghost" onClick={closeDrawer} isDisabled={busy}>
+                <Button variant="outline" colorScheme="orange" onClick={closeDrawer} isDisabled={busy}>
                   Cancel
                 </Button>
               </HStack>

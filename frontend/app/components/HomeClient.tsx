@@ -27,6 +27,7 @@ import {
 import type { NewsItem, SiteProfile } from "../lib/types";
 import { renderInlineMd } from "./inline-md";
 import { AddNewButton, EditProfileButton, EditableItem } from "./edit-mode/EditableItem";
+import { Reorderable } from "./edit-mode/Reorderable";
 
 // Logos for schools and employers, self-hosted under public/logos/. The
 // Avatar falls back to the org's initials when there is no logo file for it.
@@ -177,19 +178,20 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
   return (
     <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10} w="full">
       <Section id="education" title="Education" action={<AddNewButton resource="education" label="Add" />}>
-        <VStack
-          align="stretch"
-          spacing={4}
-          maxH="320px"
-          overflowY="auto"
-          borderWidth="1px"
-          borderColor="border.muted"
-          borderRadius="lg"
-          bg="bg.card"
-          p={4}
-        >
-          {profile.education.map((e) => (
-            <EditableItem key={e.id} resource="education" id={e.id} seed={e}>
+        <Reorderable
+          resource="education"
+          items={profile.education}
+          containerProps={{
+            maxH: "320px",
+            overflowY: "auto",
+            borderWidth: "1px",
+            borderColor: "border.muted",
+            borderRadius: "lg",
+            bg: "bg.card",
+            p: 4,
+          }}
+          renderItem={(e) => (
+            <EditableItem resource="education" id={e.id} seed={e}>
               <Flex gap={3} align="flex-start">
                 <Avatar
                   src={orgLogo(e.institution)}
@@ -215,23 +217,24 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
                 </Box>
               </Flex>
             </EditableItem>
-          ))}
-        </VStack>
+          )}
+        />
       </Section>
       <Section id="experience" title="Experience" action={<AddNewButton resource="experience" label="Add" />}>
-        <VStack
-          align="stretch"
-          spacing={4}
-          maxH="320px"
-          overflowY="auto"
-          borderWidth="1px"
-          borderColor="border.muted"
-          borderRadius="lg"
-          bg="bg.card"
-          p={4}
-        >
-          {profile.experience.map((e) => (
-            <EditableItem key={e.id} resource="experience" id={e.id} seed={e}>
+        <Reorderable
+          resource="experience"
+          items={profile.experience}
+          containerProps={{
+            maxH: "320px",
+            overflowY: "auto",
+            borderWidth: "1px",
+            borderColor: "border.muted",
+            borderRadius: "lg",
+            bg: "bg.card",
+            p: 4,
+          }}
+          renderItem={(e) => (
+            <EditableItem resource="experience" id={e.id} seed={e}>
               <Flex gap={3} align="flex-start">
                 <Avatar
                   src={orgLogo(e.org)}
@@ -261,8 +264,8 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
                 </Box>
               </Flex>
             </EditableItem>
-          ))}
-        </VStack>
+          )}
+        />
       </Section>
     </SimpleGrid>
   );
@@ -271,9 +274,12 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
 function Skills({ profile }: { profile: SiteProfile }) {
   return (
     <Section id="skills" title="Skills" action={<AddNewButton resource="skills" label="Add" />}>
-      <VStack align="stretch" spacing={3}>
-        {profile.skills.map((group) => (
-          <EditableItem key={group.id} resource="skills" id={group.id} seed={group}>
+      <Reorderable
+        resource="skills"
+        items={profile.skills}
+        containerProps={{ spacing: 3 }}
+        renderItem={(group) => (
+          <EditableItem resource="skills" id={group.id} seed={group}>
             <Box>
               <Text fontSize="xs" fontWeight="700" color="ocean" mb={2} textTransform="uppercase">
                 {group.group}
@@ -289,8 +295,8 @@ function Skills({ profile }: { profile: SiteProfile }) {
               </Wrap>
             </Box>
           </EditableItem>
-        ))}
-      </VStack>
+        )}
+      />
     </Section>
   );
 }

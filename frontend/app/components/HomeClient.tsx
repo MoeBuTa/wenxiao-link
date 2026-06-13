@@ -157,7 +157,17 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
   return (
     <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10} w="full">
       <Section id="education" title="Education">
-        <VStack align="stretch" spacing={4}>
+        <VStack
+          align="stretch"
+          spacing={4}
+          maxH="320px"
+          overflowY="auto"
+          borderWidth="1px"
+          borderColor="border.muted"
+          borderRadius="lg"
+          bg="bg.card"
+          p={4}
+        >
           {profile.education.map((e) => (
             <Box key={`${e.institution}-${e.degree}`} borderLeftWidth="2px" borderColor="border.default" pl={4}>
               <Text fontWeight="600" color="fg.default">
@@ -175,7 +185,17 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
         </VStack>
       </Section>
       <Section id="experience" title="Experience">
-        <VStack align="stretch" spacing={4}>
+        <VStack
+          align="stretch"
+          spacing={4}
+          maxH="320px"
+          overflowY="auto"
+          borderWidth="1px"
+          borderColor="border.muted"
+          borderRadius="lg"
+          bg="bg.card"
+          p={4}
+        >
           {profile.experience.map((e) => (
             <Box key={`${e.org}-${e.role}`} borderLeftWidth="2px" borderColor="border.default" pl={4}>
               <Text fontWeight="600" color="fg.default">

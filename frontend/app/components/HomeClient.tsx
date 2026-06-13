@@ -27,14 +27,16 @@ import {
 import type { NewsItem, SiteProfile } from "../lib/types";
 import { renderInlineMd } from "./inline-md";
 
-// Institution logos for the Education list. Self-hosted under
-// public/edu-logos/; the Avatar falls back to the institution's initials
-// when there is no logo file for it.
-function eduLogo(institution: string): string | undefined {
-  const s = institution.toLowerCase();
-  if (s.includes("western australia")) return "/edu-logos/uwa.png";
-  if (s.includes("wellington") || s.includes("victoria university")) return "/edu-logos/vuw.png";
-  if (s.includes("xiamen")) return "/edu-logos/xmut.png";
+// Logos for schools and employers, self-hosted under public/logos/. The
+// Avatar falls back to the org's initials when there is no logo file for it.
+function orgLogo(name: string): string | undefined {
+  const s = name.toLowerCase();
+  if (s.includes("western australia")) return "/logos/uwa.png";
+  if (s.includes("wellington") || s.includes("victoria university")) return "/logos/vuw.png";
+  if (s.includes("xiamen")) return "/logos/xmut.png";
+  if (s.includes("telstra")) return "/logos/telstra.png";
+  if (s.includes("china telecom")) return "/logos/china-telecom.png";
+  if (s.includes("gillion")) return "/logos/gillion.png";
   return undefined;
 }
 
@@ -182,7 +184,7 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
           {profile.education.map((e) => (
             <Flex key={`${e.institution}-${e.degree}`} gap={3} align="flex-start">
               <Avatar
-                src={eduLogo(e.institution)}
+                src={orgLogo(e.institution)}
                 name={e.institution}
                 boxSize="40px"
                 borderRadius="md"
@@ -220,22 +222,34 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
           p={4}
         >
           {profile.experience.map((e) => (
-            <Box key={`${e.org}-${e.role}`} borderLeftWidth="2px" borderColor="border.default" pl={4}>
-              <Text fontWeight="600" color="fg.default">
-                {e.role}
-              </Text>
-              <Text fontSize="sm" color="fg.muted">
-                {e.org}
-              </Text>
-              <Text fontSize="xs" color="fg.faint">
-                {e.period}
-              </Text>
-              {e.detail ? (
-                <Text fontSize="sm" color="fg.muted" mt={1}>
-                  {e.detail}
+            <Flex key={`${e.org}-${e.role}`} gap={3} align="flex-start">
+              <Avatar
+                src={orgLogo(e.org)}
+                name={e.org}
+                boxSize="40px"
+                borderRadius="md"
+                flexShrink={0}
+                bg="bg.subtle"
+                color="fg.muted"
+                sx={{ "& img": { objectFit: "contain" } }}
+              />
+              <Box minW={0}>
+                <Text fontWeight="600" color="fg.default">
+                  {e.role}
                 </Text>
-              ) : null}
-            </Box>
+                <Text fontSize="sm" color="fg.muted">
+                  {e.org}
+                </Text>
+                <Text fontSize="xs" color="fg.faint">
+                  {e.period}
+                </Text>
+                {e.detail ? (
+                  <Text fontSize="sm" color="fg.muted" mt={1}>
+                    {e.detail}
+                  </Text>
+                ) : null}
+              </Box>
+            </Flex>
           ))}
         </VStack>
       </Section>

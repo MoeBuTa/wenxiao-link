@@ -34,6 +34,7 @@ function eduLogo(institution: string): string | undefined {
   const s = institution.toLowerCase();
   if (s.includes("western australia")) return "/edu-logos/uwa.png";
   if (s.includes("wellington") || s.includes("victoria university")) return "/edu-logos/vuw.png";
+  if (s.includes("xiamen")) return "/edu-logos/xmut.png";
   return undefined;
 }
 

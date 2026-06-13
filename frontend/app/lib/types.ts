@@ -1,0 +1,103 @@
+export type ScholarProfile = {
+  userId: string;
+  name: string;
+  affiliation: string;
+  avatarUrl: string;
+  citationsAll: number;
+  hIndexAll: number;
+  i10IndexAll: number;
+  syncedAt: string | null;
+};
+
+export type Publication = {
+  id: number;
+  scholarId: string;
+  title: string;
+  authors: string;
+  venue: string;
+  year: number | null;
+  citedBy: number;
+  citedByUrl: string;
+  url: string;
+  coreRank: string;
+  coreAcronym: string;
+};
+
+export type PublicationsPayload = {
+  profile: ScholarProfile;
+  publications: Publication[];
+};
+
+export type NewsItem = {
+  date: string;
+  text: string;
+};
+
+export type Project = {
+  name: string;
+  description: string;
+  tags: string[];
+  repoUrl: string;
+  stars?: number;
+  highlight?: boolean;
+};
+
+export type EducationItem = {
+  institution: string;
+  degree: string;
+  period: string;
+  detail?: string;
+};
+
+export type ExperienceItem = {
+  org: string;
+  role: string;
+  period: string;
+  detail?: string;
+};
+
+export type SkillGroup = {
+  group: string;
+  items: string[];
+};
+
+export type SiteProfile = {
+  name: string;
+  title: string;
+  affiliation: string;
+  email: string;
+  links: {
+    github: string;
+    linkedin: string;
+    scholar: string;
+    cv: string;
+  };
+  summary: string[];
+  researchDirection: string;
+  interests: string[];
+  education: EducationItem[];
+  experience: ExperienceItem[];
+  skills: SkillGroup[];
+};
+
+export type BlogPostMeta = {
+  slug: string;
+  title: string;
+  date: string;
+  summary: string;
+  tags: string[];
+};
+
+export type QAComment = {
+  id: number;
+  parentId: number | null;
+  body: string;
+  displayName: string;
+  isOwner: boolean;
+  isRegistered: boolean;
+  isEdited: boolean;
+  canModify: boolean;
+  createdAt: string;
+  updatedAt: string;
+  replies?: QAComment[];
+};

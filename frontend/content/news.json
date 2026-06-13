@@ -1,0 +1,40 @@
+{
+  "news": [
+    {
+      "date": "2026-04",
+      "text": "Our STIndex demo was accepted at [WWW 2026](https://www2026.thewebconf.org/) (Companion proceedings) in Dubai, UAE!"
+    },
+    {
+      "date": "2026-04",
+      "text": "[Trans-RAG](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Yf6xHJ4AAAAJ&citation_for_view=Yf6xHJ4AAAAJ:eQOLeE2rZwMC) was accepted at DASFAA 2026!"
+    },
+    {
+      "date": "2025-09",
+      "text": "[\"Enhancing Reliability in LLM-Integrated Robotic Systems\"](https://www.sciencedirect.com/science/article/pii/S0164121225002833) was published in the Journal of Systems and Software!"
+    },
+    {
+      "date": "2025-04",
+      "text": "[Docs2KG](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Yf6xHJ4AAAAJ&citation_for_view=Yf6xHJ4AAAAJ:Tyk-4Ss8FVUC) was published in the WWW 2025 Companion proceedings and presented in Sydney, Australia!"
+    },
+    {
+      "date": "2024-11",
+      "text": "[OpenOmni](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Yf6xHJ4AAAAJ&citation_for_view=Yf6xHJ4AAAAJ:d1gkVwhDpl0C) won the Best Demo Paper Award at EMNLP 2024 in Miami!"
+    },
+    {
+      "date": "2024-11",
+      "text": "Joined [Telstra](https://www.telstra.com.au) as a Data Science Specialist, building GraphRAG and agentic retrieval for frontline customer service."
+    },
+    {
+      "date": "2024-10",
+      "text": "Our [study on prompt injection attacks](https://arxiv.org/abs/2408.03515) against LLM-integrated mobile robots was presented at ISSRE 2024 in Tsukuba, Japan!"
+    },
+    {
+      "date": "2024-03",
+      "text": "Started my PhD in Computer Science at [UWA](https://www.uwa.edu.au), researching reliable and secure LLM agent systems!"
+    },
+    {
+      "date": "2024-02",
+      "text": "Began tutoring at [UWA](https://www.uwa.edu.au): Cloud Computing, Intelligent Agents, Web Development, Cybersecurity, and Databases."
+    }
+  ]
+}

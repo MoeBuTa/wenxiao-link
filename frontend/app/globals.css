@@ -1,0 +1,9 @@
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+/* SSR paint matches the dark canvas before Chakra hydrates. */
+body {
+  background: #0a0e16;
+}

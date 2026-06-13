@@ -1,0 +1,248 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Force a target (auto chooses by changed paths)"
+        type: choice
+        required: false
+        default: auto
+        options: [auto, frontend, backend, both]
+      rebuild:
+        description: "Rebuild backend docker images (only when Dockerfile / requirements.txt change)"
+        type: boolean
+        required: false
+        default: false
+
+# Frontend and backend can deploy in parallel; within each side we
+# serialise so concurrent pushes don't trample each other mid-deploy.
+jobs:
+  changes:
+    runs-on: [self-hosted, macOS]
+    outputs:
+      frontend: ${{ steps.decide.outputs.frontend }}
+      backend: ${{ steps.decide.outputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          clean: false
+
+      - name: Decide which sides to deploy
+        id: decide
+        env:
+          TARGET: ${{ inputs.target || 'auto' }}
+          BEFORE: ${{ github.event.before }}
+          SHA: ${{ github.sha }}
+        run: |
+          if [ "$TARGET" = "frontend" ]; then
+            echo "frontend=true"  >> "$GITHUB_OUTPUT"
+            echo "backend=false"  >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$TARGET" = "backend" ]; then
+            echo "frontend=false" >> "$GITHUB_OUTPUT"
+            echo "backend=true"   >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$TARGET" = "both" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "frontend=true"  >> "$GITHUB_OUTPUT"
+            echo "backend=true"   >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            echo "frontend=true" >> "$GITHUB_OUTPUT"
+            echo "backend=true"  >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          changed=$(git diff --name-only "$BEFORE" "$SHA" || true)
+          echo "[changes] files since $BEFORE:"; echo "$changed"
+          fe=false; be=false
+          if echo "$changed" | grep -E '^frontend/' >/dev/null; then fe=true; fi
+          if echo "$changed" | grep -E '^backend/'  >/dev/null; then be=true; fi
+          if echo "$changed" | grep -E '^(\.github/|README|\.gitignore$)' >/dev/null; then fe=true; be=true; fi
+          if [ "$fe" = false ] && [ "$be" = false ]; then fe=true; be=true; fi
+          echo "frontend=$fe" >> "$GITHUB_OUTPUT"
+          echo "backend=$be"  >> "$GITHUB_OUTPUT"
+
+  deploy-frontend:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: [self-hosted, macOS]
+    concurrency:
+      group: deploy-wenxiao-link-frontend
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: false
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Reload PM2 (or start on first run)
+        run: |
+          pm2 reload ecosystem.config.js --update-env || pm2 start ecosystem.config.js
+          pm2 save
+
+  deploy-backend:
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: [self-hosted, macOS]
+    concurrency:
+      group: deploy-wenxiao-link-backend
+      cancel-in-progress: false
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      # Persistent data lives outside the runner workspace so a `git clean`
+      # or workflow re-checkout can never wipe the database.
+      WENXIAO_DATA_ROOT: /Users/wenxiao/wenxiao-link-data
+      # credsStore-free docker config: the user-level config routes
+      # credential lookups through Docker Desktop's GUI helper, which hangs
+      # forever from a launchd-spawned runner.
+      DOCKER_CONFIG: /Users/wenxiao/.docker-ci
+      DOCKER_HOST: unix:///Users/wenxiao/.docker/run/docker.sock
+
+    steps:
+      - name: Checkout (preserve uncommitted backend/.env)
+        uses: actions/checkout@v4
+        with:
+          clean: false
+
+      - name: Ensure persistent data dirs exist
+        run: |
+          mkdir -p "$WENXIAO_DATA_ROOT/postgres"
+          mkdir -p "$WENXIAO_DATA_ROOT/staticfiles"
+          mkdir -p "$WENXIAO_DATA_ROOT/logs"
+
+      - name: Initialise credsStore-free DOCKER_CONFIG
+        run: |
+          mkdir -p "$DOCKER_CONFIG"
+          if [ ! -f "$DOCKER_CONFIG/config.json" ]; then
+            cat > "$DOCKER_CONFIG/config.json" <<'EOF'
+          {"auths":{}}
+          EOF
+            echo "[deploy] wrote credsStore-free $DOCKER_CONFIG/config.json"
+          else
+            echo "[deploy] kept existing $DOCKER_CONFIG/config.json"
+          fi
+          ln -sfn "$HOME/.docker/cli-plugins" "$DOCKER_CONFIG/cli-plugins"
+
+      - name: Write .env from secrets (only if missing)
+        env:
+          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          HASURA_ADMIN_SECRET: ${{ secrets.HASURA_ADMIN_SECRET }}
+        run: |
+          if [ ! -f .env ]; then
+            : "${ADMIN_USERNAME:=admin}"
+            for k in ADMIN_PASSWORD JWT_SECRET HASURA_ADMIN_SECRET; do
+              eval v=\$$k
+              if [ -z "$v" ]; then
+                echo "::error::secret $k is empty — set it under repo Settings → Secrets"
+                exit 1
+              fi
+            done
+            {
+              printf 'PROD_ENV=True\n'
+              printf 'ADMIN_USERNAME=%s\n' "$ADMIN_USERNAME"
+              printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD"
+              printf 'JWT_SECRET=%s\n'     "$JWT_SECRET"
+              printf 'HASURA_ADMIN_SECRET=%s\n' "$HASURA_ADMIN_SECRET"
+              printf 'POSTGRES_DATA_DIR=%s\n' "$WENXIAO_DATA_ROOT/postgres"
+              printf 'WENXIAO_STATIC_DIR=%s\n' "$WENXIAO_DATA_ROOT/staticfiles"
+            } > .env
+            echo "[deploy] wrote fresh .env"
+          else
+            grep -q '^PROD_ENV=' .env || echo "PROD_ENV=True" >> .env
+            grep -q '^POSTGRES_DATA_DIR=' .env || echo "POSTGRES_DATA_DIR=${WENXIAO_DATA_ROOT}/postgres" >> .env
+            grep -q '^WENXIAO_STATIC_DIR=' .env || echo "WENXIAO_STATIC_DIR=${WENXIAO_DATA_ROOT}/staticfiles" >> .env
+            if ! grep -q '^HASURA_ADMIN_SECRET=' .env; then
+              if [ -z "$HASURA_ADMIN_SECRET" ]; then
+                echo "::error::HASURA_ADMIN_SECRET missing from .env and repo secrets"
+                exit 1
+              fi
+              printf 'HASURA_ADMIN_SECRET=%s\n' "$HASURA_ADMIN_SECRET" >> .env
+            fi
+            echo "[deploy] kept existing .env, ensured volume-path keys"
+          fi
+          for k in ADMIN_PASSWORD JWT_SECRET HASURA_ADMIN_SECRET; do
+            val=$(grep -E "^${k}=" .env | cut -d= -f2-)
+            if [ -z "$val" ]; then
+              echo "::error::${k} is empty in .env — fix and retry"
+              exit 1
+            fi
+          done
+
+      - name: Verify Docker daemon is running
+        run: |
+          for i in $(seq 1 30); do
+            if docker info >/dev/null 2>&1; then
+              echo "[deploy] docker ready"; exit 0
+            fi
+            echo "[deploy] waiting for Docker daemon ($i/30)..."; sleep 2
+          done
+          echo "[deploy] Docker daemon not reachable"; exit 1
+
+      - name: Pin buildx to the desktop-linux driver
+        timeout-minutes: 1
+        run: docker buildx use desktop-linux || true
+
+      - name: Pre-pull base images
+        if: ${{ inputs.rebuild == true }}
+        timeout-minutes: 5
+        run: |
+          docker pull python:3.11-slim
+          docker pull postgres:16
+          docker pull hasura/graphql-engine:v2.44.0.cli-migrations-v3
+
+      - name: Build images
+        if: ${{ inputs.rebuild == true }}
+        timeout-minutes: 10
+        run: docker compose build
+
+      - name: Bring stack up
+        run: docker compose up -d --remove-orphans
+
+      - name: Restart platform to re-run entrypoint
+        if: ${{ inputs.rebuild != true }}
+        run: docker compose restart platform
+
+      - name: Wait for Postgres healthy
+        run: |
+          for i in $(seq 1 60); do
+            status=$(docker inspect -f '{{.State.Health.Status}}' wenxiao-db 2>/dev/null || echo "starting")
+            if [ "$status" = "healthy" ]; then
+              echo "[deploy] postgres healthy"; exit 0
+            fi
+            echo "[deploy] postgres status=$status ($i/60)"; sleep 2
+          done
+          docker compose logs postgres
+          exit 1
+
+      - name: Wait for Django (entrypoint runs migrate + scholar sync)
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8002/api/health/ >/dev/null 2>&1; then
+              echo "[deploy] django ready"; exit 0
+            fi
+            echo "[deploy] waiting for django ($i/60)..."; sleep 3
+          done
+          docker compose logs platform
+          exit 1
+
+      - name: Show running containers
+        if: always()
+        run: docker compose ps

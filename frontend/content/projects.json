@@ -1,0 +1,126 @@
+{
+  "projects": [
+    {
+      "name": "Docs2KG",
+      "description": "Human-LLM collaborative framework for constructing unified knowledge graphs from heterogeneous documents (PDFs, web pages, scanned files), fusing layout, markdown, and semantic structure into a single graph. Published at WWW 2025; core contributor.",
+      "tags": [
+        "knowledge-graph",
+        "llm",
+        "document-understanding",
+        "neo4j",
+        "information-extraction"
+      ],
+      "repoUrl": "https://github.com/AI4WA/Docs2KG",
+      "stars": 366,
+      "highlight": true
+    },
+    {
+      "name": "OpenOmni Framework",
+      "description": "Open-source framework for building and benchmarking multimodal conversational agents, wiring speech, vision, and LLM components into an end-to-end pipeline with latency and accuracy evaluation. Best Demo Paper at EMNLP 2024.",
+      "tags": [
+        "multimodal",
+        "conversational-ai",
+        "llm",
+        "speech",
+        "benchmarking"
+      ],
+      "repoUrl": "https://github.com/AI4WA/OpenOmniFramework",
+      "stars": 27,
+      "highlight": false
+    },
+    {
+      "name": "STIndex",
+      "description": "Multi-dimensional information extraction system that uses LLMs to pull temporal, spatial, and custom-dimension data from unstructured text, with automatic schema discovery, an evaluation suite, and both vLLM and API-based backends. WWW 2026 demo; shipped on PyPI with a live dashboard.",
+      "tags": [
+        "spatiotemporal",
+        "information-extraction",
+        "llm",
+        "vllm",
+        "python"
+      ],
+      "repoUrl": "https://github.com/MoeBuTa/STIndex",
+      "stars": 1,
+      "highlight": true
+    },
+    {
+      "name": "CARE",
+      "description": "Pre-execution verification engine for shell-executing LLM agents: canonicalizes candidate commands, scores risk through AST-based and path-sensitive static analysis, and selectively escalates ambiguous cases to a model judge before any side effect occurs. Accompanies an ISSRE 2026 submission.",
+      "tags": [
+        "llm-agents",
+        "security",
+        "shell",
+        "static-analysis",
+        "verification"
+      ],
+      "repoUrl": "https://github.com/MoeBuTa/CARE",
+      "stars": 0,
+      "highlight": true
+    },
+    {
+      "name": "Reviewviz",
+      "description": "Claude Code skill + zero-dependency npx CLI that turns peer-review comments into a single offline interactive HTML page — review text highlighted in place, colour-coded by required action, grouped into priority-ordered rebuttal points with editable drafts.",
+      "tags": [
+        "claude-code",
+        "research-tools",
+        "rebuttal",
+        "cli"
+      ],
+      "repoUrl": "https://github.com/MoeBuTa/Reviewviz",
+      "stars": 0,
+      "highlight": false
+    },
+    {
+      "name": "LLMEyesim",
+      "description": "Study of prompt-injection attacks against LLM-integrated mobile robots, built on the EyeSim robotics simulator to probe the capabilities and failure modes of LLM-driven control loops.",
+      "tags": [
+        "prompt-injection",
+        "robotics",
+        "llm",
+        "security",
+        "simulation"
+      ],
+      "repoUrl": "https://github.com/MoeBuTa/LLMEyesim",
+      "stars": 3,
+      "highlight": false
+    },
+    {
+      "name": "SlimeMould",
+      "description": "Agent-based Physarum simulation that regrows the Nanjing subway network from real geometric station data, comparing the emergent transport network against the actual topology with animated visualisations.",
+      "tags": [
+        "agent-based-modeling",
+        "simulation",
+        "complex-systems",
+        "python"
+      ],
+      "repoUrl": "https://github.com/MoeBuTa/SlimeMould",
+      "stars": 29,
+      "highlight": false
+    },
+    {
+      "name": "MTDSimTime",
+      "description": "Discrete-event simulation (SimPy) for evaluating moving target defense strategies in the time domain — modelling attacker/defender dynamics over a network graph to measure security versus availability trade-offs.",
+      "tags": [
+        "moving-target-defense",
+        "cybersecurity",
+        "discrete-event-simulation",
+        "python"
+      ],
+      "repoUrl": "https://github.com/MoeBuTa/MTDSimTime",
+      "stars": 3,
+      "highlight": false
+    },
+    {
+      "name": "PentestAssist",
+      "description": "Self-hosted uncensored cybersecurity LLM (WhiteRabbitNeo-V3) for an authorized penetration-testing lab — vLLM serving, streaming chat UI, Django/Hasura auth.",
+      "tags": [
+        "llm",
+        "cybersecurity",
+        "vllm",
+        "teaching"
+      ],
+      "repoUrl": "https://github.com/MoeBuTa/PentestAssist",
+      "stars": 0,
+      "highlight": false
+    }
+  ]
+}

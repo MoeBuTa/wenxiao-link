@@ -1,0 +1,85 @@
+{
+  "name": "Wenxiao Zhang",
+  "title": "PhD Candidate in Computer Science · AI Engineer · Data Scientist",
+  "affiliation": "The University of Western Australia",
+  "email": "moebutamail@gmail.com",
+  "links": {
+    "github": "https://github.com/MoeBuTa",
+    "linkedin": "https://linkedin.com/in/wenxiao-zhang",
+    "scholar": "https://scholar.google.com/citations?hl=en&user=Yf6xHJ4AAAAJ",
+    "cv": "/cv.pdf"
+  },
+  "summary": [
+    "I am a PhD candidate in Computer Science at The University of Western Australia, researching reliable and secure large language model (LLM) agent systems for complex knowledge and execution tasks — spanning agentic retrieval, multi-hop reasoning, multimodal personal agents, and pre-execution safety verification for agents that act in the real world.",
+    "Alongside research, I build production AI systems. At Telstra I designed and shipped an enterprise GraphRAG and agentic retrieval platform for frontline customer service — a Neo4j knowledge graph over Salesforce data with query decomposition and multi-step planning — together with an automated RAG evaluation system delivered on Azure ML with Docker, CI/CD, and TDD. Before my PhD I worked as a software developer on CMS and enterprise transport platforms, and I tutor Cloud Computing, Intelligent Agents, Web Development, Cybersecurity, and Database Systems at UWA."
+  ],
+  "researchDirection": "Reliable and secure large language model agent systems for complex knowledge and execution tasks.",
+  "interests": [
+    "LLM Agent Safety",
+    "Retrieval-Augmented Generation",
+    "Multi-Agent Systems",
+    "Multi-Hop Reasoning",
+    "Reinforcement Learning",
+    "Knowledge Graphs"
+  ],
+  "education": [
+    {
+      "institution": "The University of Western Australia",
+      "degree": "PhD in Computer Science",
+      "period": "2024/03 – 2027/03 (expected)",
+      "detail": "Reliable and secure LLM agent systems"
+    },
+    {
+      "institution": "The University of Western Australia",
+      "degree": "Master of Software Engineering",
+      "period": "2021/02 – 2023/07",
+      "detail": "WAM 80.42"
+    },
+    {
+      "institution": "Xiamen University of Technology",
+      "degree": "BEng in Electronic and Information Engineering",
+      "period": "2016/09 – 2020/06",
+      "detail": "WAM 85.69"
+    }
+  ],
+  "experience": [
+    {
+      "org": "Telstra",
+      "role": "Data Science Specialist",
+      "period": "2024/11 – 2025/07",
+      "detail": "Enterprise GraphRAG and agentic retrieval for frontline customer service; automated RAG evaluation (AutoEval) on Azure ML with Docker, CI/CD and TDD."
+    },
+    {
+      "org": "The University of Western Australia",
+      "role": "Academic Tutor",
+      "period": "2024/02 – present",
+      "detail": "Cloud Computing (AWS), Intelligent Agents, Web Development, Cybersecurity (CTF), and Database Systems."
+    },
+    {
+      "org": "China Telecom",
+      "role": "Software Developer",
+      "period": "2021/11 – 2022/02",
+      "detail": "Rebuilt CMS frontend with Vue.js; designed RESTful APIs with Spring Boot and MyBatis."
+    },
+    {
+      "org": "Gillion Technologies",
+      "role": "Software Developer",
+      "period": "2019/12 – 2020/05",
+      "detail": "Enterprise maritime transport management system; scalable frontend/backend and CI/CD pipelines."
+    }
+  ],
+  "skills": [
+    {
+      "group": "Agentic / LLM",
+      "items": ["LangChain", "LangGraph", "MCP", "RAG", "vLLM", "harness engineering"]
+    },
+    {
+      "group": "Engineering",
+      "items": ["Python", "TypeScript", "SQL/Cypher", "Django", "Docker", "Neo4j", "PostgreSQL", "React/Next.js"]
+    },
+    {
+      "group": "Cloud & Delivery",
+      "items": ["AWS", "Azure ML", "REST/microservices", "CI/CD", "Git", "TDD"]
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+# Explicit project name. Without this, compose picks the working-dir
+# basename (`backend`) — which can collide with other compose projects also
+# rooted at a `backend/` dir, producing shared image tags and a destructive
+# `--remove-orphans` blast radius. Namespace everything.
+name: wenxiao
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: wenxiao-db
+    restart: unless-stopped
+    volumes:
+      - ${POSTGRES_DATA_DIR:-./postgres_data}:/var/lib/postgresql/data
+      - ./scripts/db/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+    environment:
+      POSTGRES_DB: wenxiao
+      POSTGRES_USER: wenxiao
+      POSTGRES_PASSWORD: wenxiao
+    ports:
+      # Non-default host port to avoid colliding with other local Postgres
+      # instances. Loopback-only: nothing off-box should reach Postgres directly.
+      - "127.0.0.1:5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wenxiao -d wenxiao -h 127.0.0.1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wenxiao-api
+    restart: unless-stopped
+    command: /usr/src/app/scripts/api/entrypoint.sh
+    volumes:
+      # Source bind so code edits on the host (or a fresh CI checkout) reach
+      # the container without rebuilding the image.
+      - .:/usr/src/app
+      # Django staticfiles persisted on the host so collectstatic output
+      # survives `docker compose down`.
+      - ${WENXIAO_STATIC_DIR:-./staticfiles}:/usr/src/app/staticfiles
+    ports:
+      # API on 8002 (non-default host port to avoid local collisions).
+      # Loopback-only: cloudflared and the Next rewrite both live on this
+      # host; the LAN has no business talking to Django directly.
+      - "127.0.0.1:8002:8000"
+    env_file:
+      - .env
+    environment:
+      - DB_NAME=wenxiao
+      - DB_USER=wenxiao
+      - DB_PASS=wenxiao
+      - DB_SERVICE=wenxiao-db
+      - DB_PORT=5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  hasura:
+    image: hasura/graphql-engine:v2.44.0.cli-migrations-v3
+    container_name: wenxiao-hasura
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://wenxiao:wenxiao@wenxiao-db:5432/wenxiao
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      # :? makes boot fail loudly when the secret is missing — a default or
+      # empty admin secret would expose run_sql (arbitrary SQL) to anyone
+      # who can reach the port.
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_ADMIN_SECRET:?HASURA_ADMIN_SECRET must be set in backend/.env}
+      HASURA_GRAPHQL_ENABLE_TELEMETRY: "false"
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: "public"
+      HASURA_GRAPHQL_METADATA_DIR: /hasura/metadata
+      HASURA_GRAPHQL_JWT_SECRET: '{"type": "HS256", "key": "${JWT_SECRET}", "claims_namespace": "https://hasura.io/jwt/claims"}'
+    volumes:
+      - ./hasura/:/hasura/
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      # Hasura on 8082 (non-default host port to avoid local collisions),
+      # loopback-only (no cloudflared ingress; host-local console access).
+      - "127.0.0.1:8082:8080"

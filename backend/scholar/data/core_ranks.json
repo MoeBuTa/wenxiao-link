@@ -1,0 +1,422 @@
+{
+  "_source": "CORE2023 conference portal + CORE2020 legacy journal portal, verified 2026-06 (see notes)",
+  "_notes": "All conference ranks verified live against the CORE2023 portal CSV export (https://portal.core.edu.au/conf-ranks/?search=<ACRONYM>&by=acronym&source=CORE2023&do=Export); journal ranks verified against the CORE2020 legacy journal portal (https://portal.core.edu.au/jnl-ranks/). Mapping of the profile's venue strings: \"Companion Proceedings of the ACM on Web Conference 2025/2026\" -> WWW (A*); \"2024 IEEE 35th Int. Symp. on Software Reliability Engineering (ISSRE)\" -> ISSRE (A); \"Proceedings of the 15th International Conference on Simulation and Modeling Methodologies\" -> SIMULTECH (CORE2023 C; confirmed the 15th edition = SIMULTECH 2025, Bilbao, full name \"International Conference on Simulation and Modeling Methodologies, Technologies and Applications\" — it is NOT ICSC); \"Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing\" -> EMNLP (A*); \"Journal of Systems and Software, 112614, 2025\" -> JSS (CORE2020 journal rank A — this is the defensible source for the CV's \"CORE A\" claim; CORE no longer maintains journal rankings, ERA2010 also rated JSS A); \"International Conference on Database Systems for Advanced Applications\" -> DASFAA, VERIFIED as CORE2023 B (not A); the three arXiv strings -> Preprint. Caveats: (1) Companion/workshop proceedings of WWW inherit the WWW A* label here — annotate as desired; (2) EMNLP/ACL/NAACL \"Findings\" tracks are not CORE-ranked, so the Findings pattern is Unranked and must precede the plain \"association for computational linguistics\" pattern; (3) UbiComp/IMWUT: CORE2023 lists UbiComp as \"journal published\" (papers appear in Proc. ACM IMWUT, which is absent from the CORE2020 journal list); the last numeric CORE rating is CORE2018 A*, reported here with that caveat; (4) known substring-collision hazards if the owner ever publishes there: PAKDD (B) contains \"knowledge discovery and data mining\" (KDD pattern), ICMLA (C) contains \"international conference on machine learning\", ICSEA (C) contains \"international conference on software engineering\", ICMR contains \"acm international conference on multimedia\" — add more-specific patterns above these if needed; (5) the venues array is in match-priority order: arXiv first, most-specific multiword patterns next, short acronym fallbacks (sigmod, sigkdd, icassp, aaai, ijcai, neurips, interspeech) placed so they only fire when the long-form pattern is absent. Apply patterns top-to-bottom against the lowercased Scholar venue string and take the first hit.",
+  "venues": [
+    {
+      "pattern": "arxiv",
+      "acronym": "arXiv",
+      "fullName": "arXiv preprint server",
+      "rank": "Preprint",
+      "kind": "preprint",
+      "source": "n/a - preprint, not a ranked venue"
+    },
+    {
+      "pattern": "findings of the association for computational linguistics",
+      "acronym": "Findings",
+      "fullName": "Findings of the Association for Computational Linguistics (incl. EMNLP/ACL/NAACL Findings)",
+      "rank": "Unranked",
+      "kind": "conference",
+      "source": "CORE2023 portal has no entry for Findings tracks; only main-track ACL/EMNLP/NAACL are ranked"
+    },
+    {
+      "pattern": "north american chapter of the association for computational linguistics",
+      "acronym": "NAACL",
+      "fullName": "North American Chapter of the Association for Computational Linguistics",
+      "rank": "A",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=NAACL&by=acronym&source=CORE2023&do=Export (id 1648, A)"
+    },
+    {
+      "pattern": "empirical methods in natural language",
+      "acronym": "EMNLP",
+      "fullName": "Conference on Empirical Methods in Natural Language Processing",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=EMNLP&by=acronym&source=CORE2023&do=Export (id 448, A*)"
+    },
+    {
+      "pattern": "annual meeting of the association for computational linguistics",
+      "acronym": "ACL",
+      "fullName": "Annual Meeting of the Association for Computational Linguistics",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=ACL&by=acronym&source=CORE2023&do=Export (id 196, A*)"
+    },
+    {
+      "pattern": "international conference on computational linguistics",
+      "acronym": "COLING",
+      "fullName": "International Conference on Computational Linguistics",
+      "rank": "B",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=COLING&by=acronym&source=CORE2023&do=Export (id 949, B)"
+    },
+    {
+      "pattern": "association for computational linguistics",
+      "acronym": "ACL",
+      "fullName": "Annual Meeting of the Association for Computational Linguistics (fallback pattern; keep after Findings/NAACL)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 196, A*"
+    },
+    {
+      "pattern": "neural information processing systems",
+      "acronym": "NeurIPS",
+      "fullName": "Advances in Neural Information Processing Systems",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=NEURIPS&by=acronym&source=CORE2023&do=Export (id 98, A*)"
+    },
+    {
+      "pattern": "international conference on machine learning",
+      "acronym": "ICML",
+      "fullName": "International Conference on Machine Learning",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=ICML&by=acronym&source=CORE2023&do=Export (id 1121, A*); beware ICMLA (C) contains this substring"
+    },
+    {
+      "pattern": "international conference on learning representations",
+      "acronym": "ICLR",
+      "fullName": "International Conference on Learning Representations",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=ICLR&by=acronym&source=CORE2023&do=Export (id 2273, A*)"
+    },
+    {
+      "pattern": "aaai conference on artificial intelligence",
+      "acronym": "AAAI",
+      "fullName": "AAAI Conference on Artificial Intelligence",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=AAAI&by=acronym&source=CORE2023&do=Export (id 1629, A*)"
+    },
+    {
+      "pattern": "international joint conference on artificial intelligence",
+      "acronym": "IJCAI",
+      "fullName": "International Joint Conference on Artificial Intelligence",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=IJCAI&by=acronym&source=CORE2023&do=Export (id 1313, A*)"
+    },
+    {
+      "pattern": "research and development in information retrieval",
+      "acronym": "SIGIR",
+      "fullName": "ACM SIGIR Conference on Research and Development in Information Retrieval",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=SIGIR&by=acronym&source=CORE2023&do=Export (id 29, A*)"
+    },
+    {
+      "pattern": "sigkdd",
+      "acronym": "KDD",
+      "fullName": "ACM SIGKDD Conference on Knowledge Discovery and Data Mining",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=KDD&by=acronym&source=CORE2023&do=Export (id 26, A*)"
+    },
+    {
+      "pattern": "knowledge discovery and data mining",
+      "acronym": "KDD",
+      "fullName": "ACM SIGKDD Conference on Knowledge Discovery and Data Mining (fallback; beware PAKDD=B also contains this)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 26, A*; PAKDD is id 1667, B — add a 'pacific-asia' pattern above this if ever needed"
+    },
+    {
+      "pattern": "information and knowledge management",
+      "acronym": "CIKM",
+      "fullName": "ACM International Conference on Information and Knowledge Management",
+      "rank": "A",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=CIKM&by=acronym&source=CORE2023&do=Export (id 25, A)"
+    },
+    {
+      "pattern": "web search and data mining",
+      "acronym": "WSDM",
+      "fullName": "ACM International Conference on Web Search and Data Mining",
+      "rank": "A",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=WSDM&by=acronym&source=CORE2023&do=Export (id 31, A)"
+    },
+    {
+      "pattern": "transactions on knowledge and data engineering",
+      "acronym": "TKDE",
+      "fullName": "IEEE Transactions on Knowledge and Data Engineering",
+      "rank": "A*",
+      "kind": "journal",
+      "source": "CORE2020 journal portal https://portal.core.edu.au/jnl-ranks/?search=Knowledge+and+Data+Engineering&by=title&source=all&do=Export (id 415, A*)"
+    },
+    {
+      "pattern": "international conference on data engineering",
+      "acronym": "ICDE",
+      "fullName": "IEEE International Conference on Data Engineering",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=ICDE&by=acronym&source=CORE2023&do=Export (id 986, A*)"
+    },
+    {
+      "pattern": "vldb endowment",
+      "acronym": "VLDB",
+      "fullName": "Proceedings of the VLDB Endowment / International Conference on Very Large Data Bases",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=VLDB&by=acronym&source=CORE2023&do=Export (id 1261, A*)"
+    },
+    {
+      "pattern": "very large data",
+      "acronym": "VLDB",
+      "fullName": "International Conference on Very Large Data Bases (covers 'very large data bases' and 'very large databases')",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 1261, A*"
+    },
+    {
+      "pattern": "acm on management of data",
+      "acronym": "SIGMOD",
+      "fullName": "Proceedings of the ACM on Management of Data (PACMMOD, SIGMOD's journal-style proceedings)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=SIGMOD&by=acronym&source=CORE2023&do=Export (id 56, A*)"
+    },
+    {
+      "pattern": "international conference on management of data",
+      "acronym": "SIGMOD",
+      "fullName": "ACM SIGMOD International Conference on Management of Data",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 56, A*"
+    },
+    {
+      "pattern": "sigmod",
+      "acronym": "SIGMOD",
+      "fullName": "ACM SIGMOD International Conference on Management of Data (acronym fallback)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 56, A*"
+    },
+    {
+      "pattern": "database systems for advanced applications",
+      "acronym": "DASFAA",
+      "fullName": "International Conference on Database Systems for Advanced Applications",
+      "rank": "B",
+      "kind": "conference",
+      "source": "VERIFIED: CORE2023 export https://portal.core.edu.au/conf-ranks/?search=DASFAA&by=acronym&source=CORE2023&do=Export (id 988, rank B — not A)"
+    },
+    {
+      "pattern": "human factors in computing systems",
+      "acronym": "CHI",
+      "fullName": "ACM CHI Conference on Human Factors in Computing Systems",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=CHI&by=acronym&source=CORE2023&do=Export (id 1053, A*)"
+    },
+    {
+      "pattern": "esec/fse",
+      "acronym": "FSE",
+      "fullName": "ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=FSE&by=acronym&source=CORE2023&do=Export (id 52, A*; was ESEC/FSE, renamed FSE 2024)"
+    },
+    {
+      "pattern": "foundations of software engineering",
+      "acronym": "FSE",
+      "fullName": "ACM International Conference on the Foundations of Software Engineering (was ESEC/FSE)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 52, A*"
+    },
+    {
+      "pattern": "proceedings of the acm on software engineering",
+      "acronym": "FSE",
+      "fullName": "Proceedings of the ACM on Software Engineering (PACMSE — FSE/ISSTA journal-style proceedings)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 52, A* (FSE); note ISSTA (A) papers also appear in PACMSE"
+    },
+    {
+      "pattern": "automated software engineering",
+      "acronym": "ASE",
+      "fullName": "IEEE/ACM International Conference on Automated Software Engineering",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=ASE&by=acronym&source=CORE2023&do=Export (id 279, A*); the Springer journal of the same name would also match this pattern"
+    },
+    {
+      "pattern": "software testing and analysis",
+      "acronym": "ISSTA",
+      "fullName": "ACM SIGSOFT International Symposium on Software Testing and Analysis",
+      "rank": "A",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=ISSTA&by=acronym&source=CORE2023&do=Export (id 1412, A)"
+    },
+    {
+      "pattern": "software reliability engineering",
+      "acronym": "ISSRE",
+      "fullName": "IEEE International Symposium on Software Reliability Engineering",
+      "rank": "A",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=ISSRE&by=acronym&source=CORE2023&do=Export (id 1411, A)"
+    },
+    {
+      "pattern": "international conference on software engineering",
+      "acronym": "ICSE",
+      "fullName": "IEEE/ACM International Conference on Software Engineering (keep after ASE/FSE/ISSTA patterns; beware ICSEA=C contains this substring)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=ICSE&by=acronym&source=CORE2023&do=Export (id 1209, A*)"
+    },
+    {
+      "pattern": "journal of systems and software",
+      "acronym": "JSS",
+      "fullName": "Journal of Systems and Software",
+      "rank": "A",
+      "kind": "journal",
+      "source": "CORE2020 journal portal https://portal.core.edu.au/jnl-ranks/?search=Journal+of+Systems+and+Software&by=title&source=all&do=Export (id 351, A) — defensible basis for the CV's 'CORE A' claim; CORE journal rankings are legacy (last updated 2020), ERA2010 also rated JSS A"
+    },
+    {
+      "pattern": "acm international conference on multimedia",
+      "acronym": "ACMMM",
+      "fullName": "ACM Multimedia (ACM International Conference on Multimedia)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=MM&by=acronym&source=CORE2023&do=Export (id 37, ACM Multimedia, A*); beware ICMR ('...Multimedia Retrieval') contains this substring"
+    },
+    {
+      "pattern": "acm multimedia",
+      "acronym": "ACMMM",
+      "fullName": "ACM Multimedia (alternate spelling)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 37, A*"
+    },
+    {
+      "pattern": "international conference on robotics and automation",
+      "acronym": "ICRA",
+      "fullName": "IEEE International Conference on Robotics and Automation",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=ICRA&by=acronym&source=CORE2023&do=Export (id 2051, A*)"
+    },
+    {
+      "pattern": "intelligent robots and systems",
+      "acronym": "IROS",
+      "fullName": "IEEE/RSJ International Conference on Intelligent Robots and Systems",
+      "rank": "A",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=IROS&by=acronym&source=CORE2023&do=Export (id 792, A)"
+    },
+    {
+      "pattern": "acoustics, speech and signal processing",
+      "acronym": "ICASSP",
+      "fullName": "IEEE International Conference on Acoustics, Speech and Signal Processing",
+      "rank": "B",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=ICASSP&by=acronym&source=CORE2023&do=Export (id 2042, B)"
+    },
+    {
+      "pattern": "acoustics, speech, and signal processing",
+      "acronym": "ICASSP",
+      "fullName": "IEEE International Conference on Acoustics, Speech, and Signal Processing (Oxford-comma spelling)",
+      "rank": "B",
+      "kind": "conference",
+      "source": "CORE2023 export, id 2042, B"
+    },
+    {
+      "pattern": "icassp",
+      "acronym": "ICASSP",
+      "fullName": "IEEE ICASSP (acronym fallback, e.g. 'ICASSP 2024-2024 IEEE...')",
+      "rank": "B",
+      "kind": "conference",
+      "source": "CORE2023 export, id 2042, B"
+    },
+    {
+      "pattern": "interspeech",
+      "acronym": "INTERSPEECH",
+      "fullName": "Interspeech (ISCA Annual Conference)",
+      "rank": "A",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=INTERSPEECH&by=acronym&source=CORE2023&do=Export (id 494, A)"
+    },
+    {
+      "pattern": "world wide web conference",
+      "acronym": "WWW",
+      "fullName": "International World Wide Web Conference (TheWebConf)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=WWW&by=acronym&source=CORE2023&do=Export (id 1548, A*)"
+    },
+    {
+      "pattern": "web conference",
+      "acronym": "WWW",
+      "fullName": "The Web Conference / ACM Web Conference — matches 'Companion Proceedings of the ACM on Web Conference 2025/2026' (companion = workshop/short track; rank inherited from main conference)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 1548, A*"
+    },
+    {
+      "pattern": "proceedings of the www",
+      "acronym": "WWW",
+      "fullName": "The Web Conference (alternate spelling)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 1548, A*"
+    },
+    {
+      "pattern": "pervasive computing and communications",
+      "acronym": "PerCom",
+      "fullName": "IEEE International Conference on Pervasive Computing and Communications",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=PERCOM&by=acronym&source=CORE2023&do=Export (id 669, A*)"
+    },
+    {
+      "pattern": "interactive, mobile, wearable and ubiquitous technologies",
+      "acronym": "IMWUT",
+      "fullName": "Proceedings of the ACM on Interactive, Mobile, Wearable and Ubiquitous Technologies (UbiComp's publication venue)",
+      "rank": "A*",
+      "kind": "journal",
+      "source": "Caveat: IMWUT absent from CORE2020 journal list; CORE2023 lists UbiComp as 'journal published' (id 1825); last numeric CORE rating is CORE2018 A* (https://portal.core.edu.au/conf-ranks/?search=UBICOMP&by=acronym&source=CORE2018&do=Export) — A* reported on that basis"
+    },
+    {
+      "pattern": "pervasive and ubiquitous computing",
+      "acronym": "UbiComp",
+      "fullName": "ACM International Joint Conference on Pervasive and Ubiquitous Computing",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2018 export (id 1825, A*); CORE2023 status is 'journal published' (papers appear in IMWUT)"
+    },
+    {
+      "pattern": "international conference on simulation and modeling",
+      "acronym": "SIMULTECH",
+      "fullName": "International Conference on Simulation and Modeling Methodologies, Technologies and Applications",
+      "rank": "C",
+      "kind": "conference",
+      "source": "CORE2023 export https://portal.core.edu.au/conf-ranks/?search=SIMULTECH&by=acronym&source=CORE2023&do=Export (id 2298, C); identity confirmed — '15th Int. Conf. on Simulation and Modeling Methodologies' = SIMULTECH 2025, Bilbao (wikicfp.com eventid=182697, simultech.scitevents.org)"
+    },
+    {
+      "pattern": "neurips",
+      "acronym": "NeurIPS",
+      "fullName": "NeurIPS (acronym fallback)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 98, A*"
+    },
+    {
+      "pattern": "ijcai",
+      "acronym": "IJCAI",
+      "fullName": "IJCAI (acronym fallback)",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 1313, A*"
+    },
+    {
+      "pattern": "aaai",
+      "acronym": "AAAI",
+      "fullName": "AAAI (acronym fallback; keep last to avoid matching other venues containing 'aaai')",
+      "rank": "A*",
+      "kind": "conference",
+      "source": "CORE2023 export, id 1629, A*"
+    }
+  ]
+}

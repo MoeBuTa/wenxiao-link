@@ -1,0 +1,14 @@
+.DS_Store
+node_modules/
+.next/
+*.tsbuildinfo
+__pycache__/
+*.pyc
+*.log
+
+# Per-host secrets — CI writes this from repo secrets on first deploy.
+backend/.env
+
+# Local docker-compose volume fallbacks (prod uses /Users/wenxiao/wenxiao-link-data).
+backend/postgres_data/
+backend/staticfiles/

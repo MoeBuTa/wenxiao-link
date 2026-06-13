@@ -27,6 +27,16 @@ import {
 import type { NewsItem, SiteProfile } from "../lib/types";
 import { renderInlineMd } from "./inline-md";
 
+// Institution logos for the Education list. Self-hosted under
+// public/edu-logos/; the Avatar falls back to the institution's initials
+// when there is no logo file for it.
+function eduLogo(institution: string): string | undefined {
+  const s = institution.toLowerCase();
+  if (s.includes("western australia")) return "/edu-logos/uwa.png";
+  if (s.includes("wellington") || s.includes("victoria university")) return "/edu-logos/vuw.png";
+  return undefined;
+}
+
 function Section({
   id,
   title,
@@ -169,18 +179,30 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
           p={4}
         >
           {profile.education.map((e) => (
-            <Box key={`${e.institution}-${e.degree}`} borderLeftWidth="2px" borderColor="border.default" pl={4}>
-              <Text fontWeight="600" color="fg.default">
-                {e.degree}
-              </Text>
-              <Text fontSize="sm" color="fg.muted">
-                {e.institution}
-              </Text>
-              <Text fontSize="xs" color="fg.faint">
-                {e.period}
-                {e.detail ? ` · ${e.detail}` : ""}
-              </Text>
-            </Box>
+            <Flex key={`${e.institution}-${e.degree}`} gap={3} align="flex-start">
+              <Avatar
+                src={eduLogo(e.institution)}
+                name={e.institution}
+                boxSize="40px"
+                borderRadius="md"
+                flexShrink={0}
+                bg="bg.subtle"
+                color="fg.muted"
+                sx={{ "& img": { objectFit: "contain" } }}
+              />
+              <Box minW={0}>
+                <Text fontWeight="600" color="fg.default">
+                  {e.degree}
+                </Text>
+                <Text fontSize="sm" color="fg.muted">
+                  {e.institution}
+                </Text>
+                <Text fontSize="xs" color="fg.faint">
+                  {e.period}
+                  {e.detail ? ` · ${e.detail}` : ""}
+                </Text>
+              </Box>
+            </Flex>
           ))}
         </VStack>
       </Section>

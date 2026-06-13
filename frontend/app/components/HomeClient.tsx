@@ -26,6 +26,7 @@ import {
 
 import type { NewsItem, SiteProfile } from "../lib/types";
 import { renderInlineMd } from "./inline-md";
+import { AddNewButton, EditProfileButton, EditableItem } from "./edit-mode/EditableItem";
 
 // Logos for schools and employers, self-hosted under public/logos/. The
 // Avatar falls back to the org's initials when there is no logo file for it.
@@ -43,16 +44,21 @@ function orgLogo(name: string): string | undefined {
 function Section({
   id,
   title,
+  action,
   children,
 }: {
   id: string;
   title: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <VStack as="section" id={id} align="stretch" spacing={4} w="full">
       <Box>
-        <Heading size="md">{title}</Heading>
+        <Flex align="center" gap={3}>
+          <Heading size="md">{title}</Heading>
+          {action}
+        </Flex>
         <Box w="44px" h="3px" bg="accent" borderRadius="full" mt={2} />
       </Box>
       {children}
@@ -132,7 +138,7 @@ function IdentityCard({ profile }: { profile: SiteProfile }) {
 
 function NewsSection({ news }: { news: NewsItem[] }) {
   return (
-    <Section id="news" title="News">
+    <Section id="news" title="News" action={<AddNewButton resource="news" label="Add" />}>
       <VStack
         align="stretch"
         spacing={0}
@@ -144,22 +150,23 @@ function NewsSection({ news }: { news: NewsItem[] }) {
         bg="bg.card"
       >
         {news.map((item, i) => (
-          <Flex
-            key={`${item.date}-${i}`}
-            gap={3}
-            px={4}
-            py={3}
-            borderBottomWidth={i === news.length - 1 ? 0 : "1px"}
-            borderColor="border.muted"
-            align="baseline"
-          >
-            <Badge bg="bg.subtle" color="ocean" flexShrink={0} sx={{ fontVariantNumeric: "tabular-nums" }}>
-              {item.date}
-            </Badge>
-            <Text fontSize="sm" color="fg.default">
-              {renderInlineMd(item.text)}
-            </Text>
-          </Flex>
+          <EditableItem key={item.id} resource="news" id={item.id} seed={item}>
+            <Flex
+              gap={3}
+              px={4}
+              py={3}
+              borderBottomWidth={i === news.length - 1 ? 0 : "1px"}
+              borderColor="border.muted"
+              align="baseline"
+            >
+              <Badge bg="bg.subtle" color="ocean" flexShrink={0} sx={{ fontVariantNumeric: "tabular-nums" }}>
+                {item.date}
+              </Badge>
+              <Text fontSize="sm" color="fg.default">
+                {renderInlineMd(item.text)}
+              </Text>
+            </Flex>
+          </EditableItem>
         ))}
       </VStack>
     </Section>
@@ -169,7 +176,7 @@ function NewsSection({ news }: { news: NewsItem[] }) {
 function EducationExperience({ profile }: { profile: SiteProfile }) {
   return (
     <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10} w="full">
-      <Section id="education" title="Education">
+      <Section id="education" title="Education" action={<AddNewButton resource="education" label="Add" />}>
         <VStack
           align="stretch"
           spacing={4}
@@ -182,34 +189,36 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
           p={4}
         >
           {profile.education.map((e) => (
-            <Flex key={`${e.institution}-${e.degree}`} gap={3} align="flex-start">
-              <Avatar
-                src={orgLogo(e.institution)}
-                name={e.institution}
-                boxSize="40px"
-                borderRadius="md"
-                flexShrink={0}
-                bg="bg.subtle"
-                color="fg.muted"
-                sx={{ "& img": { objectFit: "contain" } }}
-              />
-              <Box minW={0}>
-                <Text fontWeight="600" color="fg.default">
-                  {e.degree}
-                </Text>
-                <Text fontSize="sm" color="fg.muted">
-                  {e.institution}
-                </Text>
-                <Text fontSize="xs" color="fg.faint">
-                  {e.period}
-                  {e.detail ? ` · ${e.detail}` : ""}
-                </Text>
-              </Box>
-            </Flex>
+            <EditableItem key={e.id} resource="education" id={e.id} seed={e}>
+              <Flex gap={3} align="flex-start">
+                <Avatar
+                  src={orgLogo(e.institution)}
+                  name={e.institution}
+                  boxSize="40px"
+                  borderRadius="md"
+                  flexShrink={0}
+                  bg="bg.subtle"
+                  color="fg.muted"
+                  sx={{ "& img": { objectFit: "contain" } }}
+                />
+                <Box minW={0}>
+                  <Text fontWeight="600" color="fg.default">
+                    {e.degree}
+                  </Text>
+                  <Text fontSize="sm" color="fg.muted">
+                    {e.institution}
+                  </Text>
+                  <Text fontSize="xs" color="fg.faint">
+                    {e.period}
+                    {e.detail ? ` · ${e.detail}` : ""}
+                  </Text>
+                </Box>
+              </Flex>
+            </EditableItem>
           ))}
         </VStack>
       </Section>
-      <Section id="experience" title="Experience">
+      <Section id="experience" title="Experience" action={<AddNewButton resource="experience" label="Add" />}>
         <VStack
           align="stretch"
           spacing={4}
@@ -222,34 +231,36 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
           p={4}
         >
           {profile.experience.map((e) => (
-            <Flex key={`${e.org}-${e.role}`} gap={3} align="flex-start">
-              <Avatar
-                src={orgLogo(e.org)}
-                name={e.org}
-                boxSize="40px"
-                borderRadius="md"
-                flexShrink={0}
-                bg="bg.subtle"
-                color="fg.muted"
-                sx={{ "& img": { objectFit: "contain" } }}
-              />
-              <Box minW={0}>
-                <Text fontWeight="600" color="fg.default">
-                  {e.role}
-                </Text>
-                <Text fontSize="sm" color="fg.muted">
-                  {e.org}
-                </Text>
-                <Text fontSize="xs" color="fg.faint">
-                  {e.period}
-                </Text>
-                {e.detail ? (
-                  <Text fontSize="sm" color="fg.muted" mt={1}>
-                    {e.detail}
+            <EditableItem key={e.id} resource="experience" id={e.id} seed={e}>
+              <Flex gap={3} align="flex-start">
+                <Avatar
+                  src={orgLogo(e.org)}
+                  name={e.org}
+                  boxSize="40px"
+                  borderRadius="md"
+                  flexShrink={0}
+                  bg="bg.subtle"
+                  color="fg.muted"
+                  sx={{ "& img": { objectFit: "contain" } }}
+                />
+                <Box minW={0}>
+                  <Text fontWeight="600" color="fg.default">
+                    {e.role}
                   </Text>
-                ) : null}
-              </Box>
-            </Flex>
+                  <Text fontSize="sm" color="fg.muted">
+                    {e.org}
+                  </Text>
+                  <Text fontSize="xs" color="fg.faint">
+                    {e.period}
+                  </Text>
+                  {e.detail ? (
+                    <Text fontSize="sm" color="fg.muted" mt={1}>
+                      {e.detail}
+                    </Text>
+                  ) : null}
+                </Box>
+              </Flex>
+            </EditableItem>
           ))}
         </VStack>
       </Section>
@@ -259,23 +270,25 @@ function EducationExperience({ profile }: { profile: SiteProfile }) {
 
 function Skills({ profile }: { profile: SiteProfile }) {
   return (
-    <Section id="skills" title="Skills">
+    <Section id="skills" title="Skills" action={<AddNewButton resource="skills" label="Add" />}>
       <VStack align="stretch" spacing={3}>
         {profile.skills.map((group) => (
-          <Box key={group.group}>
-            <Text fontSize="xs" fontWeight="700" color="ocean" mb={2} textTransform="uppercase">
-              {group.group}
-            </Text>
-            <Wrap spacing={2}>
-              {group.items.map((item) => (
-                <WrapItem key={item}>
-                  <Tag size="md" bg="bg.card" color="fg.muted" borderWidth="1px" borderColor="border.muted">
-                    {item}
-                  </Tag>
-                </WrapItem>
-              ))}
-            </Wrap>
-          </Box>
+          <EditableItem key={group.id} resource="skills" id={group.id} seed={group}>
+            <Box>
+              <Text fontSize="xs" fontWeight="700" color="ocean" mb={2} textTransform="uppercase">
+                {group.group}
+              </Text>
+              <Wrap spacing={2}>
+                {group.items.map((item) => (
+                  <WrapItem key={item}>
+                    <Tag size="md" bg="bg.card" color="fg.muted" borderWidth="1px" borderColor="border.muted">
+                      {item}
+                    </Tag>
+                  </WrapItem>
+                ))}
+              </Wrap>
+            </Box>
+          </EditableItem>
         ))}
       </VStack>
     </Section>
@@ -284,7 +297,7 @@ function Skills({ profile }: { profile: SiteProfile }) {
 
 function AboutSection({ profile }: { profile: SiteProfile }) {
   return (
-    <Section id="about" title="About">
+    <Section id="about" title="About" action={<EditProfileButton />}>
       <VStack align="stretch" spacing={3}>
         {profile.summary.map((paragraph, i) => (
           <Text key={i} color="fg.default" lineHeight="1.7">

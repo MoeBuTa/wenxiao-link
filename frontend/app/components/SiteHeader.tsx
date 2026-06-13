@@ -28,6 +28,7 @@ import { useEffect } from "react";
 import { FiChevronDown, FiMenu, FiUser, FiX } from "react-icons/fi";
 
 import { useAuth } from "../lib/auth-context";
+import { useEditMode } from "./edit-mode/edit-mode-context";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
@@ -65,6 +66,7 @@ function NavLink({ href, label, onClick }: { href: string; label: string; onClic
 
 function AuthControl({ onNavigate }: { onNavigate?: () => void }) {
   const { user, loading, logout } = useAuth();
+  const { toggle: toggleEdit } = useEditMode();
   const router = useRouter();
   if (loading) return null;
 
@@ -103,8 +105,16 @@ function AuthControl({ onNavigate }: { onNavigate?: () => void }) {
       <MenuList>
         {user.isSuperuser ? (
           <>
-            <MenuItem as={NextLink} href="/admin" onClick={onNavigate}>
-              ⚙ Content admin
+            <MenuItem
+              onClick={() => {
+                onNavigate?.();
+                toggleEdit();
+              }}
+            >
+              ✎ Edit mode
+            </MenuItem>
+            <MenuItem as={NextLink} href="/admin/blog" onClick={onNavigate}>
+              📝 Blog editor
             </MenuItem>
             <MenuDivider />
           </>

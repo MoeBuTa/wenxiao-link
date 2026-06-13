@@ -30,7 +30,7 @@ function FieldGrid({
   setDraft: (d: Record<string, any>) => void;
 }) {
   // Full-width for long fields; two columns for short scalar fields.
-  const wide = (f: FieldDef) => f.type === "markdown" || f.type === "textarea";
+  const wide = (f: FieldDef) => f.type === "markdown" || f.type === "textarea" || f.type === "tags";
   return (
     <VStack align="stretch" spacing={3}>
       <SimpleGrid columns={{ base: 1, md: 2 }} spacing={3}>

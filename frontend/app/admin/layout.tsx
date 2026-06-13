@@ -17,16 +17,9 @@ import { usePathname } from "next/navigation";
 
 import { useAuth } from "../lib/auth-context";
 
-const ADMIN_NAV = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/profile", label: "Profile & About" },
-  { href: "/admin/news", label: "News" },
-  { href: "/admin/education", label: "Education" },
-  { href: "/admin/experience", label: "Experience" },
-  { href: "/admin/skills", label: "Skills" },
-  { href: "/admin/projects", label: "Projects" },
-  { href: "/admin/blog", label: "Blog" },
-];
+// All other content is edited inline on the live site (toggle Edit mode).
+// Blog keeps a dedicated editor here for its markdown body and drafts.
+const ADMIN_NAV = [{ href: "/admin/blog", label: "Blog" }];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();

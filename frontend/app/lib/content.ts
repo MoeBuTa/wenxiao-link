@@ -34,13 +34,24 @@ async function apiGet<T>(endpoint: string, revalidate = 30): Promise<T | null> {
 
 // ---- File fallbacks ---------------------------------------------------------
 
+// The committed JSON fallbacks have no DB ids; synthesize index-based ones so
+// list keys stay stable when the backend is unreachable (edit mode needs the
+// live backend, so these ids are only ever used as React keys).
 function siteProfileFromFile(): SiteProfile {
-  return readJson<SiteProfile>("profile.json");
+  const p = readJson<SiteProfile>("profile.json");
+  return {
+    ...p,
+    education: p.education.map((e, i) => ({ ...e, id: i })),
+    experience: p.experience.map((e, i) => ({ ...e, id: i })),
+    skills: p.skills.map((s, i) => ({ ...s, id: i })),
+  };
 }
 
 function newsFromFile(): NewsItem[] {
   const items = readJson<{ news: NewsItem[] }>("news.json").news;
-  return [...items].sort((a, b) => (a.date < b.date ? 1 : -1));
+  return [...items]
+    .sort((a, b) => (a.date < b.date ? 1 : -1))
+    .map((n, i) => ({ ...n, id: i }));
 }
 
 // ---- Home page (profile + news + education/experience/skills) --------------
@@ -73,7 +84,7 @@ export async function getSiteContent(): Promise<{ profile: SiteProfile; news: Ne
 export async function getProjects(): Promise<Project[]> {
   const data = await apiGet<Project[]>("/projects/");
   if (data) return data;
-  return readJson<{ projects: Project[] }>("projects.json").projects;
+  return readJson<{ projects: Project[] }>("projects.json").projects.map((p, i) => ({ ...p, id: i }));
 }
 
 // ---- Blog -------------------------------------------------------------------

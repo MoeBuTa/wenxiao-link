@@ -32,6 +32,7 @@ import {
 
 import type { Project } from "../lib/types";
 import { PaginatedGrid } from "./PaginatedGrid";
+import { AddNewButton, EditableItem } from "./edit-mode/EditableItem";
 
 // SVG cover icon chosen per project — name first, then a tag keyword.
 function iconForProject(p: Project): IconType {
@@ -122,9 +123,10 @@ export function ProjectsClient({ projects }: { projects: Project[] }) {
 
   return (
     <Container maxW="6xl" py={{ base: 8, md: 12 }} px={{ base: 6, md: 10 }}>
-      <Heading size="lg" mb={2}>
-        Projects
-      </Heading>
+      <Flex align="center" gap={3} mb={2}>
+        <Heading size="lg">Projects</Heading>
+        <AddNewButton resource="projects" label="Add project" />
+      </Flex>
       <Text color="fg.muted" fontSize="sm" mb={8}>
         Open-source research systems and engineering projects — more on{" "}
         <Link href="https://github.com/MoeBuTa" isExternal>
@@ -134,7 +136,11 @@ export function ProjectsClient({ projects }: { projects: Project[] }) {
       </Text>
       <PaginatedGrid
         items={sorted}
-        renderItem={(p, i) => <ProjectCard key={p.name} project={p} index={i} />}
+        renderItem={(p, i) => (
+          <EditableItem key={p.id} resource="projects" id={p.id} seed={p}>
+            <ProjectCard project={p} index={i} />
+          </EditableItem>
+        )}
       />
     </Container>
   );

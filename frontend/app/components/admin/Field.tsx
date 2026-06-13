@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  Box,
-  FormLabel,
-  Input,
-  Switch,
-  Text,
-  Textarea,
-  VStack,
-} from "@chakra-ui/react";
+import { FormLabel, Input, Switch, Text, Textarea, VStack } from "@chakra-ui/react";
+import { useEffect, useRef, useState } from "react";
 
 import { MarkdownField } from "./MarkdownField";
 
@@ -23,6 +16,53 @@ export type FieldDef = {
   rows?: number;
 };
 
+// Comma-separated tag editor. Keeps a raw text buffer so typing a space or a
+// trailing comma is preserved (the old version re-normalized on every
+// keystroke, which ate spaces/commas and jumped the cursor to the end).
+// Rendered as a full-width multi-line textarea for breathing room.
+export function TagsInput({
+  value,
+  onChange,
+  rows = 3,
+  placeholder,
+}: {
+  value: unknown;
+  onChange: (v: string[]) => void;
+  rows?: number;
+  placeholder?: string;
+}) {
+  const ext = Array.isArray(value) ? (value as string[]).join(", ") : "";
+  const [raw, setRaw] = useState(ext);
+  const lastEmitted = useRef(ext);
+
+  // Resync only when the value changes from outside our own edits (e.g. the
+  // drawer re-seeds with a different item) — never mid-typing.
+  useEffect(() => {
+    if (ext !== lastEmitted.current) {
+      setRaw(ext);
+      lastEmitted.current = ext;
+    }
+  }, [ext]);
+
+  const handle = (s: string) => {
+    setRaw(s);
+    const parsed = s.split(",").map((t) => t.trim()).filter(Boolean);
+    lastEmitted.current = parsed.join(", ");
+    onChange(parsed);
+  };
+
+  return (
+    <Textarea
+      value={raw}
+      onChange={(e) => handle(e.target.value)}
+      rows={rows}
+      placeholder={placeholder ?? "comma, separated, values"}
+      bg="bg.surface"
+      w="full"
+    />
+  );
+}
+
 export function Field({
   def,
   value,
@@ -33,7 +73,7 @@ export function Field({
   onChange: (v: any) => void;
 }) {
   return (
-    <VStack align="stretch" spacing={1}>
+    <VStack align="stretch" spacing={1} w="full">
       {def.type === "bool" ? (
         <Switch
           isChecked={Boolean(value)}
@@ -65,13 +105,14 @@ export function Field({
           value={value ?? ""}
           placeholder={def.placeholder}
           onChange={(e) => onChange(e.target.value)}
-          rows={def.rows ?? 3}
+          rows={def.rows ?? 6}
           bg="bg.surface"
+          w="full"
         />
       ) : null}
 
       {def.type === "markdown" ? (
-        <MarkdownField value={value ?? ""} onChange={onChange} rows={def.rows ?? 3} />
+        <MarkdownField value={value ?? ""} onChange={onChange} rows={def.rows ?? 8} />
       ) : null}
 
       {def.type === "number" ? (
@@ -87,20 +128,7 @@ export function Field({
       ) : null}
 
       {def.type === "tags" ? (
-        <Input
-          size="sm"
-          value={Array.isArray(value) ? value.join(", ") : ""}
-          placeholder={def.placeholder ?? "comma, separated, values"}
-          onChange={(e) =>
-            onChange(
-              e.target.value
-                .split(",")
-                .map((s) => s.trim())
-                .filter(Boolean),
-            )
-          }
-          bg="bg.surface"
-        />
+        <TagsInput value={value} onChange={onChange} rows={def.rows ?? 3} placeholder={def.placeholder} />
       ) : null}
 
       {def.help ? (

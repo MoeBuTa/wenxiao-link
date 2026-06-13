@@ -29,36 +29,45 @@ export type PublicationsPayload = {
 };
 
 export type NewsItem = {
+  id: number;
   date: string;
   text: string;
 };
 
 export type Project = {
+  id: number;
   name: string;
   description: string;
   tags: string[];
   repoUrl: string;
   stars?: number;
   highlight?: boolean;
+  order?: number;
 };
 
 export type EducationItem = {
+  id: number;
   institution: string;
   degree: string;
   period: string;
   detail?: string;
+  order?: number;
 };
 
 export type ExperienceItem = {
+  id: number;
   org: string;
   role: string;
   period: string;
   detail?: string;
+  order?: number;
 };
 
 export type SkillGroup = {
+  id: number;
   group: string;
   items: string[];
+  order?: number;
 };
 
 export type SiteProfile = {

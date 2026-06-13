@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 
 import { ApiError } from "../../lib/api";
 import { profileGet, profilePatch } from "../../lib/admin-client";
+import { TagsInput } from "./Field";
 
 type ProfileData = {
   name: string;
@@ -46,7 +47,13 @@ function Labeled({ label, help, children }: { label: string; help?: string; chil
   );
 }
 
-export function ProfileEditor() {
+export function ProfileEditor({
+  onSaved,
+  embedded,
+}: {
+  onSaved?: () => void;
+  embedded?: boolean;
+} = {}) {
   const [data, setData] = useState<ProfileData | null>(null);
   const [busy, setBusy] = useState(false);
   const toast = useToast();
@@ -86,6 +93,7 @@ export function ProfileEditor() {
       });
       setData(updated);
       toast({ status: "success", title: "Profile saved", duration: 1500 });
+      onSaved?.();
     } catch (err) {
       toast({ status: "error", title: err instanceof ApiError ? err.message : "Save failed" });
     } finally {
@@ -94,6 +102,60 @@ export function ProfileEditor() {
   };
 
   const inputBg = { bg: "bg.surface" };
+
+  const form = (
+    <VStack align="stretch" spacing={4}>
+      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+        <Labeled label="Name">
+          <Input {...inputBg} value={data.name} onChange={(e) => set({ name: e.target.value })} />
+        </Labeled>
+        <Labeled label="Title">
+          <Input {...inputBg} value={data.title} onChange={(e) => set({ title: e.target.value })} />
+        </Labeled>
+        <Labeled label="Affiliation">
+          <Input {...inputBg} value={data.affiliation} onChange={(e) => set({ affiliation: e.target.value })} />
+        </Labeled>
+        <Labeled label="Email">
+          <Input {...inputBg} value={data.email} onChange={(e) => set({ email: e.target.value })} />
+        </Labeled>
+      </SimpleGrid>
+
+      <Labeled label="Research direction (hero tagline)">
+        <Textarea {...inputBg} rows={3} value={data.researchDirection} onChange={(e) => set({ researchDirection: e.target.value })} />
+      </Labeled>
+
+      <Labeled label="About summary" help="Separate paragraphs with a blank line.">
+        <Textarea {...inputBg} rows={10} value={data.summaryText} onChange={(e) => set({ summaryText: e.target.value })} />
+      </Labeled>
+
+      <Labeled label="Research interests" help="Comma-separated.">
+        <TagsInput value={data.interests} onChange={(v) => set({ interests: v })} rows={2} />
+      </Labeled>
+
+      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+        <Labeled label="GitHub URL">
+          <Input {...inputBg} value={data.links.github} onChange={(e) => setLink("github", e.target.value)} />
+        </Labeled>
+        <Labeled label="LinkedIn URL">
+          <Input {...inputBg} value={data.links.linkedin} onChange={(e) => setLink("linkedin", e.target.value)} />
+        </Labeled>
+        <Labeled label="Google Scholar URL">
+          <Input {...inputBg} value={data.links.scholar} onChange={(e) => setLink("scholar", e.target.value)} />
+        </Labeled>
+        <Labeled label="CV path/URL" help="e.g. /cv.pdf">
+          <Input {...inputBg} value={data.links.cv} onChange={(e) => setLink("cv", e.target.value)} />
+        </Labeled>
+      </SimpleGrid>
+
+      <Box>
+        <Button colorScheme="orange" onClick={() => void save()} isLoading={busy}>
+          Save profile
+        </Button>
+      </Box>
+    </VStack>
+  );
+
+  if (embedded) return form;
 
   return (
     <VStack align="stretch" spacing={6}>
@@ -105,61 +167,7 @@ export function ProfileEditor() {
       </Box>
 
       <Box borderWidth="1px" borderColor="border.muted" borderRadius="lg" bg="bg.card" p={5}>
-        <VStack align="stretch" spacing={4}>
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-            <Labeled label="Name">
-              <Input {...inputBg} value={data.name} onChange={(e) => set({ name: e.target.value })} />
-            </Labeled>
-            <Labeled label="Title">
-              <Input {...inputBg} value={data.title} onChange={(e) => set({ title: e.target.value })} />
-            </Labeled>
-            <Labeled label="Affiliation">
-              <Input {...inputBg} value={data.affiliation} onChange={(e) => set({ affiliation: e.target.value })} />
-            </Labeled>
-            <Labeled label="Email">
-              <Input {...inputBg} value={data.email} onChange={(e) => set({ email: e.target.value })} />
-            </Labeled>
-          </SimpleGrid>
-
-          <Labeled label="Research direction (hero tagline)">
-            <Textarea {...inputBg} rows={2} value={data.researchDirection} onChange={(e) => set({ researchDirection: e.target.value })} />
-          </Labeled>
-
-          <Labeled label="About summary" help="Separate paragraphs with a blank line.">
-            <Textarea {...inputBg} rows={8} value={data.summaryText} onChange={(e) => set({ summaryText: e.target.value })} />
-          </Labeled>
-
-          <Labeled label="Research interests" help="Comma-separated.">
-            <Input
-              {...inputBg}
-              value={data.interests.join(", ")}
-              onChange={(e) =>
-                set({ interests: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })
-              }
-            />
-          </Labeled>
-
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-            <Labeled label="GitHub URL">
-              <Input {...inputBg} value={data.links.github} onChange={(e) => setLink("github", e.target.value)} />
-            </Labeled>
-            <Labeled label="LinkedIn URL">
-              <Input {...inputBg} value={data.links.linkedin} onChange={(e) => setLink("linkedin", e.target.value)} />
-            </Labeled>
-            <Labeled label="Google Scholar URL">
-              <Input {...inputBg} value={data.links.scholar} onChange={(e) => setLink("scholar", e.target.value)} />
-            </Labeled>
-            <Labeled label="CV path/URL" help="e.g. /cv.pdf">
-              <Input {...inputBg} value={data.links.cv} onChange={(e) => setLink("cv", e.target.value)} />
-            </Labeled>
-          </SimpleGrid>
-
-          <Box>
-            <Button colorScheme="orange" onClick={() => void save()} isLoading={busy}>
-              Save profile
-            </Button>
-          </Box>
-        </VStack>
+        {form}
       </Box>
     </VStack>
   );

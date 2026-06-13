@@ -121,7 +121,7 @@ export function EditDrawer() {
                     Delete
                   </Button>
                 ) : null}
-                <Button variant="outline" colorScheme="orange" onClick={closeDrawer} isDisabled={busy}>
+                <Button bg="gray.600" color="white" _hover={{ bg: "gray.500" }} onClick={closeDrawer} isDisabled={busy}>
                   Cancel
                 </Button>
               </HStack>

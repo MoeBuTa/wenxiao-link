@@ -155,7 +155,7 @@ export function ProfileEditor({
           Save profile
         </Button>
         {onCancel ? (
-          <Button variant="outline" onClick={onCancel} isDisabled={busy}>
+          <Button bg="gray.600" color="white" _hover={{ bg: "gray.500" }} onClick={onCancel} isDisabled={busy}>
             Cancel
           </Button>
         ) : null}

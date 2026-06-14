@@ -6,6 +6,7 @@ import {
   Container,
   Divider,
   Flex,
+  HStack,
   Heading,
   Icon,
   Link,
@@ -18,9 +19,12 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useEffect, useState } from "react";
+import { FaRegEye } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+import { getBlogStats } from "../lib/stats";
 import { teaserForTags } from "../lib/teaser";
 import type { BlogPostMeta } from "../lib/types";
 
@@ -67,6 +71,18 @@ const components = {
 
 export function BlogPostClient({ meta, content }: { meta: BlogPostMeta; content: string }) {
   const { gradient, Icon: CoverIcon } = teaserForTags(meta.tags);
+  const [views, setViews] = useState<number | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    getBlogStats()
+      .then((m) => alive && setViews(m[meta.slug] ?? 0))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [meta.slug]);
+
   return (
     <Container maxW="3xl" py={{ base: 8, md: 12 }} px={{ base: 6, md: 10 }}>
       <Link as={NextLink} href="/blog" fontSize="sm" color="fg.muted">
@@ -86,9 +102,15 @@ export function BlogPostClient({ meta, content }: { meta: BlogPostMeta; content:
       <Heading size="xl" mb={2}>
         {meta.title}
       </Heading>
-      <Text fontSize="sm" color="fg.faint" mb={2}>
-        {meta.date}
-      </Text>
+      <HStack spacing={2} fontSize="sm" color="fg.faint" mb={2}>
+        <Text>{meta.date}</Text>
+        {views !== null ? (
+          <HStack spacing={1}>
+            <Icon as={FaRegEye} boxSize={3.5} />
+            <Text>{views.toLocaleString()} views</Text>
+          </HStack>
+        ) : null}
+      </HStack>
       {meta.tags.length > 0 ? (
         <Wrap spacing={2} mb={6}>
           {meta.tags.map((tag) => (

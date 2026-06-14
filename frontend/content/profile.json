@@ -1,19 +1,20 @@
 {
   "name": "Wenxiao Zhang",
-  "title": "PhD Candidate in Computer Science · AI Engineer · Data Scientist",
+  "title": "PhD Candidate · AI Engineer · Data Scientist",
   "affiliation": "The University of Western Australia",
   "email": "moebutamail@gmail.com",
   "links": {
     "github": "https://github.com/MoeBuTa",
-    "linkedin": "https://linkedin.com/in/wenxiao-zhang",
+    "linkedin": "https://www.linkedin.com/in/wenxiao-zhang-a0801b206/",
     "scholar": "https://scholar.google.com/citations?hl=en&user=Yf6xHJ4AAAAJ",
     "cv": "/cv.pdf"
   },
   "summary": [
-    "I am a PhD candidate in Computer Science at The University of Western Australia, researching reliable and secure large language model (LLM) agent systems for complex knowledge and execution tasks — spanning agentic retrieval, multi-hop reasoning, multimodal personal agents, and pre-execution safety verification for agents that act in the real world.",
-    "Alongside research, I build production AI systems. At Telstra I designed and shipped an enterprise GraphRAG and agentic retrieval platform for frontline customer service — a Neo4j knowledge graph over Salesforce data with query decomposition and multi-step planning — together with an automated RAG evaluation system delivered on Azure ML with Docker, CI/CD, and TDD. Before my PhD I worked as a software developer on CMS and enterprise transport platforms, and I tutor Cloud Computing, Intelligent Agents, Web Development, Cybersecurity, and Database Systems at UWA."
+    "I am a PhD candidate in Computer Science at UWA, building reliable and secure LLM agent systems, with a focus on agentic retrieval, multi-hop reasoning, multimodal agents, and execution safety.",
+    "Alongside research I build production AI. At Telstra I shipped an enterprise GraphRAG and agentic-retrieval platform for frontline customer service, with an automated RAG evaluation system delivered on Azure ML.",
+    "I also teach and tutor across a broad range of Computer Science units at UWA such as Cloud Computing, Intelligent Agents, Agile Web Development, Cybersecurity, and Databases, where I support students with technical concepts, practical lab work, and problem-solving skills."
   ],
-  "researchDirection": "Reliable and secure large language model agent systems for complex knowledge and execution tasks.",
+  "researchDirection": "Researching, building, and optimising cutting-edge AI agent systems for various complex knowledge and execution tasks.",
   "interests": [
     "LLM Agent Safety",
     "Retrieval-Augmented Generation",
@@ -40,6 +41,12 @@
       "degree": "BEng in Electronic and Information Engineering",
       "period": "2016/09 – 2020/06",
       "detail": "WAM 85.69"
+    },
+    {
+      "institution": "Victoria University of Wellington",
+      "degree": "Bachelor's degree, Computer Science",
+      "period": "2018/07 – 2018/11",
+      "detail": "International student exchange program"
     }
   ],
   "experience": [
@@ -71,15 +78,40 @@
   "skills": [
     {
       "group": "Agentic / LLM",
-      "items": ["LangChain", "LangGraph", "MCP", "RAG", "vLLM", "harness engineering"]
+      "items": [
+        "LangChain",
+        "LangGraph",
+        "vLLM",
+        "MCP",
+        "Skills",
+        "RAG",
+        "Harness Engineering",
+        "Loop Engineering"
+      ]
     },
     {
       "group": "Engineering",
-      "items": ["Python", "TypeScript", "SQL/Cypher", "Django", "Docker", "Neo4j", "PostgreSQL", "React/Next.js"]
+      "items": [
+        "Python",
+        "TypeScript",
+        "SQL/Cypher",
+        "Django",
+        "Docker",
+        "Neo4j",
+        "PostgreSQL",
+        "React/Next.js"
+      ]
     },
     {
       "group": "Cloud & Delivery",
-      "items": ["AWS", "Azure ML", "REST/microservices", "CI/CD", "Git", "TDD"]
+      "items": [
+        "AWS",
+        "Azure ML",
+        "REST/microservices",
+        "CI/CD",
+        "Git",
+        "TDD"
+      ]
     }
   ]
 }

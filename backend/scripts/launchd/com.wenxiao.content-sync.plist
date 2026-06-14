@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.wenxiao.content-sync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string>/bin/bash</string>
+      <string>-c</string>
+      <string>/Users/wenxiao/actions-runner-wenxiao-link/_work/wenxiao-link/wenxiao-link/backend/scripts/launchd/sync-content.sh</string>
+    </array>
+
+    <!-- Daily at 06:45 (Australia/Perth), just after the scholar sync. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+      <key>Hour</key>
+      <integer>6</integer>
+      <key>Minute</key>
+      <integer>45</integer>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+    <key>KeepAlive</key>
+    <false/>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>PATH</key>
+      <string>/usr/local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+      <!-- A DEDICATED checkout used only by this job (clone of main). The
+           script hard-fails if this is the CI runner workspace. Create it once:
+           git clone <repo> /Users/wenxiao/wenxiao-link-content-sync -->
+      <key>WENXIAO_REPO</key>
+      <string>/Users/wenxiao/wenxiao-link-content-sync</string>
+      <!-- credsStore-free docker config + direct socket: Docker Desktop's
+           GUI credential helper hangs from launchd context (same
+           workaround as the scholar sync job). -->
+      <key>DOCKER_CONFIG</key>
+      <string>/Users/wenxiao/.docker-ci</string>
+      <key>DOCKER_HOST</key>
+      <string>unix:///Users/wenxiao/.docker/run/docker.sock</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/wenxiao/wenxiao-link-data/logs/com.wenxiao.content-sync.out</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/wenxiao/wenxiao-link-data/logs/com.wenxiao.content-sync.err</string>
+  </dict>
+</plist>

@@ -1,9 +1,11 @@
 from django.shortcuts import get_object_or_404
+from django.utils.text import slugify
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from content.markdown import parse_blog_markdown
 from content.models import (
     BlogPost,
     EducationItem,
@@ -170,3 +172,59 @@ class BlogBySlugView(APIView):
     def get(self, request, slug):
         post = get_object_or_404(BlogPost, slug=slug, published=True)
         return Response(BlogPostDetailSerializer(post).data)
+
+
+def _unique_slug(base: str) -> str:
+    """A blog slug that doesn't collide; appends -2, -3, … when needed."""
+    # Cap to leave headroom for the numeric suffix under SlugField(max_length=200).
+    base = (base or "post")[:190]
+    slug, n = base, 2
+    while BlogPost.objects.filter(slug=slug).exists():
+        slug = f"{base}-{n}"
+        n += 1
+    return slug
+
+
+def _truthy(v) -> bool:
+    if isinstance(v, bool):
+        return v
+    return str(v).strip().lower() in ("1", "true", "yes", "on")
+
+
+class BlogUploadView(APIView):
+    """Create a blog post from an uploaded markdown document (owner only).
+
+    Accepts either a multipart `file` field (``-F file=@post.md``) or a JSON
+    body ``{"markdown": "…", "published": true}``. The optional `published`
+    field overrides any `published:` frontmatter. Frontmatter is parsed for
+    title/date/summary/tags/slug; the slug is derived from the title when
+    absent and de-duplicated. Returns the created post (201).
+    """
+
+    permission_classes = [ReadOnlyOrSuperUser]
+
+    def post(self, request):
+        upload = request.FILES.get("file")
+        if upload is not None:
+            text = upload.read().decode("utf-8", errors="replace")
+        else:
+            raw = request.data.get("markdown") if isinstance(request.data, dict) else None
+            text = raw if isinstance(raw, str) else ""
+
+        if not text.strip():
+            return Response(
+                {"detail": "Provide markdown as a `file` upload or a JSON `markdown` field."},
+                status=400,
+            )
+
+        try:
+            parsed = parse_blog_markdown(text)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=400)
+
+        if isinstance(request.data, dict) and request.data.get("published") is not None:
+            parsed["published"] = _truthy(request.data.get("published"))
+
+        parsed["slug"] = _unique_slug(slugify(parsed["slug"]) or slugify(parsed["title"]))
+        post = BlogPost.objects.create(**parsed)
+        return Response(BlogPostDetailSerializer(post).data, status=201)

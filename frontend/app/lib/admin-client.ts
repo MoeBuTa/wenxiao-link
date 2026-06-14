@@ -22,6 +22,16 @@ export function adminDelete(resource: string, id: number): Promise<void> {
   return apiJson<void>(`${base(resource)}${id}/`, { method: "DELETE" });
 }
 
+// Create a blog post from a raw markdown document (optional YAML frontmatter).
+// The backend parses the frontmatter, derives/uniquifies the slug, and returns
+// the created post.
+export function blogUpload<T>(markdown: string): Promise<T> {
+  return apiJson<T>("/api/content/blog/upload/", {
+    method: "POST",
+    body: JSON.stringify({ markdown }),
+  });
+}
+
 export function profileGet<T>(): Promise<T> {
   return apiJson<T>("/api/content/profile/", { cache: "no-store" });
 }

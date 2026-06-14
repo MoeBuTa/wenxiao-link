@@ -5,7 +5,9 @@ import {
   Code,
   Container,
   Divider,
+  Flex,
   Heading,
+  Icon,
   Link,
   ListItem,
   OrderedList,
@@ -19,6 +21,7 @@ import NextLink from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+import { teaserForTags } from "../lib/teaser";
 import type { BlogPostMeta } from "../lib/types";
 
 const components = {
@@ -63,12 +66,24 @@ const components = {
 };
 
 export function BlogPostClient({ meta, content }: { meta: BlogPostMeta; content: string }) {
+  const { gradient, Icon: CoverIcon } = teaserForTags(meta.tags);
   return (
     <Container maxW="3xl" py={{ base: 8, md: 12 }} px={{ base: 6, md: 10 }}>
       <Link as={NextLink} href="/blog" fontSize="sm" color="fg.muted">
         ← Back to blog
       </Link>
-      <Heading size="xl" mt={4} mb={2}>
+      <Flex
+        h="120px"
+        align="center"
+        justify="center"
+        bgGradient={gradient}
+        borderRadius="lg"
+        mt={4}
+        mb={5}
+      >
+        <Icon as={CoverIcon} boxSize={10} color="whiteAlpha.900" />
+      </Flex>
+      <Heading size="xl" mb={2}>
         {meta.title}
       </Heading>
       <Text fontSize="sm" color="fg.faint" mb={2}>

@@ -16,6 +16,7 @@ urlpatterns = [
     path("projects/", views.ProjectListView.as_view(), name="content-projects"),
     path("projects/<int:pk>/", views.ProjectDetailView.as_view(), name="content-projects-detail"),
     path("blog/", views.BlogListView.as_view(), name="content-blog"),
+    path("blog/upload/", views.BlogUploadView.as_view(), name="content-blog-upload"),
     path("blog/<int:pk>/", views.BlogDetailView.as_view(), name="content-blog-detail"),
     path("blog/by-slug/<slug:slug>/", views.BlogBySlugView.as_view(), name="content-blog-slug"),
 ]

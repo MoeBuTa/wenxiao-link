@@ -2,23 +2,23 @@
   "news": [
     {
       "date": "2026-04",
-      "text": "Our STIndex demo was accepted at [WWW 2026](https://www2026.thewebconf.org/) (Companion proceedings) in Dubai, UAE!"
+      "text": "Our paper [STIndex: A Context-Aware Multi-Dimensional Spatiotemporal Information Extraction System](https://dl.acm.org/doi/pdf/10.1145/3774905.3793103) was accepted at WWW 2026!"
     },
     {
       "date": "2026-04",
-      "text": "[Trans-RAG](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Yf6xHJ4AAAAJ&citation_for_view=Yf6xHJ4AAAAJ:eQOLeE2rZwMC) was accepted at DASFAA 2026!"
+      "text": "Our paper [Trans-RAG: Query-Centric Vector Transformation for Secure Cross-Organizational Retrieval](https://link.springer.com/chapter/10.1007/978-981-92-0372-7_35) was accepted at DASFAA 2026!"
     },
     {
-      "date": "2025-09",
-      "text": "[\"Enhancing Reliability in LLM-Integrated Robotic Systems\"](https://www.sciencedirect.com/science/article/pii/S0164121225002833) was published in the Journal of Systems and Software!"
+      "date": "2026-01",
+      "text": "Our paper [\"Enhancing reliability in LLM-integrated robotic systems: A unified approach to security and safety\"](https://www.sciencedirect.com/science/article/pii/S0164121225002833) was published in the Journal of Systems and Software!"
     },
     {
       "date": "2025-04",
-      "text": "[Docs2KG](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Yf6xHJ4AAAAJ&citation_for_view=Yf6xHJ4AAAAJ:Tyk-4Ss8FVUC) was published in the WWW 2025 Companion proceedings and presented in Sydney, Australia!"
+      "text": "Our paper [Docs2KG: A Human-LLM Collaborative Approach to Unified Knowledge Graph Construction from Heterogeneous Documents](https://dl.acm.org/doi/pdf/10.1145/3701716.3715309) was published in the WWW 2025!"
     },
     {
       "date": "2024-11",
-      "text": "[OpenOmni](https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Yf6xHJ4AAAAJ&citation_for_view=Yf6xHJ4AAAAJ:d1gkVwhDpl0C) won the Best Demo Paper Award at EMNLP 2024 in Miami!"
+      "text": "Our paper [OpenOmni: A collaborative open source tool for building future-ready multimodal conversational agents](https://aclanthology.org/2024.emnlp-demo.5.pdf) won the Best Demo Paper Award at EMNLP 2024!"
     },
     {
       "date": "2024-11",
@@ -26,7 +26,7 @@
     },
     {
       "date": "2024-10",
-      "text": "Our [study on prompt injection attacks](https://arxiv.org/abs/2408.03515) against LLM-integrated mobile robots was presented at ISSRE 2024 in Tsukuba, Japan!"
+      "text": "Our paper [A Study on Prompt Injection Attack Against LLM-Integrated Mobile Robotic Systems\n](https://ieeexplore.ieee.org/abstract/document/10771340) was presented at ISSRE 2024!"
     },
     {
       "date": "2024-03",

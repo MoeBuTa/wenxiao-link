@@ -15,6 +15,19 @@
       "highlight": true
     },
     {
+      "name": "PentestAssist",
+      "description": "Self-hosted uncensored cybersecurity LLM (WhiteRabbitNeo-V3) for an authorized penetration-testing lab — vLLM serving, streaming chat UI, Django/Hasura auth.",
+      "tags": [
+        "llm",
+        "cybersecurity",
+        "vllm",
+        "teaching"
+      ],
+      "repoUrl": "https://github.com/MoeBuTa/PentestAssist",
+      "stars": 0,
+      "highlight": false
+    },
+    {
       "name": "OpenOmni Framework",
       "description": "Open-source framework for building and benchmarking multimodal conversational agents, wiring speech, vision, and LLM components into an end-to-end pipeline with latency and accuracy evaluation. Best Demo Paper at EMNLP 2024.",
       "tags": [
@@ -107,19 +120,6 @@
       ],
       "repoUrl": "https://github.com/MoeBuTa/MTDSimTime",
       "stars": 3,
-      "highlight": false
-    },
-    {
-      "name": "PentestAssist",
-      "description": "Self-hosted uncensored cybersecurity LLM (WhiteRabbitNeo-V3) for an authorized penetration-testing lab — vLLM serving, streaming chat UI, Django/Hasura auth.",
-      "tags": [
-        "llm",
-        "cybersecurity",
-        "vllm",
-        "teaching"
-      ],
-      "repoUrl": "https://github.com/MoeBuTa/PentestAssist",
-      "stars": 0,
       "highlight": false
     }
   ]

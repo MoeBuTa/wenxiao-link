@@ -6,6 +6,7 @@ import { AuthProvider } from "./lib/auth-context";
 import { EditModeProvider } from "./components/edit-mode/edit-mode-context";
 import { EditDrawer } from "./components/edit-mode/EditDrawer";
 import { EditModeFab } from "./components/edit-mode/EditModeFab";
+import { PageViewTracker } from "./components/PageViewTracker";
 import { theme } from "./theme";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -18,6 +19,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             {children}
             <EditDrawer />
             <EditModeFab />
+            <PageViewTracker />
           </EditModeProvider>
         </AuthProvider>
       </ChakraProvider>

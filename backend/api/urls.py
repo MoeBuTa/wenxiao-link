@@ -17,6 +17,7 @@ api_patterns = [
     path("content/", include("content.urls")),
     path("qa/", include("qa.urls")),
     path("scholar/", include("scholar.urls")),
+    path("stats/", include("stats.urls")),
     path("", include("core.urls")),
     path("django-admin/", admin.site.urls),
 ]

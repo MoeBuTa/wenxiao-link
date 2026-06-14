@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "core",
     "qa",
     "scholar",
+    "stats",
 ]
 
 MIDDLEWARE = [
@@ -63,6 +64,8 @@ REST_FRAMEWORK = {
         # Guests can post Q&A comments — keep drive-by spam bounded.
         "qa-write": "20/hour",
         "auth-write": "20/hour",
+        # Page-view pings: generous for a real reader, bounds scripted inflation.
+        "stats-write": "120/hour",
     },
     # Behind cloudflared, Cloudflare appends the real client IP as the LAST
     # X-Forwarded-For entry. Trust exactly one hop so throttle identity is

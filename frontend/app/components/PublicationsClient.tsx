@@ -7,16 +7,11 @@ import {
   AccordionItem,
   AccordionPanel,
   Badge,
-  Box,
   Container,
   Divider,
   HStack,
   Heading,
   Link,
-  SimpleGrid,
-  Stat,
-  StatLabel,
-  StatNumber,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -24,26 +19,7 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 
 import type { Publication, PublicationsPayload } from "../lib/types";
 import { PublicationItem } from "./PublicationItem";
-
-function MetricCard({ label, value }: { label: string; value: number | string }) {
-  return (
-    <Stat
-      bg="bg.card"
-      borderWidth="1px"
-      borderColor="border.muted"
-      borderRadius="lg"
-      px={4}
-      py={3}
-    >
-      <StatNumber color="accent" fontSize="2xl">
-        {value}
-      </StatNumber>
-      <StatLabel color="fg.muted" fontSize="xs">
-        {label}
-      </StatLabel>
-    </Stat>
-  );
-}
+import { PublicationStats } from "./PublicationStats";
 
 export function PublicationsClient({ payload }: { payload: PublicationsPayload }) {
   const { profile, publications } = payload;
@@ -85,12 +61,8 @@ export function PublicationsClient({ payload }: { payload: PublicationsPayload }
         {syncedDate ? <Text color="fg.faint">auto-synced {syncedDate}</Text> : null}
       </HStack>
 
-      {profile.citationsAll > 0 ? (
-        <SimpleGrid columns={{ base: 3 }} spacing={3} mb={8} maxW="md">
-          <MetricCard label="Citations" value={profile.citationsAll} />
-          <MetricCard label="h-index" value={profile.hIndexAll} />
-          <MetricCard label="i10-index" value={profile.i10IndexAll} />
-        </SimpleGrid>
+      {publications.length > 0 ? (
+        <PublicationStats profile={profile} publications={publications} />
       ) : null}
 
       <Divider borderColor="border.muted" mb={2} />

@@ -25,6 +25,7 @@ import {
 } from "react-icons/fa";
 
 import type { NewsItem, SiteProfile } from "../lib/types";
+import { skillIcon } from "../lib/skill-icons";
 import { renderInlineMd } from "./inline-md";
 import { AddNewButton, EditProfileButton, EditableItem } from "./edit-mode/EditableItem";
 import { Reorderable } from "./edit-mode/Reorderable";
@@ -284,12 +285,21 @@ function Skills({ profile }: { profile: SiteProfile }) {
               <Text fontSize="xs" fontWeight="700" color="ocean" mb={2} textTransform="uppercase">
                 {group.group}
               </Text>
-              <Wrap spacing={2}>
+              <Wrap spacing={{ base: 4, md: 5 }}>
                 {group.items.map((item) => (
                   <WrapItem key={item}>
-                    <Tag size="md" bg="bg.card" color="fg.muted" borderWidth="1px" borderColor="border.muted">
-                      {item}
-                    </Tag>
+                    <VStack spacing={1.5} w="84px" role="group">
+                      <Icon
+                        as={skillIcon(item)}
+                        boxSize={7}
+                        color="fg.muted"
+                        transition="color 0.15s ease"
+                        _groupHover={{ color: "accent" }}
+                      />
+                      <Text fontSize="xs" color="fg.muted" textAlign="center" lineHeight="1.2">
+                        {item}
+                      </Text>
+                    </VStack>
                   </WrapItem>
                 ))}
               </Wrap>

@@ -25,7 +25,7 @@ import {
 } from "react-icons/fa";
 
 import type { NewsItem, SiteProfile } from "../lib/types";
-import { skillIcon } from "../lib/skill-icons";
+import { skillColor, skillIcon } from "../lib/skill-icons";
 import { renderInlineMd } from "./inline-md";
 import { AddNewButton, EditProfileButton, EditableItem } from "./edit-mode/EditableItem";
 import { Reorderable } from "./edit-mode/Reorderable";
@@ -292,9 +292,9 @@ function Skills({ profile }: { profile: SiteProfile }) {
                       <Icon
                         as={skillIcon(item)}
                         boxSize={7}
-                        color="fg.muted"
-                        transition="color 0.15s ease"
-                        _groupHover={{ color: "accent" }}
+                        color={skillColor(item)}
+                        transition="transform 0.15s ease"
+                        _groupHover={{ transform: "scale(1.15)" }}
                       />
                       <Text fontSize="xs" color="fg.muted" textAlign="center" lineHeight="1.2">
                         {item}

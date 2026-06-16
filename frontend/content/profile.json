@@ -77,40 +77,140 @@
   ],
   "skills": [
     {
-      "group": "Agentic / LLM",
+      "group": "AI, LLM & Agent Systems",
       "items": [
+        "RAG",
+        "Agentic RAG",
+        "GraphRAG",
         "LangChain",
         "LangGraph",
-        "vLLM",
         "MCP",
-        "Skills",
-        "RAG",
+        "Tool Use",
+        "Function Calling",
+        "LLM Agents",
+        "Multi-agent Systems",
+        "Prompt Engineering",
+        "Context Engineering",
+        "Memory Management",
+        "Planning",
+        "Workflow Orchestration",
+        "OpenClaw",
+        "LLM Skills",
         "Harness Engineering",
         "Loop Engineering"
       ]
     },
     {
-      "group": "Engineering",
+      "group": "Machine Learning & Deep Learning",
       "items": [
-        "Python",
-        "TypeScript",
-        "SQL/Cypher",
-        "Django",
-        "Docker",
-        "Neo4j",
-        "PostgreSQL",
-        "React/Next.js"
+        "PyTorch",
+        "Hugging Face",
+        "Transformers",
+        "Reinforcement Learning",
+        "RLHF",
+        "GRPO",
+        "Reward Models",
+        "Fine-tuning",
+        "LoRA / PEFT",
+        "Embeddings",
+        "Model Evaluation",
+        "NLP",
+        "Deep Learning",
+        "Neural Networks"
       ]
     },
     {
-      "group": "Cloud & Delivery",
+      "group": "Programming Languages",
       "items": [
-        "AWS",
+        "Python",
+        "TypeScript",
+        "SQL",
+        "Cypher",
+        "JavaScript",
+        "Bash",
+        "JSON",
+        "YAML",
+        "HTML/CSS"
+      ]
+    },
+    {
+      "group": "Databases & Knowledge Graphs",
+      "items": [
+        "Neo4j",
+        "PostgreSQL",
+        "Vector Databases",
+        "Knowledge Graphs",
+        "Graph Databases",
+        "Relational Databases",
+        "Chroma",
+        "FAISS",
+        "Pinecone",
+        "pgvector",
+        "Data Modelling",
+        "Query Optimisation"
+      ]
+    },
+    {
+      "group": "Backend & API Development",
+      "items": [
+        "Django",
+        "REST APIs",
+        "Microservices",
+        "FastAPI",
+        "Flask",
+        "API Integration",
+        "Backend Development",
+        "Authentication",
+        "Web Services",
+        "Server-side Development"
+      ]
+    },
+    {
+      "group": "Frontend Development",
+      "items": [
+        "React",
+        "Next.js",
+        "JavaScript",
+        "TypeScript",
+        "HTML",
+        "CSS",
+        "Tailwind CSS",
+        "UI Components",
+        "Responsive Design",
+        "Frontend Integration"
+      ]
+    },
+    {
+      "group": "Cloud, MLOps & DevOps",
+      "items": [
+        "Docker",
         "Azure ML",
-        "REST/microservices",
+        "AWS",
         "CI/CD",
         "Git",
-        "TDD"
+        "GitHub Actions",
+        "Containerisation",
+        "Deployment",
+        "Model Serving",
+        "Experiment Tracking",
+        "ML Pipelines",
+        "Cloud Infrastructure"
+      ]
+    },
+    {
+      "group": "Software Engineering & Development Tools",
+      "items": [
+        "TDD",
+        "Claude Code",
+        "Codex",
+        "Git",
+        "Debugging",
+        "Unit Testing",
+        "Code Review",
+        "Agile Development",
+        "Documentation",
+        "Version Control",
+        "Test Automation"
       ]
     }
   ]

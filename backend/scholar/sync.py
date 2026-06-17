@@ -14,8 +14,11 @@ import re
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+import certifi
 import requests
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from urllib3.util.ssl_ import create_urllib3_context
 
 SCHOLAR_BASE = "https://scholar.google.com"
 USER_AGENT = (
@@ -28,6 +31,37 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 
 class ScholarFetchError(RuntimeError):
     pass
+
+
+class _ClassicTLSAdapter(HTTPAdapter):
+    """Pin the TLS key exchange to a classical curve.
+
+    OpenSSL 3.5 (shipped in the API image) advertises a post-quantum hybrid
+    key share (X25519MLKEM768) by default. That produces a ClientHello whose
+    fingerprint Google Scholar's bot detection rejects with HTTP 429 — while
+    the same request from an older OpenSSL (or a browser) succeeds. Forcing a
+    single classical curve restores a normal-looking handshake. Verified: the
+    default context 429s, this one returns 200.
+    """
+
+    def init_poolmanager(self, *args, **kwargs):
+        ctx = create_urllib3_context()
+        ctx.load_verify_locations(certifi.where())
+        ctx.set_ecdh_curve("prime256v1")
+        kwargs["ssl_context"] = ctx
+        return super().init_poolmanager(*args, **kwargs)
+
+
+_SESSION: requests.Session | None = None
+
+
+def _http() -> requests.Session:
+    global _SESSION
+    if _SESSION is None:
+        session = requests.Session()
+        session.mount("https://", _ClassicTLSAdapter())
+        _SESSION = session
+    return _SESSION
 
 
 def _load_json(name: str):
@@ -64,7 +98,7 @@ def rank_for(title: str, venue: str) -> tuple[str, str]:
 
 def _fetch_page(user_id: str, cstart: int) -> BeautifulSoup:
     try:
-        resp = requests.get(
+        resp = _http().get(
             f"{SCHOLAR_BASE}/citations",
             params={
                 "hl": "en",

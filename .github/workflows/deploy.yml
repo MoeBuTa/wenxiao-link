@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: "Force a target (auto chooses by changed paths)"
+        description: "Force a target (auto = backend only; the frontend lives on Vercel)"
         type: choice
         required: false
         default: auto
@@ -33,6 +33,13 @@ jobs:
 
       - name: Decide which sides to deploy
         id: decide
+        # The frontend now lives on Vercel (its own Git integration deploys
+        # wenxiao.link on every push to main). The macmini only deploys the
+        # backend on auto/push; the local pm2 frontend (:8890) is no longer
+        # routed to anything, so it's manual-only via `target: frontend|both`
+        # as an emergency escape hatch. This stops every content-sync commit
+        # (frontend/content + frontend/public/fallback) from triggering a
+        # useless local npm build.
         env:
           TARGET: ${{ inputs.target || 'auto' }}
           BEFORE: ${{ github.event.before }}
@@ -48,25 +55,24 @@ jobs:
             echo "backend=true"   >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if [ "$TARGET" = "both" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "$TARGET" = "both" ]; then
             echo "frontend=true"  >> "$GITHUB_OUTPUT"
             echo "backend=true"   >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          # auto: never deploy the frontend; decide the backend by changed paths.
           if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
-            echo "frontend=true" >> "$GITHUB_OUTPUT"
-            echo "backend=true"  >> "$GITHUB_OUTPUT"
+            echo "frontend=false" >> "$GITHUB_OUTPUT"
+            echo "backend=true"   >> "$GITHUB_OUTPUT"
             exit 0
           fi
           changed=$(git diff --name-only "$BEFORE" "$SHA" || true)
           echo "[changes] files since $BEFORE:"; echo "$changed"
-          fe=false; be=false
-          if echo "$changed" | grep -E '^frontend/' >/dev/null; then fe=true; fi
+          be=false
           if echo "$changed" | grep -E '^backend/'  >/dev/null; then be=true; fi
-          if echo "$changed" | grep -E '^(\.github/|README|\.gitignore$)' >/dev/null; then fe=true; be=true; fi
-          if [ "$fe" = false ] && [ "$be" = false ]; then fe=true; be=true; fi
-          echo "frontend=$fe" >> "$GITHUB_OUTPUT"
-          echo "backend=$be"  >> "$GITHUB_OUTPUT"
+          if echo "$changed" | grep -E '^\.github/' >/dev/null; then be=true; fi
+          echo "frontend=false" >> "$GITHUB_OUTPUT"
+          echo "backend=$be"    >> "$GITHUB_OUTPUT"
 
   deploy-frontend:
     needs: changes

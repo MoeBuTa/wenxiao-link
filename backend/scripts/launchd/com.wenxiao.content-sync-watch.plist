@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.wenxiao.content-sync-watch</string>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string>/bin/bash</string>
+      <string>-c</string>
+      <string>/Users/wenxiao/actions-runner-wenxiao-link/_work/wenxiao-link/wenxiao-link/backend/scripts/launchd/sync-content.sh</string>
+    </array>
+
+    <!-- Event-driven companion to com.wenxiao.content-sync (which still runs
+         the daily 06:45 full sync). The API container touches
+         content.dirty in this dir on any content/Q&A edit; launchd coalesces
+         rapid changes and runs the same sync script. launchd never runs two
+         instances of this label at once, and sync-content.sh takes a lock and
+         is a no-op when nothing changed, so bursts are safe. -->
+    <key>WatchPaths</key>
+    <array>
+      <string>/Users/wenxiao/wenxiao-link-data/sync-triggers</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <false/>
+    <key>KeepAlive</key>
+    <false/>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>PATH</key>
+      <string>/usr/local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+      <!-- Same dedicated checkout + docker workarounds as the daily job. -->
+      <key>WENXIAO_REPO</key>
+      <string>/Users/wenxiao/wenxiao-link-content-sync</string>
+      <key>DOCKER_CONFIG</key>
+      <string>/Users/wenxiao/.docker-ci</string>
+      <key>DOCKER_HOST</key>
+      <string>unix:///Users/wenxiao/.docker/run/docker.sock</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/wenxiao/wenxiao-link-data/logs/com.wenxiao.content-sync-watch.out</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/wenxiao/wenxiao-link-data/logs/com.wenxiao.content-sync-watch.err</string>
+  </dict>
+</plist>

@@ -5,17 +5,20 @@ The frontend reads content from the API first and falls back to these
 committed JSON files when the backend is unreachable. To keep that fallback a
 truthful snapshot:
 
-- ``dump_content()`` builds the JSON payloads from the DB — used by the
-  periodic *DB → fallback* sync (``export_content``).
+- ``dump_content()`` builds the profile/news/projects JSON payloads from the
+  DB. ``dump_all_fallbacks()`` wraps it and widens the snapshot to every
+  read-only feature (publications, blog markdown, stats + Q&A read snapshots) —
+  used by the periodic *DB → fallback* sync (``export_content``).
 - ``load_content()`` writes JSON payloads into the DB — used by the one-time
-  *fallback → DB* bootstrap (``seed_content``).
+  *fallback → DB* bootstrap (``seed_content``); it remains profile/news/projects
+  only (the widened sections are export-only).
 
-The JSON shapes mirror exactly what ``frontend/app/lib/content.ts`` expects
-(camelCase, summary as a paragraph array, links object), so a regenerated file
-is a drop-in. The blog is intentionally excluded — it is DB-only with no file
-fallback.
+The JSON shapes mirror exactly what ``frontend/app/lib/content.ts`` and the
+client fetchers expect (camelCase, summary as a paragraph array, links object),
+so a regenerated file is a drop-in.
 """
 
+import json
 from pathlib import Path
 
 from django.conf import settings
@@ -40,6 +43,18 @@ FILES = [PROFILE_FILE, NEWS_FILE, PROJECTS_FILE]
 def default_content_dir() -> Path:
     """``<repo>/frontend/content`` (BASE_DIR is the backend dir)."""
     return Path(settings.BASE_DIR).parent / "frontend" / "content"
+
+
+def default_frontend_dir() -> Path:
+    """``<repo>/frontend`` — the root the full fallback set is keyed against.
+
+    ``dump_all_fallbacks()`` keys payloads by paths *relative to this dir*
+    (``content/profile.json``, ``content/blog/<slug>.md``,
+    ``public/fallback/stats.json``) because the snapshot now spans both the
+    server-read ``content/`` files and the client-read ``public/fallback/``
+    files.
+    """
+    return Path(settings.BASE_DIR).parent / "frontend"
 
 
 # ---- DB -> JSON (export) ----------------------------------------------------
@@ -92,6 +107,93 @@ def _project_dict(pr: Project) -> dict:
         d["stars"] = pr.stars
     d["highlight"] = pr.highlight
     return d
+
+
+# ---- Full fallback snapshot (export) ----------------------------------------
+#
+# dump_content() above produces only the three core profile/news/projects files
+# (its shapes also drive the reverse seed_content path, so it stays untouched).
+# dump_all_fallbacks() is the export pipeline's entry point: it widens the
+# snapshot to EVERY read-only feature so the Vercel-hosted frontend can render a
+# complete site when the backend is unreachable. Keys are paths relative to
+# frontend/ (see default_frontend_dir); .md values are raw strings, .json values
+# are JSON-serialisable objects — the writer branches on the extension.
+
+def dump_all_fallbacks() -> dict:
+    core = dump_content()
+    out: dict = {
+        "content/profile.json": core[PROFILE_FILE],
+        "content/news.json": core[NEWS_FILE],
+        "content/projects.json": core[PROJECTS_FILE],
+    }
+    pubs = _dump_publications()
+    if pubs is not None:  # 0-row guard: keep the last good seed, never blank it
+        out["content/publications.seed.json"] = pubs
+    for slug, md in _dump_blog().items():
+        out[f"content/blog/{slug}.md"] = md
+    out["public/fallback/stats.json"] = _dump_stats()
+    out["public/fallback/qa.json"] = _dump_qa()
+    return out
+
+
+def _blog_frontmatter(title: str, date: str, summary: str, tags: list) -> str:
+    # JSON scalars/sequences are valid YAML flow syntax, so json.dumps gives us
+    # correctly-escaped frontmatter values that gray-matter (js-yaml) parses
+    # back into the exact title/date/summary/tags the frontend expects.
+    fields = {"title": title, "date": date, "summary": summary, "tags": list(tags or [])}
+    body = "\n".join(f"{k}: {json.dumps(v, ensure_ascii=False)}" for k, v in fields.items())
+    return f"---\n{body}\n---\n"
+
+
+def _dump_blog() -> dict:
+    """``{slug: "<frontmatter>\\n\\n<body>\\n"}`` for every published post.
+
+    The frontend's file fallback (content.ts ``blogPostsFromFiles``) reads
+    ``content/blog/*.md`` — this is what finally fills that directory.
+    """
+    from content.models import BlogPost
+
+    out: dict = {}
+    for post in BlogPost.objects.filter(published=True):
+        fm = _blog_frontmatter(post.title, post.date, post.summary, post.tags)
+        body = (post.body or "").rstrip()
+        out[post.slug] = f"{fm}\n{body}\n" if body else f"{fm}\n"
+    return out
+
+
+def _dump_publications():
+    """Reuse the scholar API's payload builders so the seed file is a drop-in
+    for ``GET /api/scholar/publications/``. Returns None when there are no
+    publications (mirrors sync_scholar's 0-row guard — don't blank the seed)."""
+    from scholar.models import Publication, ScholarProfile
+    from scholar.views import _profile_payload, _publication_payload
+
+    pubs = list(Publication.objects.all())
+    if not pubs:
+        return None
+    profile = ScholarProfile.objects.filter(user_id=settings.SCHOLAR_USER_ID).first()
+    return {
+        "profile": _profile_payload(profile),
+        "publications": [_publication_payload(p) for p in pubs],
+    }
+
+
+def _dump_stats() -> dict:
+    """``{"summary": {...}, "blog": {slug: views}}`` — the read side of the
+    stats endpoints, snapshotted for the client-side fallback."""
+    from stats.views import blog_stats_payload, summary_payload
+
+    return {"summary": summary_payload(), "blog": blog_stats_payload()}
+
+
+def _dump_qa() -> list:
+    """The public Q&A board as an anonymous viewer sees it (canModify/isOwner
+    are all false offline — posting/editing needs the live backend anyway)."""
+    from django.contrib.auth.models import AnonymousUser
+
+    from qa.views import board_payload
+
+    return board_payload(AnonymousUser())
 
 
 # ---- JSON -> DB (seed) ------------------------------------------------------

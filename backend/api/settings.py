@@ -140,17 +140,21 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    # Production is same-origin via cloudflared path routing; these cover
-    # local `next dev` (3000) and direct pm2-bundle access (8890).
+    # Production is same-origin: the browser only ever talks to wenxiao.link.
+    # On Vercel, Next reverse-proxies /api/* to api.wenxiao.link server-side, so
+    # requests still arrive first-party. These cover local `next dev` (3000) and
+    # direct pm2-bundle access (8890).
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:8890",
     "http://127.0.0.1:8890",
     "https://wenxiao.link",
+    "https://api.wenxiao.link",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://wenxiao.link",
+    "https://api.wenxiao.link",
     "http://localhost:8890",
     "http://127.0.0.1:8890",
     "http://localhost:8002",

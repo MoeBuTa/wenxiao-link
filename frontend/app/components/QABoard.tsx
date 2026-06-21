@@ -212,9 +212,11 @@ function CommentBody({
 function Thread({
   comment,
   onChanged,
+  readOnly,
 }: {
   comment: QAComment;
   onChanged: () => void;
+  readOnly?: boolean;
 }) {
   const [replying, setReplying] = useState(false);
 
@@ -262,21 +264,23 @@ function Thread({
         </VStack>
       ) : null}
 
-      <Box mt={3}>
-        {replying ? (
-          <Composer
-            placeholder="Write a reply…"
-            submitLabel="Reply"
-            onSubmit={postReply}
-            onCancel={() => setReplying(false)}
-            autoFocus
-          />
-        ) : (
-          <Button size="xs" variant="link" color="accent" onClick={() => setReplying(true)}>
-            Reply
-          </Button>
-        )}
-      </Box>
+      {readOnly ? null : (
+        <Box mt={3}>
+          {replying ? (
+            <Composer
+              placeholder="Write a reply…"
+              submitLabel="Reply"
+              onSubmit={postReply}
+              onCancel={() => setReplying(false)}
+              autoFocus
+            />
+          ) : (
+            <Button size="xs" variant="link" color="accent" onClick={() => setReplying(true)}>
+              Reply
+            </Button>
+          )}
+        </Box>
+      )}
     </Box>
   );
 }
@@ -284,19 +288,25 @@ function Thread({
 export function QABoard() {
   const { user } = useAuth();
   const [comments, setComments] = useState<QAComment[] | null>(null);
-  const toast = useToast();
+  // True when the live board is unreachable and we're showing the committed
+  // snapshot. We degrade silently (no error toast) so a backend outage doesn't
+  // show its seams to visitors — the board just reads as closed for new posts.
+  const [readOnly, setReadOnly] = useState(false);
 
   const load = useCallback(async () => {
     try {
       setComments(await apiJson<QAComment[]>("/api/qa/", { cache: "no-store" }));
-    } catch (err) {
-      toast({
-        status: "error",
-        title: err instanceof ApiError ? err.message : "Could not load comments.",
-      });
-      setComments([]);
+      setReadOnly(false);
+    } catch {
+      try {
+        const resp = await fetch("/fallback/qa.json", { cache: "no-store" });
+        setComments(resp.ok ? ((await resp.json()) as QAComment[]) : []);
+      } catch {
+        setComments([]);
+      }
+      setReadOnly(true);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     void load();
@@ -325,26 +335,41 @@ export function QABoard() {
         to manage your comments later.
       </Text>
 
-      <Box
-        bg="bg.card"
-        borderWidth="1px"
-        borderColor="border.muted"
-        borderRadius="lg"
-        p={4}
-        mb={8}
-      >
-        {user ? (
-          <Text fontSize="sm" color="fg.muted" mb={2}>
-            Posting as <b>{user.username}</b>
-            {user.isSuperuser ? " (owner)" : ""}
+      {readOnly ? (
+        <Box
+          bg="bg.card"
+          borderWidth="1px"
+          borderColor="border.muted"
+          borderRadius="lg"
+          p={4}
+          mb={8}
+        >
+          <Text fontSize="sm" color="fg.muted">
+            Comments are read-only right now. Please check back soon to post.
           </Text>
-        ) : null}
-        <Composer
-          placeholder="Write a question or comment…"
-          submitLabel="Post"
-          onSubmit={post}
-        />
-      </Box>
+        </Box>
+      ) : (
+        <Box
+          bg="bg.card"
+          borderWidth="1px"
+          borderColor="border.muted"
+          borderRadius="lg"
+          p={4}
+          mb={8}
+        >
+          {user ? (
+            <Text fontSize="sm" color="fg.muted" mb={2}>
+              Posting as <b>{user.username}</b>
+              {user.isSuperuser ? " (owner)" : ""}
+            </Text>
+          ) : null}
+          <Composer
+            placeholder="Write a question or comment…"
+            submitLabel="Post"
+            onSubmit={post}
+          />
+        </Box>
+      )}
 
       {comments === null ? (
         <Flex justify="center" py={10}>
@@ -352,12 +377,17 @@ export function QABoard() {
         </Flex>
       ) : comments.length === 0 ? (
         <Text color="fg.muted" fontSize="sm">
-          No comments yet — be the first to ask something.
+          {readOnly ? "No comments to show yet." : "No comments yet — be the first to ask something."}
         </Text>
       ) : (
         <VStack align="stretch" spacing={4}>
           {comments.map((comment) => (
-            <Thread key={comment.id} comment={comment} onChanged={() => void load()} />
+            <Thread
+              key={comment.id}
+              comment={comment}
+              onChanged={() => void load()}
+              readOnly={readOnly}
+            />
           ))}
         </VStack>
       )}

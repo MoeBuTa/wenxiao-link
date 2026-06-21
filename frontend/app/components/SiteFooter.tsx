@@ -46,7 +46,7 @@ export function SiteFooter() {
               </Link>
             ))}
           </HStack>
-          {stats ? (
+          {stats && stats.totalViews > 0 ? (
             <HStack spacing={2} fontSize="xs" color="fg.faint">
               <Icon as={FaRegEye} boxSize={3.5} />
               <Text>{stats.totalViews.toLocaleString()} views</Text>

@@ -31,3 +31,20 @@ Gotchas:
 - `sync_scholar` refuses to run if it parses 0 rows (markup-change guard).
 - CORE rank table is ordered — first matching pattern wins; add specific
   patterns above generic ones.
+
+Blog publishing:
+- Whenever asked to write or publish a blog post, sync the repo first so the
+  agent has the latest authoring workflow and site context.
+- After syncing, read `frontend/docs/blog-authoring.md` when present and follow
+  it as the current source of truth for Markdown metadata, upload, and
+  verification.
+- Choose blog tags with the teaser in mind. The teaser must fit the post's
+  content; when introducing a new semantic tag, either verify the generated
+  teaser is appropriate or add/update a curated teaser mapping in
+  `frontend/app/lib/teaser.ts` and document it in
+  `frontend/docs/blog-authoring.md`.
+
+Home/projects authoring:
+- Whenever asked to edit home-page or projects content through the API, sync
+  the repo first, then read `frontend/docs/home-projects-authoring.md` and
+  follow its REST field names, auth, ordering, and verification guidance.

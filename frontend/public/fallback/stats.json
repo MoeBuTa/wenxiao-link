@@ -1,8 +1,11 @@
 {
   "summary": {
-    "totalViews": 0,
+    "totalViews": 68,
     "todayViews": 0,
-    "uniqueVisitors": 0
+    "uniqueVisitors": 31
   },
-  "blog": {}
+  "blog": {
+    "automatic-blog-posting-with-codex": 1,
+    "surviving-the-rebuttal-reviewviz": 1
+  }
 }

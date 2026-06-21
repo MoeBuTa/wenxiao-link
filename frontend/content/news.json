@@ -1,6 +1,10 @@
 {
   "news": [
     {
+      "date": "2026-06",
+      "text": "Our paper CARE: Pre-Execution Command Verification for Shell-Executing LLM Agents was accepted at ISSRE 2026!"
+    },
+    {
       "date": "2026-04",
       "text": "Our paper [STIndex: A Context-Aware Multi-Dimensional Spatiotemporal Information Extraction System](https://dl.acm.org/doi/pdf/10.1145/3774905.3793103) was accepted at WWW 2026!"
     },

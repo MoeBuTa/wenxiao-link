@@ -40,6 +40,12 @@ services:
       # Django staticfiles persisted on the host so collectstatic output
       # survives `docker compose down`.
       - ${WENXIAO_STATIC_DIR:-./staticfiles}:/usr/src/app/staticfiles
+      # Trigger dir for the event-driven fallback sync: content/qa edits touch
+      # /sync-trigger/content.dirty inside the container; a host launchd
+      # WatchPaths job (com.wenxiao.content-sync-watch.plist) watches the host
+      # side and runs sync-content.sh. Mounted outside /usr/src/app to avoid
+      # nesting under the source bind.
+      - ${WENXIAO_SYNC_TRIGGER_DIR:-/Users/wenxiao/wenxiao-link-data/sync-triggers}:/sync-trigger
     ports:
       # API on 8002 (non-default host port to avoid local collisions).
       # Loopback-only: cloudflared and the Next rewrite both live on this

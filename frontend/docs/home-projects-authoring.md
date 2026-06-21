@@ -146,15 +146,17 @@ structured records, so send JSON directly to the resource endpoints.
 
 ## 4. How the offline fallback stays fresh (FYI)
 
-The DB is authoritative. Two management commands keep the committed
-`frontend/content/*.json` fallback in sync (the blog is excluded — it's
-DB-only):
+The DB is authoritative. Two management commands keep the committed offline
+fallback snapshot in sync:
 
-- `python manage.py seed_content` — one-time bootstrap, loads the committed JSON
-  into an empty DB (`--force` to replace).
-- `python manage.py export_content` — writes the JSON back **from** the DB; run
-  periodically (`scripts/launchd/com.wenxiao.content-sync.plist`) so the
-  fallback tracks live edits.
+- `python manage.py seed_content` — one-time bootstrap, loads the committed
+  profile/news/projects JSON into an empty DB (`--force` to replace).
+- `python manage.py export_content` — writes the **full** snapshot back from the
+  DB: `frontend/content/` (profile/news/projects/publications JSON + blog
+  `blog/*.md`) and `frontend/public/fallback/` (stats + Q&A read snapshots). Run
+  on a daily schedule (`scripts/launchd/com.wenxiao.content-sync.plist`) and on
+  every content/Q&A edit (`com.wenxiao.content-sync-watch.plist`, triggered by
+  `content/signals.py`) so the fallback tracks live edits.
 
 As an agent you never touch these files — just write to the API and the sync
 job regenerates them.

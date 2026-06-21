@@ -75,30 +75,39 @@ class HitView(APIView):
         return Response(status=204)
 
 
+def summary_payload() -> dict:
+    """{totalViews, todayViews, uniqueVisitors} — shared by the live endpoint
+    and the offline fallback snapshot (content.fallback)."""
+    site = PageViewDay.objects.filter(path=SITE_PATH)
+    total = site.aggregate(s=Sum("views"))["s"] or 0
+    today = site.filter(day=timezone.localdate()).aggregate(s=Sum("views"))["s"] or 0
+    return {
+        "totalViews": total,
+        "todayViews": today,
+        "uniqueVisitors": UniqueVisitor.objects.count(),
+    }
+
+
+def blog_stats_payload() -> dict:
+    """{"<slug>": views} — shared by the live endpoint and the fallback snapshot."""
+    rows = (
+        PageViewDay.objects.filter(path__startswith="/blog/")
+        .values("path")
+        .annotate(v=Sum("views"))
+    )
+    prefix = len("/blog/")
+    return {r["path"][prefix:]: r["v"] for r in rows}
+
+
 class SummaryView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        site = PageViewDay.objects.filter(path=SITE_PATH)
-        total = site.aggregate(s=Sum("views"))["s"] or 0
-        today = site.filter(day=timezone.localdate()).aggregate(s=Sum("views"))["s"] or 0
-        return Response(
-            {
-                "totalViews": total,
-                "todayViews": today,
-                "uniqueVisitors": UniqueVisitor.objects.count(),
-            }
-        )
+        return Response(summary_payload())
 
 
 class BlogStatsView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        rows = (
-            PageViewDay.objects.filter(path__startswith="/blog/")
-            .values("path")
-            .annotate(v=Sum("views"))
-        )
-        prefix = len("/blog/")
-        return Response({r["path"][prefix:]: r["v"] for r in rows})
+        return Response(blog_stats_payload())

@@ -14,6 +14,18 @@ from qa.serializers import (
 )
 
 
+def board_payload(user) -> list:
+    """The full public board (top-level comments + nested replies) as ``user``
+    sees it. Shared by the live GET endpoint and the offline fallback snapshot
+    (content.fallback passes an AnonymousUser)."""
+    comments = (
+        Comment.objects.filter(parent__isnull=True)
+        .select_related("author")
+        .prefetch_related("replies__author")
+    )
+    return [thread_payload(c, user) for c in comments]
+
+
 class CommentListCreateView(APIView):
     """GET  /api/qa/   public board: top-level comments with nested replies
     POST /api/qa/   anyone may post; guests must supply guest_name"""
@@ -27,12 +39,7 @@ class CommentListCreateView(APIView):
         return []
 
     def get(self, request):
-        comments = (
-            Comment.objects.filter(parent__isnull=True)
-            .select_related("author")
-            .prefetch_related("replies__author")
-        )
-        return Response([thread_payload(c, request.user) for c in comments])
+        return Response(board_payload(request.user))
 
     def post(self, request):
         serializer = CommentCreateSerializer(data=request.data, context={"request": request})

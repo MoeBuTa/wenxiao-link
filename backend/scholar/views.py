@@ -19,6 +19,7 @@ def _profile_payload(profile: ScholarProfile | None) -> dict:
             "citationsAll": 0,
             "hIndexAll": 0,
             "i10IndexAll": 0,
+            "citationsByYear": {},
             "syncedAt": None,
         }
     return {
@@ -29,6 +30,7 @@ def _profile_payload(profile: ScholarProfile | None) -> dict:
         "citationsAll": profile.citations_all,
         "hIndexAll": profile.h_index_all,
         "i10IndexAll": profile.i10_index_all,
+        "citationsByYear": profile.citations_by_year or {},
         "syncedAt": profile.synced_at.isoformat() if profile.synced_at else None,
     }
 

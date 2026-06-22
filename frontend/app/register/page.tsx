@@ -14,11 +14,12 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { ApiError } from "../lib/api";
 import { useAuth } from "../lib/auth-context";
+import { QA_ENABLED } from "../lib/features";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -29,6 +30,8 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
+
+  if (!QA_ENABLED) notFound();
 
   const mismatch = confirm.length > 0 && password !== confirm;
 

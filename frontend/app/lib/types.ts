@@ -6,6 +6,10 @@ export type ScholarProfile = {
   citationsAll: number;
   hIndexAll: number;
   i10IndexAll: number;
+  // { "2021": 25, "2022": 40 } — citations received per calendar year (recent
+  // ~6-year window from Scholar). Empty until the backend re-syncs with the
+  // histogram parser, so always read defensively.
+  citationsByYear: Record<string, number>;
   syncedAt: string | null;
 };
 

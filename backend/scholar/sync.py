@@ -164,6 +164,39 @@ def _parse_rows(soup: BeautifulSoup) -> list[dict]:
     return rows
 
 
+def _parse_citations_by_year(soup: BeautifulSoup) -> dict[str, int]:
+    """Citations received per calendar year from the "Cited by" histogram.
+
+    The graph renders year labels (``span.gsc_g_t``, oldest→newest) separately
+    from the bars (``a.gsc_g_a``), and bars are emitted only for non-zero years.
+    Each bar's column is encoded in its ``z-index`` (rightmost/newest = 1), so
+    we map ``year = years[len(years) - z]`` rather than zipping positionally.
+
+    Optional and best-effort: any parsing trouble yields ``{}`` so a markup
+    change here never aborts an otherwise-good sync.
+    """
+    try:
+        years = [_parse_int(t.get_text(strip=True)) for t in soup.select("span.gsc_g_t")]
+        if not years:
+            return {}
+        out: dict[str, int] = {}
+        for bar in soup.select("a.gsc_g_a"):
+            count_el = bar.select_one("span.gsc_g_al")
+            if count_el is None:
+                continue
+            style = bar.get("style", "")
+            m = re.search(r"z-index:\s*(\d+)", style)
+            if not m:
+                continue
+            z = int(m.group(1))
+            idx = len(years) - z
+            if 0 <= idx < len(years):
+                out[str(years[idx])] = _parse_int(count_el.get_text(strip=True))
+        return dict(sorted(out.items()))
+    except Exception:  # noqa: BLE001 — histogram is optional, never fail the sync
+        return {}
+
+
 def _parse_profile(soup: BeautifulSoup, user_id: str) -> dict:
     name_el = soup.select_one("#gsc_prf_in")
     affiliation_el = soup.select_one(".gsc_prf_il")
@@ -180,6 +213,7 @@ def _parse_profile(soup: BeautifulSoup, user_id: str) -> dict:
         "citations_all": stats[0] if len(stats) > 0 else 0,
         "h_index_all": stats[2] if len(stats) > 2 else 0,
         "i10_index_all": stats[4] if len(stats) > 4 else 0,
+        "citations_by_year": _parse_citations_by_year(soup),
     }
 
 

@@ -55,6 +55,7 @@ class Command(BaseCommand):
                     "citations_all": profile["citations_all"],
                     "h_index_all": profile["h_index_all"],
                     "i10_index_all": profile["i10_index_all"],
+                    "citations_by_year": profile.get("citations_by_year", {}),
                     "synced_at": now,
                 },
             )

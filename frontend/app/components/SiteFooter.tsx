@@ -1,10 +1,7 @@
 "use client";
 
 import { Box, Container, HStack, Icon, Link, Text, VStack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { FaEnvelope, FaGithub, FaGraduationCap, FaLinkedin, FaRegEye } from "react-icons/fa";
-
-import { getStatsSummary, type StatsSummary } from "../lib/stats";
+import { FaEnvelope, FaGithub, FaGraduationCap, FaLinkedin } from "react-icons/fa";
 
 const LINKS = [
   { href: "mailto:moebutamail@gmail.com", icon: FaEnvelope, label: "Email" },
@@ -18,18 +15,6 @@ const LINKS = [
 ];
 
 export function SiteFooter() {
-  const [stats, setStats] = useState<StatsSummary | null>(null);
-
-  useEffect(() => {
-    let alive = true;
-    getStatsSummary()
-      .then((s) => alive && setStats(s))
-      .catch(() => {});
-    return () => {
-      alive = false;
-    };
-  }, []);
-
   return (
     <Box as="footer" borderTopWidth="1px" borderColor="border.muted" mt={8}>
       <Container maxW="5xl" py={8} px={{ base: 6, md: 10 }}>
@@ -46,16 +31,6 @@ export function SiteFooter() {
               </Link>
             ))}
           </HStack>
-          {stats && stats.totalViews > 0 ? (
-            <HStack spacing={2} fontSize="xs" color="fg.faint">
-              <Icon as={FaRegEye} boxSize={3.5} />
-              <Text>{stats.totalViews.toLocaleString()} views</Text>
-              <Text aria-hidden>·</Text>
-              <Text>{stats.todayViews.toLocaleString()} today</Text>
-              <Text aria-hidden>·</Text>
-              <Text>{stats.uniqueVisitors.toLocaleString()} visitors</Text>
-            </HStack>
-          ) : null}
           <Text fontSize="xs" color="fg.faint">
             © {new Date().getFullYear()} Wenxiao Zhang · wenxiao.link
           </Text>

@@ -18,6 +18,7 @@ import { useState } from "react";
 
 import { ApiError } from "../lib/api";
 import { useAuth } from "../lib/auth-context";
+import { QA_ENABLED } from "../lib/features";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -32,7 +33,9 @@ export default function LoginPage() {
     setBusy(true);
     try {
       await login(username.trim(), password);
-      router.push("/qa");
+      // Q&A is the only public destination after sign-in; with it off, the
+      // sole remaining user is the owner heading for the home page.
+      router.push(QA_ENABLED ? "/qa" : "/");
     } catch (err) {
       toast({
         status: "error",
@@ -71,12 +74,14 @@ export default function LoginPage() {
           >
             Sign in
           </Button>
-          <Text fontSize="sm" color="fg.muted">
-            No account?{" "}
-            <Link as={NextLink} href="/register">
-              Register
-            </Link>
-          </Text>
+          {QA_ENABLED ? (
+            <Text fontSize="sm" color="fg.muted">
+              No account?{" "}
+              <Link as={NextLink} href="/register">
+                Register
+              </Link>
+            </Text>
+          ) : null}
         </VStack>
       </form>
     </Container>

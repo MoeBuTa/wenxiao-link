@@ -27,13 +27,14 @@ import { useEffect } from "react";
 import { FiChevronDown, FiMenu, FiUser, FiX } from "react-icons/fi";
 
 import { useAuth } from "../lib/auth-context";
+import { QA_ENABLED } from "../lib/features";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home" },
   { href: "/publications", label: "Publications" },
   { href: "/blog", label: "Blog" },
   { href: "/projects", label: "Projects" },
-  { href: "/qa", label: "Q&A" },
+  ...(QA_ENABLED ? [{ href: "/qa", label: "Q&A" }] : []),
 ];
 
 function isActive(pathname: string, href: string): boolean {

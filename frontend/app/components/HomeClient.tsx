@@ -27,6 +27,7 @@ import {
 import type { NewsItem, SiteProfile } from "../lib/types";
 import { skillColor, skillIcon } from "../lib/skill-icons";
 import { renderInlineMd } from "./inline-md";
+import { ViewCount } from "./ViewCount";
 import { AddNewButton, EditProfileButton, EditableItem } from "./edit-mode/EditableItem";
 import { Reorderable } from "./edit-mode/Reorderable";
 
@@ -134,6 +135,7 @@ function IdentityCard({ profile }: { profile: SiteProfile }) {
           </WrapItem>
         ))}
       </Wrap>
+      <ViewCount />
     </VStack>
   );
 }

@@ -11,6 +11,11 @@ class ScholarProfile(models.Model):
     citations_all = models.IntegerField(default=0)
     h_index_all = models.IntegerField(default=0)
     i10_index_all = models.IntegerField(default=0)
+    # {"2021": 25, "2022": 40, ...} — citations *received* per calendar year,
+    # scraped from the profile's "Cited by" histogram. Scholar only exposes a
+    # rolling recent window (~6 years). Optional: stays {} if parsing finds
+    # nothing, so a markup change never blocks the rest of the sync.
+    citations_by_year = models.JSONField(default=dict, blank=True)
     synced_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self) -> str:  # pragma: no cover - admin readability only

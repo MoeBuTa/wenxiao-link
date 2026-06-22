@@ -249,6 +249,16 @@ jobs:
           docker compose logs platform
           exit 1
 
+      - name: Refresh Scholar data (non-fatal)
+        # The entrypoint only runs sync_scholar on an empty DB, so scraper
+        # code changes (new parsed fields, selector fixes) never take effect
+        # on a redeploy without an explicit re-sync. Best-effort: a Scholar
+        # 429 / network hiccup must never fail the deploy — the daily launchd
+        # job and the admin /refresh endpoint remain the regular backfill.
+        run: |
+          docker compose exec -T platform python manage.py sync_scholar \
+            || echo "[deploy] sync_scholar failed; daily cron will retry"
+
       - name: Show running containers
         if: always()
         run: docker compose ps

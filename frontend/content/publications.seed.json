@@ -4,15 +4,15 @@
     "name": "Wenxiao Zhang",
     "affiliation": "University of Western Australia",
     "avatarUrl": "https://scholar.googleusercontent.com/citations?view_op=medium_photo&user=Yf6xHJ4AAAAJ&citpid=1",
-    "citationsAll": 103,
+    "citationsAll": 104,
     "hIndexAll": 5,
     "i10IndexAll": 4,
     "citationsByYear": {
       "2024": 7,
       "2025": 58,
-      "2026": 38
+      "2026": 39
     },
-    "syncedAt": "2026-06-23T22:30:02.795248+00:00"
+    "syncedAt": "2026-06-24T22:30:03.361470+00:00"
   },
   "publications": [
     {
@@ -87,7 +87,7 @@
       "authors": "X Kong, W Zhang, J Hong, T Braunl",
       "venue": "Proceedings of the 15th International Conference on Simulation and Modeling …",
       "year": 2025,
-      "citedBy": 13,
+      "citedBy": 14,
       "citedByUrl": "https://scholar.google.com/scholar?oi=bibs&hl=en&cites=15855397194552312183,11903185075994393537",
       "url": "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Yf6xHJ4AAAAJ&pagesize=100&citation_for_view=Yf6xHJ4AAAAJ:u-x6o8ySG0sC",
       "coreRank": "C",

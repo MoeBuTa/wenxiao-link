@@ -4,15 +4,15 @@
     "name": "Wenxiao Zhang",
     "affiliation": "University of Western Australia",
     "avatarUrl": "https://scholar.googleusercontent.com/citations?view_op=medium_photo&user=Yf6xHJ4AAAAJ&citpid=1",
-    "citationsAll": 104,
+    "citationsAll": 105,
     "hIndexAll": 5,
     "i10IndexAll": 4,
     "citationsByYear": {
       "2024": 7,
       "2025": 58,
-      "2026": 39
+      "2026": 40
     },
-    "syncedAt": "2026-06-28T22:30:04.403535+00:00"
+    "syncedAt": "2026-06-29T22:30:05.110053+00:00"
   },
   "publications": [
     {
@@ -139,7 +139,7 @@
       "authors": "Q Sun, Y Luo, S Li, W Zhang, W Liu",
       "venue": "Proceedings of the 2024 Conference on Empirical Methods in Natural Language …",
       "year": 2024,
-      "citedBy": 7,
+      "citedBy": 8,
       "citedByUrl": "https://scholar.google.com/scholar?oi=bibs&hl=en&cites=2157919348003395946",
       "url": "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Yf6xHJ4AAAAJ&pagesize=100&citation_for_view=Yf6xHJ4AAAAJ:d1gkVwhDpl0C",
       "coreRank": "A*",

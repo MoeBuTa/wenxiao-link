@@ -1,3 +1,10 @@
+# DISABLED 2026-06-30 — wenxiao.link migrated to Vercel + Neon.
+# The site now auto-deploys from `main` via Vercel's Git integration
+# (projects: wenxiao-link = frontend, wenxiao-backend = Django), so this
+# self-hosted-macOS-runner workflow is no longer used. Kept (renamed to
+# .disabled so GitHub won't run it) in case the Mac/docker path is ever
+# needed again — restore by renaming back to deploy.yml. Disabling it also
+# resolves the self-hosted-runner security advisory (issue #12).
 name: Deploy
 
 on:

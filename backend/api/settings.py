@@ -107,16 +107,33 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "api.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME", "wenxiao"),
-        "USER": os.environ.get("DB_USER", "wenxiao"),
-        "PASSWORD": os.environ.get("DB_PASS", "wenxiao"),
-        "HOST": os.environ.get("DB_SERVICE", "localhost"),
-        "PORT": os.environ.get("DB_PORT", 5432),
+# When DATABASE_URL is present (Vercel + Neon inject it) parse it; otherwise
+# fall back to the discrete DB_* vars the docker-compose stack sets. On
+# serverless we hold no persistent connection (CONN_MAX_AGE=0) and disable
+# server-side cursors, which pgbouncer's transaction pooling can't keep.
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL:
+    import dj_database_url
+
+    DATABASES = {
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=0,
+            ssl_require=True,
+        ),
     }
-}
+    DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.environ.get("DB_NAME", "wenxiao"),
+            "USER": os.environ.get("DB_USER", "wenxiao"),
+            "PASSWORD": os.environ.get("DB_PASS", "wenxiao"),
+            "HOST": os.environ.get("DB_SERVICE", "localhost"),
+            "PORT": os.environ.get("DB_PORT", 5432),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

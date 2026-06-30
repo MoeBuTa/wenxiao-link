@@ -1,3 +1,6 @@
+import hmac
+import os
+
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import CommandError
@@ -85,3 +88,30 @@ class RefreshView(APIView):
                 "count": Publication.objects.count(),
             }
         )
+
+
+class CronSyncView(APIView):
+    """GET /api/scholar/cron-sync/ — Vercel Cron entry point.
+
+    Replaces the launchd job that ran `sync_scholar` daily on the Mac. Vercel
+    Cron sends `Authorization: Bearer $CRON_SECRET`; we accept the request only
+    when that matches, so the endpoint is public-routable but not callable by
+    anyone without the secret. GET (not POST) because Vercel Cron issues GETs.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        secret = os.environ.get("CRON_SECRET", "")
+        header = request.headers.get("Authorization", "")
+        expected = f"Bearer {secret}"
+        # Constant-time compare; reject when no secret is configured at all.
+        if not secret or not hmac.compare_digest(header, expected):
+            return Response({"detail": "unauthorized"}, status=401)
+        try:
+            call_command("sync_scholar")
+        except CommandError as exc:
+            return Response({"detail": str(exc)}, status=502)
+        except Exception as exc:  # noqa: BLE001 — gateway error, not a 500
+            return Response({"detail": f"Sync failed: {exc}"}, status=502)
+        return Response({"ok": True, "count": Publication.objects.count()})

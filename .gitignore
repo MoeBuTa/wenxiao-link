@@ -12,3 +12,5 @@ backend/.env
 # Local docker-compose volume fallbacks (prod uses /Users/wenxiao/wenxiao-link-data).
 backend/postgres_data/
 backend/staticfiles/
+.vercel
+.env*

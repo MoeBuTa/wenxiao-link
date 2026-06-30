@@ -31,8 +31,20 @@ async function readSnapshot<K extends keyof StatsFallback>(
 // Fire-and-forget page-view ping. `keepalive` lets it survive a navigation,
 // and admin pages are never counted (the backend also skips the owner). When
 // the backend is down this is a silent no-op — nothing to fall back to.
+//
+// Each path is counted at most once per browser session: bouncing back and
+// forth between pages (or refreshing) no longer inflates the view count, while
+// a genuine return visit — a new tab, or reopening after closing — counts
+// again. sessionStorage is per-tab and cleared when the tab closes.
 export function recordHit(path: string): void {
   if (path.startsWith("/admin")) return;
+  try {
+    const key = `viewed:${path}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+  } catch {
+    // sessionStorage blocked (private mode, etc.) — fall through and count.
+  }
   void apiFetch("/api/stats/hit/", {
     method: "POST",
     body: JSON.stringify({ path }),

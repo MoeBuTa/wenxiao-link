@@ -10,6 +10,7 @@ last good rows from Postgres.
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -21,12 +22,20 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.ssl_ import create_urllib3_context
 
 SCHOLAR_BASE = "https://scholar.google.com"
+SERPAPI_BASE = "https://serpapi.com/search.json"
 USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
 )
 PAGE_SIZE = 100
 DATA_DIR = Path(__file__).resolve().parent / "data"
+
+
+def _avatar_url(user_id: str) -> str:
+    return (
+        f"https://scholar.googleusercontent.com/citations"
+        f"?view_op=medium_photo&user={user_id}&citpid=1"
+    )
 
 
 class ScholarFetchError(RuntimeError):
@@ -217,9 +226,94 @@ def _parse_profile(soup: BeautifulSoup, user_id: str) -> dict:
     }
 
 
+def _fetch_serpapi(user_id: str, api_key: str) -> dict:
+    """Fetch the profile via SerpApi's Google Scholar Author API.
+
+    SerpApi scrapes Scholar from its own residential-grade IPs, so this path
+    works from cloud hosts (Vercel/AWS) that Scholar 403s when hit directly.
+    Returns the same {profile, publications} shape as the HTML scraper.
+    """
+    try:
+        resp = requests.get(
+            SERPAPI_BASE,
+            params={
+                "engine": "google_scholar_author",
+                "author_id": user_id,
+                "api_key": api_key,
+                "num": PAGE_SIZE,
+                "hl": "en",
+            },
+            timeout=30,
+        )
+    except requests.RequestException as exc:
+        raise ScholarFetchError(f"SerpApi request failed: {exc}") from exc
+    if resp.status_code != 200:
+        raise ScholarFetchError(f"SerpApi returned HTTP {resp.status_code}")
+    data = resp.json()
+    if data.get("error"):
+        raise ScholarFetchError(f"SerpApi error: {data['error']}")
+
+    author = data.get("author") or {}
+    # cited_by.table is a list of single-key dicts: citations / h_index / i10_index.
+    table = {
+        key: val
+        for row in (data.get("cited_by") or {}).get("table", [])
+        for key, val in row.items()
+    }
+
+    def _metric(name: str) -> int:
+        return int((table.get(name) or {}).get("all", 0) or 0)
+
+    profile = {
+        "user_id": user_id,
+        "name": author.get("name", ""),
+        "affiliation": author.get("affiliations", ""),
+        "avatar_url": _avatar_url(user_id),
+        "citations_all": _metric("citations"),
+        "h_index_all": _metric("h_index"),
+        "i10_index_all": _metric("i10_index"),
+    }
+
+    publications = []
+    for index, art in enumerate(data.get("articles") or []):
+        cited = art.get("cited_by") or {}
+        title = art.get("title", "")
+        venue = art.get("publication", "")
+        year_raw = art.get("year")
+        try:
+            year = int(year_raw) if year_raw else None
+        except (TypeError, ValueError):
+            year = None
+        rank, acronym = rank_for(title, venue)
+        publications.append(
+            {
+                "scholar_id": art.get("citation_id", ""),
+                "title": title,
+                "url": art.get("link", ""),
+                "authors": art.get("authors", ""),
+                "venue": venue,
+                "year": year,
+                "cited_by": int(cited.get("value") or 0),
+                "cited_by_url": cited.get("link", "") or "",
+                "core_rank": rank,
+                "core_acronym": acronym,
+                "order_index": index,
+            }
+        )
+    return {"profile": profile, "publications": publications}
+
+
 def fetch_scholar(user_id: str) -> dict:
     """Fetch the full profile: header metrics + every publication row,
-    each annotated with (core_rank, core_acronym)."""
+    each annotated with (core_rank, core_acronym).
+
+    Uses SerpApi when SERPAPI_KEY is set (required on cloud hosts Scholar
+    blocks); otherwise scrapes the HTML directly (fine from a residential IP).
+    """
+    api_key = os.environ.get("SERPAPI_KEY")
+    if api_key:
+        return _fetch_serpapi(user_id, api_key)
+
     soup = _fetch_page(user_id, cstart=0)
     profile = _parse_profile(soup, user_id)
     publications = _parse_rows(soup)

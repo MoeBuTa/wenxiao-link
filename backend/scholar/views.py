@@ -99,6 +99,10 @@ class CronSyncView(APIView):
     anyone without the secret. GET (not POST) because Vercel Cron issues GETs.
     """
 
+    # No DRF auth: the Bearer header carries the cron secret, not a JWT, so the
+    # default CookieJWTAuthentication would reject it before get() runs. The
+    # hmac check below is the only gate.
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def get(self, request):

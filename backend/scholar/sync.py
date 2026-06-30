@@ -264,6 +264,13 @@ def _fetch_serpapi(user_id: str, api_key: str) -> dict:
     def _metric(name: str) -> int:
         return int((table.get(name) or {}).get("all", 0) or 0)
 
+    # cited_by.graph is the per-year histogram: [{"year": 2024, "citations": 12}, ...].
+    citations_by_year = {}
+    for point in (data.get("cited_by") or {}).get("graph", []):
+        year, count = point.get("year"), point.get("citations")
+        if year is not None and count is not None:
+            citations_by_year[str(year)] = int(count)
+
     profile = {
         "user_id": user_id,
         "name": author.get("name", ""),
@@ -272,6 +279,7 @@ def _fetch_serpapi(user_id: str, api_key: str) -> dict:
         "citations_all": _metric("citations"),
         "h_index_all": _metric("h_index"),
         "i10_index_all": _metric("i10_index"),
+        "citations_by_year": dict(sorted(citations_by_year.items())),
     }
 
     publications = []

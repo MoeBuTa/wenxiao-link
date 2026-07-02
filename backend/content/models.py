@@ -98,6 +98,48 @@ class Project(models.Model):
         return self.name
 
 
+class AgentSkill(models.Model):
+    """Claude Code plugin/skill/command/agent installed on the owner's
+    machine, shown on the /skills page. `slug`/`name`/`description`/
+    `source`/`origin`/`category` are "detected" fields refreshed by the
+    `sync_agent_skills` management command; `tags`/`highlight_blurb`/
+    `highlight_order`/`published`/`order` are "curated" fields set once via
+    admin and never overwritten by a re-sync.
+    """
+
+    SOURCE_CHOICES = [
+        ("plugin", "Plugin"),
+        ("npx-package", "npx package"),
+        ("self-authored", "Self-authored"),
+        ("linked-project", "Linked project"),
+    ]
+    CATEGORY_CHOICES = [
+        ("skill", "Skill"),
+        ("command", "Command"),
+        ("agent", "Agent"),
+    ]
+
+    slug = models.SlugField(max_length=220, unique=True)
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")  # markdown; edited via admin
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES)
+    origin = models.CharField(max_length=255, blank=True, default="")
+    category = models.CharField(max_length=10, choices=CATEGORY_CHOICES)
+    tags = models.JSONField(default=list)  # list[str]
+    highlight_blurb = models.TextField(blank=True, default="")
+    highlight_order = models.IntegerField(null=True, blank=True)
+    published = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["order", "name"]
+
+    def __str__(self) -> str:  # pragma: no cover - admin readability
+        return f"{self.name} ({self.origin or 'local'})"
+
+
 class BlogPost(models.Model):
     slug = models.SlugField(max_length=200, unique=True)
     title = models.CharField(max_length=300)

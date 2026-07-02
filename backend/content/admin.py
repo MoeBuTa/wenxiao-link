@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from content.models import (
+    AgentSkill,
     BlogPost,
     EducationItem,
     ExperienceItem,
@@ -14,6 +15,14 @@ from content.models import (
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ("name", "title", "affiliation")
+
+
+@admin.register(AgentSkill)
+class AgentSkillAdmin(admin.ModelAdmin):
+    list_display = ("name", "source", "category", "origin", "published", "order")
+    list_filter = ("source", "category", "published")
+    list_editable = ("published", "order")
+    prepopulated_fields = {"slug": ("origin", "name")}
 
 
 @admin.register(NewsItem)

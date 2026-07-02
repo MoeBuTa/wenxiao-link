@@ -6,6 +6,9 @@ import path from "path";
 import matter from "gray-matter";
 
 import type {
+  AgentSkillCategory,
+  AgentSkillEntry,
+  AgentSkillSource,
   BlogPostMeta,
   NewsItem,
   Project,
@@ -161,4 +164,48 @@ export async function getPublications(): Promise<PublicationsPayload> {
     /* fall through to seed */
   }
   return readJson<PublicationsPayload>("publications.seed.json");
+}
+
+// ---- Agent skills (DB-backed; file fallback is committed markdown dumped
+// by export_content, mirroring how blog posts fall back) ---------------------
+
+const AGENT_SKILLS_DIR = path.join(CONTENT_DIR, "agent-skills");
+
+function agentSkillFromFrontmatter(
+  slug: string,
+  data: Record<string, unknown>,
+  body: string,
+): AgentSkillEntry {
+  return {
+    id: 0,
+    slug,
+    name: String(data.name ?? slug),
+    description: body.trim(),
+    source: (typeof data.source === "string" ? data.source : "self-authored") as AgentSkillSource,
+    origin: String(data.origin ?? ""),
+    category: (typeof data.category === "string" ? data.category : "skill") as AgentSkillCategory,
+    tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+    highlightBlurb: String(data.highlightBlurb ?? ""),
+    highlightOrder: typeof data.highlightOrder === "number" ? data.highlightOrder : null,
+    order: typeof data.order === "number" ? data.order : 0,
+  };
+}
+
+function agentSkillsFromFiles(): AgentSkillEntry[] {
+  if (!fs.existsSync(AGENT_SKILLS_DIR)) return [];
+  return fs
+    .readdirSync(AGENT_SKILLS_DIR)
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => {
+      const slug = f.replace(/\.md$/, "");
+      const { data, content } = matter(fs.readFileSync(path.join(AGENT_SKILLS_DIR, f), "utf-8"));
+      return agentSkillFromFrontmatter(slug, data, content);
+    })
+    .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+}
+
+export async function getAgentSkills(): Promise<AgentSkillEntry[]> {
+  const data = await apiGet<AgentSkillEntry[]>("/agent-skills/");
+  if (data) return data;
+  return agentSkillsFromFiles();
 }

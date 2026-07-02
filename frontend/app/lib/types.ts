@@ -114,3 +114,21 @@ export type QAComment = {
   updatedAt: string;
   replies?: QAComment[];
 };
+
+export type AgentSkillSource = "plugin" | "npx-package" | "self-authored" | "linked-project";
+
+export type AgentSkillCategory = "skill" | "command" | "agent";
+
+export type AgentSkillEntry = {
+  id: number;
+  slug: string;
+  name: string;
+  description: string;
+  source: AgentSkillSource;
+  origin: string;
+  category: AgentSkillCategory;
+  tags: string[];
+  highlightBlurb: string;
+  highlightOrder: number | null;
+  order: number;
+};

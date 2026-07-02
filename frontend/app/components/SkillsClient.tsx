@@ -2,6 +2,7 @@
 
 import {
   Box,
+  Collapse,
   Container,
   Flex,
   HStack,
@@ -16,8 +17,17 @@ import {
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
-import { FaCode, FaMagic, FaPuzzlePiece, FaRobot, FaSearch, FaTerminal } from "react-icons/fa";
+import { useEffect, useMemo, useState } from "react";
+import {
+  FaChevronDown,
+  FaChevronRight,
+  FaCode,
+  FaMagic,
+  FaPuzzlePiece,
+  FaRobot,
+  FaSearch,
+  FaTerminal,
+} from "react-icons/fa";
 import type { IconType } from "react-icons";
 
 import type { AgentSkillCategory, AgentSkillEntry, AgentSkillSource } from "../lib/types";
@@ -120,6 +130,39 @@ function originLabel(origin: string): string {
   return origin.trim() || "Personal";
 }
 
+function GroupHeader({
+  origin,
+  count,
+  expanded,
+  onToggle,
+}: {
+  origin: string;
+  count: number;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <Flex
+      as="button"
+      onClick={onToggle}
+      align="center"
+      gap={2}
+      mb={3}
+      w="full"
+      textAlign="left"
+      _hover={{ color: "fg.default" }}
+    >
+      <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" />
+      <Heading size="sm" color="fg.muted">
+        {origin}
+      </Heading>
+      <Text fontSize="xs" color="fg.faint">
+        ({count})
+      </Text>
+    </Flex>
+  );
+}
+
 export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
   const [search, setSearch] = useState("");
   const [activeSources, setActiveSources] = useState<Set<AgentSkillSource>>(new Set());
@@ -160,6 +203,33 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
       return a.localeCompare(b);
     });
   }, [filtered]);
+
+  // Groups fold by default so a large catalog doesn't overwhelm the page;
+  // a group with a curated highlight starts open since that's the content
+  // worth seeing first. Once a group's been seen, its expanded/collapsed
+  // state is left alone (including on user toggle) even as filters change.
+  const [expanded, setExpanded] = useState<Map<string, boolean>>(new Map());
+  useEffect(() => {
+    setExpanded((prev) => {
+      let changed = false;
+      const next = new Map(prev);
+      for (const [origin, entries] of grouped) {
+        if (!next.has(origin)) {
+          next.set(origin, entries.some((e) => Boolean(e.highlightBlurb)));
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }, [grouped]);
+
+  function toggleGroup(origin: string) {
+    setExpanded((prev) => {
+      const next = new Map(prev);
+      next.set(origin, !next.get(origin));
+      return next;
+    });
+  }
 
   return (
     <Container maxW="6xl" py={{ base: 8, md: 12 }} px={{ base: 6, md: 10 }}>
@@ -217,18 +287,23 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
         <VStack align="stretch" spacing={8}>
           {grouped.map(([origin, entries]) => (
             <Box key={origin}>
-              <Heading size="sm" color="fg.muted" mb={3}>
-                {origin}
-              </Heading>
-              <Box
-                display="grid"
-                gridTemplateColumns={{ base: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
-                gap={4}
-              >
-                {entries.map((entry) => (
-                  <SkillCard key={entry.slug} entry={entry} />
-                ))}
-              </Box>
+              <GroupHeader
+                origin={origin}
+                count={entries.length}
+                expanded={expanded.get(origin) ?? true}
+                onToggle={() => toggleGroup(origin)}
+              />
+              <Collapse in={expanded.get(origin) ?? true} animateOpacity>
+                <Box
+                  display="grid"
+                  gridTemplateColumns={{ base: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
+                  gap={4}
+                >
+                  {entries.map((entry) => (
+                    <SkillCard key={entry.slug} entry={entry} />
+                  ))}
+                </Box>
+              </Collapse>
             </Box>
           ))}
         </VStack>

@@ -131,6 +131,8 @@ def dump_all_fallbacks() -> dict:
         out["content/publications.seed.json"] = pubs
     for slug, md in _dump_blog().items():
         out[f"content/blog/{slug}.md"] = md
+    for slug, md in _dump_agent_skills().items():
+        out[f"content/agent-skills/{slug}.md"] = md
     out["public/fallback/stats.json"] = _dump_stats()
     out["public/fallback/qa.json"] = _dump_qa()
     return out
@@ -158,6 +160,40 @@ def _dump_blog() -> dict:
         fm = _blog_frontmatter(post.title, post.date, post.summary, post.tags)
         body = (post.body or "").rstrip()
         out[post.slug] = f"{fm}\n{body}\n" if body else f"{fm}\n"
+    return out
+
+
+def _agent_skill_frontmatter(skill) -> str:
+    # Same approach as _blog_frontmatter: JSON scalars/sequences are valid
+    # YAML flow syntax, so json.dumps gives correctly-escaped values that
+    # gray-matter (js-yaml) parses back into exactly what the frontend expects.
+    fields = {
+        "name": skill.name,
+        "source": skill.source,
+        "origin": skill.origin,
+        "category": skill.category,
+        "tags": list(skill.tags or []),
+        "highlightBlurb": skill.highlight_blurb,
+        "highlightOrder": skill.highlight_order,
+        "order": skill.order,
+    }
+    body = "\n".join(f"{k}: {json.dumps(v, ensure_ascii=False)}" for k, v in fields.items())
+    return f"---\n{body}\n---\n"
+
+
+def _dump_agent_skills() -> dict:
+    """``{slug: "<frontmatter>\\n\\n<body>\\n"}`` for every published entry.
+
+    The frontend's file fallback (content.ts ``agentSkillsFromFiles``) reads
+    ``content/agent-skills/*.md`` — this is what fills that directory.
+    """
+    from content.models import AgentSkill
+
+    out: dict = {}
+    for skill in AgentSkill.objects.filter(published=True):
+        fm = _agent_skill_frontmatter(skill)
+        body = (skill.description or "").rstrip()
+        out[skill.slug] = f"{fm}\n{body}\n" if body else f"{fm}\n"
     return out
 
 

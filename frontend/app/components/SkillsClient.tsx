@@ -130,6 +130,23 @@ function originLabel(origin: string): string {
   return origin.trim() || "Personal";
 }
 
+// One-line summary of what each source actually is, shown under the group
+// name so a visitor doesn't have to guess what e.g. "mattpocock/skills"
+// means. Hand-curated (small, stable set of origins) rather than pulled
+// from any one entry's description.
+const ORIGIN_SUMMARIES: Record<string, string> = {
+  Personal: "Skills I wrote myself, or link in from other projects of mine.",
+  superpowers:
+    "Core skills library for Claude Code — TDD, systematic debugging, brainstorming, and other proven collaboration patterns.",
+  "academic-research-skills":
+    "A multi-agent pipeline for academic research and paper writing — literature review, drafting, and peer review.",
+  "andrej-karpathy-skills": "Behavioral guidelines distilled from Andrej Karpathy's notes on common LLM coding mistakes.",
+  "claude-hud": "A real-time statusline HUD for Claude Code — context health, tool activity, and todo progress at a glance.",
+  "mattpocock/skills": "A general-purpose skill library, installed via npx, spanning engineering, writing, and productivity workflows.",
+  "career-ops": "My own job-search command center, linked in from a separate project.",
+  "vercel-labs/skills": "Vercel Labs' skill-discovery tooling for finding and installing other agent skills.",
+};
+
 function GroupHeader({
   origin,
   count,
@@ -141,25 +158,24 @@ function GroupHeader({
   expanded: boolean;
   onToggle: () => void;
 }) {
+  const summary = ORIGIN_SUMMARIES[origin];
   return (
-    <Flex
-      as="button"
-      onClick={onToggle}
-      align="center"
-      gap={2}
-      mb={3}
-      w="full"
-      textAlign="left"
-      _hover={{ color: "fg.default" }}
-    >
-      <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" />
-      <Heading size="sm" color="fg.muted">
-        {origin}
-      </Heading>
-      <Text fontSize="xs" color="fg.faint">
-        ({count})
-      </Text>
-    </Flex>
+    <Box mb={3}>
+      <Flex as="button" onClick={onToggle} align="center" gap={2} w="full" textAlign="left" _hover={{ color: "fg.default" }}>
+        <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" />
+        <Heading size="sm" color="fg.muted">
+          {origin}
+        </Heading>
+        <Text fontSize="xs" color="fg.faint">
+          ({count})
+        </Text>
+      </Flex>
+      {summary ? (
+        <Text fontSize="xs" color="fg.faint" ml={5} mt={0.5}>
+          {summary}
+        </Text>
+      ) : null}
+    </Box>
   );
 }
 

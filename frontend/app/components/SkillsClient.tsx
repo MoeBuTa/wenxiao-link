@@ -2,6 +2,7 @@
 
 import {
   Box,
+  Collapse,
   Container,
   Flex,
   HStack,
@@ -20,6 +21,8 @@ import { useMemo, useState } from "react";
 import {
   FaBolt,
   FaBriefcase,
+  FaChevronDown,
+  FaChevronRight,
   FaCode,
   FaCompass,
   FaGraduationCap,
@@ -153,18 +156,41 @@ const ORIGIN_ICONS: Record<string, IconType> = {
   "vercel-labs/skills": FaCompass,
 };
 
-function GroupBlock({ origin, entries }: { origin: string; entries: AgentSkillEntry[] }) {
+function GroupBlock({
+  origin,
+  entries,
+  expanded,
+  onToggle,
+}: {
+  origin: string;
+  entries: AgentSkillEntry[];
+  expanded: boolean;
+  onToggle: () => void;
+}) {
   const summary = ORIGIN_SUMMARIES[origin];
   const GroupIcon = ORIGIN_ICONS[origin] ?? FaLayerGroup;
   return (
     <Box
+      role="button"
+      tabIndex={0}
+      onClick={onToggle}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onToggle();
+        }
+      }}
       borderWidth="1px"
       borderColor="border.muted"
       borderRadius="lg"
       bg="bg.card"
       p={4}
       mb={4}
+      w="full"
+      cursor="pointer"
+      textAlign="left"
       sx={{ breakInside: "avoid" }}
+      _hover={{ borderColor: "accent" }}
     >
       <Flex align="center" gap={2} mb={1}>
         <Flex
@@ -183,17 +209,20 @@ function GroupBlock({ origin, entries }: { origin: string; entries: AgentSkillEn
         <Text fontSize="xs" color="fg.faint">
           ({entries.length})
         </Text>
+        <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" ml="auto" />
       </Flex>
       {summary ? (
-        <Text fontSize="xs" color="fg.faint" mb={2}>
+        <Text fontSize="xs" color="fg.faint" mb={expanded ? 2 : 0}>
           {summary}
         </Text>
       ) : null}
-      <VStack align="stretch" spacing={0}>
-        {entries.map((entry) => (
-          <SkillRow key={entry.slug} entry={entry} />
-        ))}
-      </VStack>
+      <Collapse in={expanded} animateOpacity>
+        <VStack align="stretch" spacing={0} mt={1}>
+          {entries.map((entry) => (
+            <SkillRow key={entry.slug} entry={entry} />
+          ))}
+        </VStack>
+      </Collapse>
     </Box>
   );
 }
@@ -238,6 +267,31 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
       return a.localeCompare(b);
     });
   }, [filtered]);
+
+  // Groups fold by default; a group with a curated highlight starts open
+  // since that's the content worth seeing first. Seeded synchronously from
+  // the full `skills` prop (not `grouped`, which depends on filter state)
+  // so the first render already reflects the right state — no flash of
+  // every group expanded before a later effect collapses them. Origins not
+  // yet in the map (only possible if `skills` itself changes, which this
+  // page never does after mount) default to expanded via the `?? true`
+  // fallback below.
+  const [expanded, setExpanded] = useState<Map<string, boolean>>(() => {
+    const seed = new Map<string, boolean>();
+    for (const entry of skills) {
+      const key = originLabel(entry.origin);
+      seed.set(key, (seed.get(key) ?? false) || Boolean(entry.highlightBlurb));
+    }
+    return seed;
+  });
+
+  function toggleGroup(origin: string) {
+    setExpanded((prev) => {
+      const next = new Map(prev);
+      next.set(origin, !(next.get(origin) ?? true));
+      return next;
+    });
+  }
 
   return (
     <Container maxW="6xl" py={{ base: 8, md: 12 }} px={{ base: 6, md: 10 }}>
@@ -294,7 +348,13 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
       ) : (
         <Box sx={{ columnCount: { base: 1, md: 2, lg: 3 }, columnGap: "1rem" }}>
           {grouped.map(([origin, entries]) => (
-            <GroupBlock key={origin} origin={origin} entries={entries} />
+            <GroupBlock
+              key={origin}
+              origin={origin}
+              entries={entries}
+              expanded={expanded.get(origin) ?? true}
+              onToggle={() => toggleGroup(origin)}
+            />
           ))}
         </Box>
       )}

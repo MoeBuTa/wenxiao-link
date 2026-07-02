@@ -1,7 +1,7 @@
 ---
 name: "career-ops"
 source: "linked-project"
-origin: "/Users/wenxiao/PycharmProjects/Resume/career-ops/.claude/skills/career-ops"
+origin: "career-ops"
 category: "skill"
 tags: ["job-search", "automation", "linked-project"]
 highlightBlurb: "A linked skill from my job-search project that evaluates offers, generates tailored CVs, and scans portals for new listings -- wired into the same agent so job-search admin gets the same automation as my research and engineering work."

@@ -143,7 +143,13 @@ function collectUserSkills() {
         origin = lockSkills[entry.name]?.source ?? "";
       } else {
         source = "linked-project";
-        origin = resolved;
+        // Use the project directory name, not the full local filesystem
+        // path — a raw absolute path is ugly on a public page and leaks
+        // local directory structure. Project root is whatever precedes
+        // "/.claude/skills/..." in the resolved symlink target.
+        const marker = "/.claude/skills/";
+        const idx = resolved.indexOf(marker);
+        origin = idx >= 0 ? path.basename(resolved.slice(0, idx)) : path.basename(resolved);
       }
     }
 

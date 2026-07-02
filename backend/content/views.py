@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from content.markdown import parse_blog_markdown
 from content.models import (
+    AgentSkill,
     BlogPost,
     EducationItem,
     ExperienceItem,
@@ -17,6 +18,7 @@ from content.models import (
 )
 from content.permissions import ReadOnlyOrSuperUser
 from content.serializers import (
+    AgentSkillSerializer,
     BlogPostDetailSerializer,
     BlogPostListSerializer,
     EducationItemSerializer,
@@ -126,6 +128,37 @@ class ProjectListView(_List):
 class ProjectDetailView(_Detail):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+
+
+# ---- Agent skills -----------------------------------------------------------
+
+
+class AgentSkillListView(generics.ListCreateAPIView):
+    """Public list shows published entries; the owner sees unpublished too (?all=1)."""
+
+    permission_classes = [ReadOnlyOrSuperUser]
+    serializer_class = AgentSkillSerializer
+
+    def get_queryset(self):
+        qs = AgentSkill.objects.all()
+        user = self.request.user
+        show_all = self.request.query_params.get("all") == "1"
+        if not (show_all and user.is_authenticated and user.is_superuser):
+            qs = qs.filter(published=True)
+        return qs
+
+
+class AgentSkillDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Admin edit by id (full record); public read by id is published-only."""
+
+    permission_classes = [ReadOnlyOrSuperUser]
+    serializer_class = AgentSkillSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated and user.is_superuser:
+            return AgentSkill.objects.all()
+        return AgentSkill.objects.filter(published=True)
 
 
 # ---- Blog -------------------------------------------------------------------

@@ -7,6 +7,7 @@ JSON the API emits drops straight into the existing components.
 from rest_framework import serializers
 
 from content.models import (
+    AgentSkill,
     BlogPost,
     EducationItem,
     ExperienceItem,
@@ -123,6 +124,29 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ["id", "name", "description", "tags", "repoUrl", "stars", "highlight", "order"]
+
+
+class AgentSkillSerializer(serializers.ModelSerializer):
+    tags = serializers.ListField(child=serializers.CharField(), required=False)
+    highlightBlurb = serializers.CharField(source="highlight_blurb", allow_blank=True, required=False)
+    highlightOrder = serializers.IntegerField(source="highlight_order", allow_null=True, required=False)
+
+    class Meta:
+        model = AgentSkill
+        fields = [
+            "id",
+            "slug",
+            "name",
+            "description",
+            "source",
+            "origin",
+            "category",
+            "tags",
+            "highlightBlurb",
+            "highlightOrder",
+            "published",
+            "order",
+        ]
 
 
 class BlogPostListSerializer(serializers.ModelSerializer):

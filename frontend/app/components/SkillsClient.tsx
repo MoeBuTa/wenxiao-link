@@ -2,7 +2,6 @@
 
 import {
   Box,
-  Collapse,
   Container,
   Flex,
   HStack,
@@ -17,17 +16,24 @@ import {
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  FaChevronDown,
-  FaChevronRight,
+  FaBolt,
+  FaBriefcase,
   FaCode,
+  FaCompass,
+  FaGraduationCap,
+  FaLayerGroup,
   FaMagic,
   FaPuzzlePiece,
   FaRobot,
   FaSearch,
+  FaTachometerAlt,
   FaTerminal,
+  FaToolbox,
+  FaUser,
 } from "react-icons/fa";
+import { GiBrain } from "react-icons/gi";
 import type { IconType } from "react-icons";
 
 import type { AgentSkillCategory, AgentSkillEntry, AgentSkillSource } from "../lib/types";
@@ -81,48 +87,33 @@ function FilterChip({
   );
 }
 
-function SkillCard({ entry }: { entry: AgentSkillEntry }) {
+// Compact row, not a card — a large catalog reads better as a dense list
+// than as a grid of boxes, which eats vertical space fast at 75+ entries.
+function SkillRow({ entry }: { entry: AgentSkillEntry }) {
   const CategoryIcon = CATEGORY_ICONS[entry.category];
   const isHighlighted = Boolean(entry.highlightBlurb);
   return (
-    <Box
-      borderWidth="1px"
-      borderColor={isHighlighted ? "accent" : "border.muted"}
-      borderRadius="lg"
-      bg="bg.card"
-      p={4}
-      h="full"
-      boxShadow={isHighlighted ? "0 0 0 1px rgba(249,115,22,0.25)" : undefined}
+    <HStack
+      align="start"
+      spacing={2}
+      py={1.5}
+      borderBottomWidth="1px"
+      borderColor="border.muted"
+      _last={{ borderBottomWidth: 0 }}
     >
-      <VStack align="stretch" spacing={2}>
-        <Flex align="center" gap={2}>
-          <Icon as={CategoryIcon} color="fg.faint" boxSize={3.5} />
-          <Text fontWeight="700" color="fg.default" noOfLines={1}>
+      <Icon as={CategoryIcon} color={isHighlighted ? "accent" : "fg.faint"} boxSize={3} mt={1} flexShrink={0} />
+      <Box minW={0} flex={1}>
+        <HStack spacing={1.5}>
+          <Text fontSize="sm" fontWeight={isHighlighted ? "700" : "600"} color="fg.default" noOfLines={1}>
             {entry.name}
           </Text>
-          {isHighlighted ? (
-            <Icon as={FaMagic} color="accent" boxSize={3.5} ml="auto" flexShrink={0} />
-          ) : null}
-        </Flex>
-        <Text fontSize="sm" color="fg.muted" noOfLines={isHighlighted ? undefined : 3}>
+          {isHighlighted ? <Icon as={FaMagic} color="accent" boxSize={2.5} flexShrink={0} /> : null}
+        </HStack>
+        <Text fontSize="xs" color="fg.muted" noOfLines={1}>
           {isHighlighted ? entry.highlightBlurb : entry.description}
         </Text>
-        <Wrap spacing={1.5}>
-          <WrapItem>
-            <Tag size="sm" bg="rgba(56,189,248,0.1)" color="ocean" fontSize="0.7em">
-              {SOURCE_LABELS[entry.source]}
-            </Tag>
-          </WrapItem>
-          {entry.tags.slice(0, 3).map((tag) => (
-            <WrapItem key={tag}>
-              <Tag size="sm" bg="bg.subtle" color="fg.muted" fontSize="0.7em">
-                {tag}
-              </Tag>
-            </WrapItem>
-          ))}
-        </Wrap>
-      </VStack>
-    </Box>
+      </Box>
+    </HStack>
   );
 }
 
@@ -147,34 +138,62 @@ const ORIGIN_SUMMARIES: Record<string, string> = {
   "vercel-labs/skills": "Vercel Labs' skill-discovery tooling for finding and installing other agent skills.",
 };
 
-function GroupHeader({
-  origin,
-  count,
-  expanded,
-  onToggle,
-}: {
-  origin: string;
-  count: number;
-  expanded: boolean;
-  onToggle: () => void;
-}) {
+// A small teaser icon per source so groups are visually distinguishable at
+// a glance, not just by name. Falls back to a generic "layers" icon for any
+// origin not in this hand-curated set (e.g. a newly installed plugin before
+// someone adds it here).
+const ORIGIN_ICONS: Record<string, IconType> = {
+  Personal: FaUser,
+  superpowers: FaBolt,
+  "academic-research-skills": FaGraduationCap,
+  "andrej-karpathy-skills": GiBrain,
+  "claude-hud": FaTachometerAlt,
+  "mattpocock/skills": FaToolbox,
+  "career-ops": FaBriefcase,
+  "vercel-labs/skills": FaCompass,
+};
+
+function GroupBlock({ origin, entries }: { origin: string; entries: AgentSkillEntry[] }) {
   const summary = ORIGIN_SUMMARIES[origin];
+  const GroupIcon = ORIGIN_ICONS[origin] ?? FaLayerGroup;
   return (
-    <Box mb={3}>
-      <Flex as="button" onClick={onToggle} align="center" gap={2} w="full" textAlign="left" _hover={{ color: "fg.default" }}>
-        <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" />
-        <Heading size="sm" color="fg.muted">
+    <Box
+      borderWidth="1px"
+      borderColor="border.muted"
+      borderRadius="lg"
+      bg="bg.card"
+      p={4}
+      mb={4}
+      sx={{ breakInside: "avoid" }}
+    >
+      <Flex align="center" gap={2} mb={1}>
+        <Flex
+          align="center"
+          justify="center"
+          boxSize={7}
+          borderRadius="md"
+          bg="rgba(249,115,22,0.12)"
+          flexShrink={0}
+        >
+          <Icon as={GroupIcon} color="accent" boxSize={3.5} />
+        </Flex>
+        <Heading size="sm" color="fg.default">
           {origin}
         </Heading>
         <Text fontSize="xs" color="fg.faint">
-          ({count})
+          ({entries.length})
         </Text>
       </Flex>
       {summary ? (
-        <Text fontSize="xs" color="fg.faint" ml={5} mt={0.5}>
+        <Text fontSize="xs" color="fg.faint" mb={2}>
           {summary}
         </Text>
       ) : null}
+      <VStack align="stretch" spacing={0}>
+        {entries.map((entry) => (
+          <SkillRow key={entry.slug} entry={entry} />
+        ))}
+      </VStack>
     </Box>
   );
 }
@@ -219,43 +238,6 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
       return a.localeCompare(b);
     });
   }, [filtered]);
-
-  // Groups fold by default so a large catalog doesn't overwhelm the page;
-  // a group with a curated highlight starts open since that's the content
-  // worth seeing first. Seeded from the full `skills` prop (not `grouped`,
-  // which depends on filter state) so the very first render is already
-  // correct — no flash of every group expanded before an effect collapses
-  // them. Once a group's been seen, its expanded/collapsed state is left
-  // alone (including on user toggle) even as filters change.
-  const [expanded, setExpanded] = useState<Map<string, boolean>>(() => {
-    const seed = new Map<string, boolean>();
-    for (const entry of skills) {
-      const key = originLabel(entry.origin);
-      seed.set(key, (seed.get(key) ?? false) || Boolean(entry.highlightBlurb));
-    }
-    return seed;
-  });
-  useEffect(() => {
-    setExpanded((prev) => {
-      let changed = false;
-      const next = new Map(prev);
-      for (const [origin, entries] of grouped) {
-        if (!next.has(origin)) {
-          next.set(origin, entries.some((e) => Boolean(e.highlightBlurb)));
-          changed = true;
-        }
-      }
-      return changed ? next : prev;
-    });
-  }, [grouped]);
-
-  function toggleGroup(origin: string) {
-    setExpanded((prev) => {
-      const next = new Map(prev);
-      next.set(origin, !next.get(origin));
-      return next;
-    });
-  }
 
   return (
     <Container maxW="6xl" py={{ base: 8, md: 12 }} px={{ base: 6, md: 10 }}>
@@ -310,29 +292,11 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
           No skills match the current filters.
         </Text>
       ) : (
-        <VStack align="stretch" spacing={8}>
+        <Box sx={{ columnCount: { base: 1, md: 2, lg: 3 }, columnGap: "1rem" }}>
           {grouped.map(([origin, entries]) => (
-            <Box key={origin}>
-              <GroupHeader
-                origin={origin}
-                count={entries.length}
-                expanded={expanded.get(origin) ?? true}
-                onToggle={() => toggleGroup(origin)}
-              />
-              <Collapse in={expanded.get(origin) ?? true} animateOpacity>
-                <Box
-                  display="grid"
-                  gridTemplateColumns={{ base: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
-                  gap={4}
-                >
-                  {entries.map((entry) => (
-                    <SkillCard key={entry.slug} entry={entry} />
-                  ))}
-                </Box>
-              </Collapse>
-            </Box>
+            <GroupBlock key={origin} origin={origin} entries={entries} />
           ))}
-        </VStack>
+        </Box>
       )}
 
       <HStack mt={10} spacing={1} color="fg.faint" fontSize="xs">

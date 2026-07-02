@@ -206,9 +206,19 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
 
   // Groups fold by default so a large catalog doesn't overwhelm the page;
   // a group with a curated highlight starts open since that's the content
-  // worth seeing first. Once a group's been seen, its expanded/collapsed
-  // state is left alone (including on user toggle) even as filters change.
-  const [expanded, setExpanded] = useState<Map<string, boolean>>(new Map());
+  // worth seeing first. Seeded from the full `skills` prop (not `grouped`,
+  // which depends on filter state) so the very first render is already
+  // correct — no flash of every group expanded before an effect collapses
+  // them. Once a group's been seen, its expanded/collapsed state is left
+  // alone (including on user toggle) even as filters change.
+  const [expanded, setExpanded] = useState<Map<string, boolean>>(() => {
+    const seed = new Map<string, boolean>();
+    for (const entry of skills) {
+      const key = originLabel(entry.origin);
+      seed.set(key, (seed.get(key) ?? false) || Boolean(entry.highlightBlurb));
+    }
+    return seed;
+  });
   useEffect(() => {
     setExpanded((prev) => {
       let changed = false;

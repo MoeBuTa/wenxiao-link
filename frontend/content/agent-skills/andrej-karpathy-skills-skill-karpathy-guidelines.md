@@ -4,7 +4,7 @@ source: "plugin"
 origin: "andrej-karpathy-skills"
 category: "skill"
 tags: ["code-quality", "best-practices"]
-highlightBlurb: "A standing check on every diff the agent proposes: surgical changes over rewrites, assumptions surfaced instead of silently guessed, and explicit verifiable success criteria before calling something done."
+highlightBlurb: "I keep this loaded as a standing check on every diff I ask the agent to make: it pushes back on overcomplication, keeps edits surgical, and makes me surface assumptions and define verifiable success criteria before calling something done."
 highlightOrder: 4
 order: 0
 ---

@@ -34,6 +34,7 @@ const NAV_ITEMS = [
   { href: "/publications", label: "Publications" },
   { href: "/blog", label: "Blog" },
   { href: "/projects", label: "Projects" },
+  { href: "/skills", label: "Skills" },
   ...(QA_ENABLED ? [{ href: "/qa", label: "Q&A" }] : []),
 ];
 

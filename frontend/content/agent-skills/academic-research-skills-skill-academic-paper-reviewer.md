@@ -1,0 +1,12 @@
+---
+name: "academic-paper-reviewer"
+source: "plugin"
+origin: "academic-research-skills"
+category: "skill"
+tags: []
+highlightBlurb: ""
+highlightOrder: null
+order: 0
+---
+
+Multi-perspective academic paper review with dynamic reviewer personas. Simulates 5 independent reviewers (EIC + 3 peer reviewers + Devil's Advocate) with field-specific expertise. Supports full review, re-review (verification), quick assessment, methodology focus, Socratic guided, and calibration modes. Triggers on: review paper, peer review, manuscript review, referee report, review my paper, critique paper, simulate review, editorial review, calibrate reviewer, reviewer calibration, measure reviewer accuracy.

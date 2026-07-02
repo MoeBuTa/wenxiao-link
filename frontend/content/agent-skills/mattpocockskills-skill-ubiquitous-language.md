@@ -1,0 +1,12 @@
+---
+name: "ubiquitous-language"
+source: "npx-package"
+origin: "mattpocock/skills"
+category: "skill"
+tags: []
+highlightBlurb: ""
+highlightOrder: null
+order: 0
+---
+
+Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities and proposing canonical terms. Saves to UBIQUITOUS_LANGUAGE.md. Use when user wants to define domain terms, build a glossary, harden terminology, create a ubiquitous language, or mentions "domain model" or "DDD".

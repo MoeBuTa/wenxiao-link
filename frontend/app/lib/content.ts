@@ -207,7 +207,11 @@ function agentSkillsFromFiles(): AgentSkillEntry[] {
 }
 
 export async function getAgentSkills(): Promise<AgentSkillEntry[]> {
+  // Only trust a non-empty API response: an empty list means the backend's
+  // AgentSkill table hasn't been synced (e.g. fresh Neon in prod) — the
+  // committed markdown snapshot is the truthful fallback, same guard as
+  // getPublications uses for a not-yet-synced scholar table.
   const data = await apiGet<AgentSkillEntry[]>("/agent-skills/");
-  if (data) return data;
+  if (data && data.length > 0) return data;
   return agentSkillsFromFiles();
 }

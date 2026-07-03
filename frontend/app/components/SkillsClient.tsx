@@ -16,6 +16,7 @@ import {
   VStack,
   Wrap,
   WrapItem,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import {
@@ -189,7 +190,6 @@ function GroupBlock({
       w="full"
       cursor="pointer"
       textAlign="left"
-      sx={{ breakInside: "avoid" }}
       _hover={{ borderColor: "accent" }}
     >
       <Flex align="center" gap={2} mb={1}>
@@ -264,6 +264,21 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
       return a.localeCompare(b);
     });
   }, [filtered]);
+
+  // CSS `column-count` masonry re-flows every item (top-to-bottom, column by
+  // column) whenever ANY item's height changes, so folding one group could
+  // visibly jump every other group into a different column. Assigning each
+  // group a fixed column by index instead means a group's column membership
+  // never depends on rendered heights — only re-computed when the group
+  // list or column count itself changes.
+  const columnCount = useBreakpointValue({ base: 1, md: 2, lg: 3 }) ?? 3;
+  const columns = useMemo(() => {
+    const cols: Array<[string, AgentSkillEntry[]][]> = Array.from({ length: columnCount }, () => []);
+    grouped.forEach(([origin, entries], i) => {
+      cols[i % columnCount].push([origin, entries]);
+    });
+    return cols;
+  }, [grouped, columnCount]);
 
   // Groups fold by default; a group with a curated highlight starts open
   // since that's the content worth seeing first. Seeded synchronously from
@@ -343,17 +358,21 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
           No skills match the current filters.
         </Text>
       ) : (
-        <Box sx={{ columnCount: { base: 1, md: 2, lg: 3 }, columnGap: "1rem" }}>
-          {grouped.map(([origin, entries]) => (
-            <GroupBlock
-              key={origin}
-              origin={origin}
-              entries={entries}
-              expanded={expanded.get(origin) ?? true}
-              onToggle={() => toggleGroup(origin)}
-            />
+        <Flex gap={4} align="start">
+          {columns.map((col, i) => (
+            <VStack key={i} align="stretch" spacing={0} flex={1} minW={0}>
+              {col.map(([origin, entries]) => (
+                <GroupBlock
+                  key={origin}
+                  origin={origin}
+                  entries={entries}
+                  expanded={expanded.get(origin) ?? true}
+                  onToggle={() => toggleGroup(origin)}
+                />
+              ))}
+            </VStack>
           ))}
-        </Box>
+        </Flex>
       )}
 
       <HStack mt={10} spacing={1} color="fg.faint" fontSize="xs">

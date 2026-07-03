@@ -25,7 +25,6 @@ import {
   FaChevronRight,
   FaCode,
   FaExternalLinkAlt,
-  FaMagic,
   FaPuzzlePiece,
   FaRobot,
   FaSearch,
@@ -144,7 +143,7 @@ function RepoCard({
   expanded: boolean;
   onToggle: () => void;
 }) {
-  const { name, url, entries, isHighlighted } = group;
+  const { name, url, entries } = group;
   const single = entries.length === 1;
   const topNames = entries.slice(0, 3).map((e) => e.name);
   const primaryCategory = entries[0].category;
@@ -162,7 +161,7 @@ function RepoCard({
         }
       }}
       borderWidth="1px"
-      borderColor={isHighlighted ? "accent" : "border.muted"}
+      borderColor="border.muted"
       borderRadius="lg"
       bg="bg.card"
       p={3}
@@ -170,18 +169,17 @@ function RepoCard({
       w="full"
       cursor="pointer"
       textAlign="left"
-      boxShadow={isHighlighted ? "0 0 0 1px rgba(249,115,22,0.25)" : undefined}
       _hover={{ borderColor: "accent" }}
     >
       <Flex align="center" gap={2}>
-        <Icon as={CategoryIcon} color={isHighlighted ? "accent" : "fg.faint"} boxSize={3} flexShrink={0} />
+        <Icon as={CategoryIcon} color="fg.faint" boxSize={3} flexShrink={0} />
         {url ? (
           <Link
             href={url}
             isExternal
             onClick={(e) => e.stopPropagation()}
             fontSize="sm"
-            fontWeight={isHighlighted ? "700" : "600"}
+            fontWeight="600"
             color="fg.default"
             noOfLines={1}
             _hover={{ color: "accent", textDecoration: "underline" }}
@@ -189,12 +187,11 @@ function RepoCard({
             {name}
           </Link>
         ) : (
-          <Text fontSize="sm" fontWeight={isHighlighted ? "700" : "600"} color="fg.default" noOfLines={1}>
+          <Text fontSize="sm" fontWeight="600" color="fg.default" noOfLines={1}>
             {name}
           </Text>
         )}
         {url ? <Icon as={FaExternalLinkAlt} color="fg.faint" boxSize={2} flexShrink={0} /> : null}
-        {isHighlighted ? <Icon as={FaMagic} color="accent" boxSize={2.5} flexShrink={0} /> : null}
         <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" ml="auto" flexShrink={0} />
       </Flex>
 
@@ -217,7 +214,7 @@ function RepoCard({
 
       <Collapse in={expanded} animateOpacity>
         {single ? (
-          <Text fontSize="xs" color="fg.muted" mt={2}>
+          <Text fontSize="xs" color="fg.muted" mt={2} noOfLines={2}>
             {entries[0].highlightBlurb || entries[0].description}
           </Text>
         ) : (
@@ -273,14 +270,8 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
     return cols;
   }, [groups, columnCount]);
 
-  // Each card folds by default; a repo containing a curated highlight starts
-  // expanded. Seeded synchronously from the full `skills` prop (grouped the
-  // same way) so the first render is already correct.
-  const [expanded, setExpanded] = useState<Map<string, boolean>>(() => {
-    const seed = new Map<string, boolean>();
-    for (const group of groupByRepo(skills)) seed.set(group.key, group.isHighlighted);
-    return seed;
-  });
+  // Every card folds by default — no highlighting/auto-expand special case.
+  const [expanded, setExpanded] = useState<Map<string, boolean>>(new Map());
 
   function toggleGroup(key: string) {
     setExpanded((prev) => {

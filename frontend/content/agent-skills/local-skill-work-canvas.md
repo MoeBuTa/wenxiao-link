@@ -5,7 +5,7 @@ origin: ""
 category: "skill"
 tags: ["dashboard", "visualization", "reporting"]
 usage: []
-url: ""
+url: "https://github.com/JingbiaoMei/work-canvas-skill"
 highlightBlurb: ""
 highlightOrder: null
 order: 0

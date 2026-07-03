@@ -84,27 +84,72 @@ function FilterChip({
   );
 }
 
-// Each skill is its own top-level card: name (linked) + up to 3 tags always
-// visible; the description only shows once expanded, so a 75-entry catalog
-// stays scannable at a glance.
-function SkillCard({
-  entry,
+type RepoGroup = {
+  key: string;
+  name: string;
+  url: string;
+  isHighlighted: boolean;
+  highlightOrder: number;
+  entries: AgentSkillEntry[];
+};
+
+// One card per repo, not per individual skill — a repo that ships many
+// skills (mattpocock/skills: ~40, superpowers: 14) would otherwise flood
+// the page with near-identical-looking cards. Repos with no public origin
+// (self-authored, no shared repo) are their own one-skill "repo".
+function groupByRepo(entries: AgentSkillEntry[]): RepoGroup[] {
+  const byKey = new Map<string, AgentSkillEntry[]>();
+  for (const entry of entries) {
+    const key = entry.origin.trim() || entry.name;
+    const list = byKey.get(key) ?? [];
+    list.push(entry);
+    byKey.set(key, list);
+  }
+
+  const groups: RepoGroup[] = [];
+  for (const [key, list] of byKey) {
+    list.sort((a, b) => {
+      const ao = a.highlightOrder ?? Number.POSITIVE_INFINITY;
+      const bo = b.highlightOrder ?? Number.POSITIVE_INFINITY;
+      if (ao !== bo) return ao - bo;
+      return a.name.localeCompare(b.name);
+    });
+    const highlightOrder = list.reduce(
+      (min, e) => (e.highlightOrder !== null ? Math.min(min, e.highlightOrder) : min),
+      Number.POSITIVE_INFINITY,
+    );
+    groups.push({
+      key,
+      name: key,
+      url: list.find((e) => e.url)?.url ?? "",
+      isHighlighted: list.some((e) => Boolean(e.highlightBlurb)),
+      highlightOrder,
+      entries: list,
+    });
+  }
+
+  groups.sort((a, b) => {
+    if (a.highlightOrder !== b.highlightOrder) return a.highlightOrder - b.highlightOrder;
+    return a.name.localeCompare(b.name);
+  });
+  return groups;
+}
+
+function RepoCard({
+  group,
   expanded,
   onToggle,
 }: {
-  entry: AgentSkillEntry;
+  group: RepoGroup;
   expanded: boolean;
   onToggle: () => void;
 }) {
-  const CategoryIcon = CATEGORY_ICONS[entry.category];
-  const isHighlighted = Boolean(entry.highlightBlurb);
-  // A skill invoked via a documented set of commands (e.g. academic-paper,
-  // triggered by ars-plan/ars-outline/...) is shown under its repo name —
-  // the internal skill id isn't meaningful on its own once several skills
-  // from the same repo all have their own usage lists. A skill with no such
-  // set (brainstorming, tdd, career-ops...) keeps its own name.
-  const hasUsageSet = entry.usage.length > 0;
-  const displayName = hasUsageSet && entry.origin ? entry.origin : entry.name;
+  const { name, url, entries, isHighlighted } = group;
+  const single = entries.length === 1;
+  const topNames = entries.slice(0, 3).map((e) => e.name);
+  const primaryCategory = entries[0].category;
+  const CategoryIcon = CATEGORY_ICONS[primaryCategory];
+
   return (
     <Box
       role="button"
@@ -130,9 +175,9 @@ function SkillCard({
     >
       <Flex align="center" gap={2}>
         <Icon as={CategoryIcon} color={isHighlighted ? "accent" : "fg.faint"} boxSize={3} flexShrink={0} />
-        {entry.url ? (
+        {url ? (
           <Link
-            href={entry.url}
+            href={url}
             isExternal
             onClick={(e) => e.stopPropagation()}
             fontSize="sm"
@@ -141,20 +186,26 @@ function SkillCard({
             noOfLines={1}
             _hover={{ color: "accent", textDecoration: "underline" }}
           >
-            {displayName}
+            {name}
           </Link>
         ) : (
           <Text fontSize="sm" fontWeight={isHighlighted ? "700" : "600"} color="fg.default" noOfLines={1}>
-            {displayName}
+            {name}
           </Text>
         )}
-        {entry.url ? <Icon as={FaExternalLinkAlt} color="fg.faint" boxSize={2} flexShrink={0} /> : null}
+        {url ? <Icon as={FaExternalLinkAlt} color="fg.faint" boxSize={2} flexShrink={0} /> : null}
         {isHighlighted ? <Icon as={FaMagic} color="accent" boxSize={2.5} flexShrink={0} /> : null}
         <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" ml="auto" flexShrink={0} />
       </Flex>
-      {entry.tags.length > 0 ? (
+
+      {!single ? (
+        <Text fontSize="xs" color="fg.faint" mt={1.5}>
+          Usage: {topNames.join(", ")}
+          {entries.length > 3 ? ` +${entries.length - 3} more` : ""}
+        </Text>
+      ) : entries[0].tags.length > 0 ? (
         <Wrap spacing={1} mt={1.5}>
-          {entry.tags.slice(0, 3).map((tag) => (
+          {entries[0].tags.slice(0, 3).map((tag) => (
             <WrapItem key={tag}>
               <Tag size="sm" bg="bg.subtle" color="fg.muted" fontSize="0.65em" px={1.5} py={0}>
                 {tag}
@@ -163,15 +214,26 @@ function SkillCard({
           ))}
         </Wrap>
       ) : null}
-      {hasUsageSet ? (
-        <Text fontSize="xs" color="fg.faint" mt={1.5}>
-          Usage: {entry.usage.slice(0, 3).join(", ")}
-        </Text>
-      ) : null}
+
       <Collapse in={expanded} animateOpacity>
-        <Text fontSize="xs" color="fg.muted" mt={2}>
-          {isHighlighted ? entry.highlightBlurb : entry.description}
-        </Text>
+        {single ? (
+          <Text fontSize="xs" color="fg.muted" mt={2}>
+            {entries[0].highlightBlurb || entries[0].description}
+          </Text>
+        ) : (
+          <VStack align="stretch" spacing={1.5} mt={2}>
+            {entries.map((entry) => (
+              <Box key={entry.slug}>
+                <Text fontSize="xs" fontWeight="600" color="fg.default">
+                  {entry.name}
+                </Text>
+                <Text fontSize="xs" color="fg.muted" noOfLines={2}>
+                  {entry.highlightBlurb || entry.description}
+                </Text>
+              </Box>
+            ))}
+          </VStack>
+        )}
       </Collapse>
     </Box>
   );
@@ -200,41 +262,30 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
     });
   }, [skills, search, activeSources, activeCategories]);
 
-  // Curated highlights first (by highlightOrder), then everything else
-  // alphabetically — there's no origin grouping anymore, so this ordering is
-  // what surfaces the featured entries up top.
-  const sorted = useMemo(() => {
-    return [...filtered].sort((a, b) => {
-      const ao = a.highlightOrder ?? Number.POSITIVE_INFINITY;
-      const bo = b.highlightOrder ?? Number.POSITIVE_INFINITY;
-      if (ao !== bo) return ao - bo;
-      return a.name.localeCompare(b.name);
-    });
-  }, [filtered]);
+  const groups = useMemo(() => groupByRepo(filtered), [filtered]);
 
   // Fixed column assignment (not CSS `column-count`) so expanding/collapsing
   // one card never reflows every other card into a different column.
   const columnCount = useBreakpointValue({ base: 1, md: 2, lg: 3 }) ?? 3;
   const columns = useMemo(() => {
-    const cols: AgentSkillEntry[][] = Array.from({ length: columnCount }, () => []);
-    sorted.forEach((entry, i) => cols[i % columnCount].push(entry));
+    const cols: RepoGroup[][] = Array.from({ length: columnCount }, () => []);
+    groups.forEach((group, i) => cols[i % columnCount].push(group));
     return cols;
-  }, [sorted, columnCount]);
+  }, [groups, columnCount]);
 
-  // Each card folds to name + tags by default; a curated highlight starts
-  // expanded since that's the content worth seeing first. Seeded
-  // synchronously from the full `skills` prop so the first render is
-  // already correct.
+  // Each card folds by default; a repo containing a curated highlight starts
+  // expanded. Seeded synchronously from the full `skills` prop (grouped the
+  // same way) so the first render is already correct.
   const [expanded, setExpanded] = useState<Map<string, boolean>>(() => {
     const seed = new Map<string, boolean>();
-    for (const entry of skills) seed.set(entry.slug, Boolean(entry.highlightBlurb));
+    for (const group of groupByRepo(skills)) seed.set(group.key, group.isHighlighted);
     return seed;
   });
 
-  function toggleCard(slug: string) {
+  function toggleGroup(key: string) {
     setExpanded((prev) => {
       const next = new Map(prev);
-      next.set(slug, !(next.get(slug) ?? false));
+      next.set(key, !(next.get(key) ?? false));
       return next;
     });
   }
@@ -287,7 +338,7 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
         </Wrap>
       </VStack>
 
-      {sorted.length === 0 ? (
+      {groups.length === 0 ? (
         <Text color="fg.faint" fontSize="sm">
           No skills match the current filters.
         </Text>
@@ -295,12 +346,12 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
         <Flex gap={4} align="start">
           {columns.map((col, i) => (
             <VStack key={i} align="stretch" spacing={0} flex={1} minW={0}>
-              {col.map((entry) => (
-                <SkillCard
-                  key={entry.slug}
-                  entry={entry}
-                  expanded={expanded.get(entry.slug) ?? false}
-                  onToggle={() => toggleCard(entry.slug)}
+              {col.map((group) => (
+                <RepoCard
+                  key={group.key}
+                  group={group}
+                  expanded={expanded.get(group.key) ?? false}
+                  onToggle={() => toggleGroup(group.key)}
                 />
               ))}
             </VStack>

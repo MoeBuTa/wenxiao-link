@@ -3,7 +3,7 @@ name: "to-prd"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["planning", "prd", "product"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/to-prd/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

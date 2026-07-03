@@ -3,7 +3,7 @@ name: "setup-pre-commit"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["git-hooks", "ci", "code-quality"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/misc/setup-pre-commit/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

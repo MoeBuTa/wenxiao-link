@@ -3,7 +3,7 @@ name: "codebase-design"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["architecture", "modules", "design"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/codebase-design/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

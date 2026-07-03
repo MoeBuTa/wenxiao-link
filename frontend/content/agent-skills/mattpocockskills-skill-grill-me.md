@@ -3,7 +3,7 @@ name: "grill-me"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["planning", "interview", "design-review"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

@@ -3,7 +3,7 @@ name: "caveman"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["communication", "token-efficiency", "productivity"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/productivity/caveman/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

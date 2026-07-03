@@ -3,7 +3,7 @@ name: "ars-abstract"
 source: "plugin"
 origin: "academic-research-skills"
 category: "command"
-tags: []
+tags: ["academic-writing", "abstract", "bilingual"]
 url: "https://github.com/Imbad0202/academic-research-skills"
 highlightBlurb: ""
 highlightOrder: null

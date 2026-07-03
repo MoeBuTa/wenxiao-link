@@ -3,7 +3,7 @@ name: "academic-pipeline"
 source: "plugin"
 origin: "academic-research-skills"
 category: "skill"
-tags: []
+tags: ["orchestration", "research", "academic-writing"]
 url: "https://github.com/Imbad0202/academic-research-skills"
 highlightBlurb: ""
 highlightOrder: null

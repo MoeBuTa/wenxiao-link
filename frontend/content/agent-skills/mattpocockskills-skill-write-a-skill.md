@@ -3,7 +3,7 @@ name: "write-a-skill"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["skill-authoring", "documentation", "meta"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/productivity/write-a-skill/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

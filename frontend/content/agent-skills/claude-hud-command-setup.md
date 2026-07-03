@@ -3,7 +3,7 @@ name: "setup"
 source: "plugin"
 origin: "claude-hud"
 category: "command"
-tags: []
+tags: ["statusline", "configuration", "hud"]
 url: "https://github.com/jarrodwatts/claude-hud"
 highlightBlurb: ""
 highlightOrder: null

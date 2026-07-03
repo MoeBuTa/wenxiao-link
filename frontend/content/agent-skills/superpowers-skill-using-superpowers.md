@@ -3,7 +3,7 @@ name: "using-superpowers"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
-tags: []
+tags: ["meta", "skill-discovery", "onboarding"]
 url: "https://github.com/obra/superpowers"
 highlightBlurb: ""
 highlightOrder: null

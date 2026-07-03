@@ -3,7 +3,7 @@ name: "verification-before-completion"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
-tags: []
+tags: ["verification", "quality", "testing"]
 url: "https://github.com/obra/superpowers"
 highlightBlurb: ""
 highlightOrder: null

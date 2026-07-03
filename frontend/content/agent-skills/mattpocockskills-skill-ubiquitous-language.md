@@ -3,7 +3,7 @@ name: "ubiquitous-language"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["ddd", "glossary", "terminology"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/deprecated/ubiquitous-language/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

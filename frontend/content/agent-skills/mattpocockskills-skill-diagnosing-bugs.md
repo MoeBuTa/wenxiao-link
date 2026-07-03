@@ -3,7 +3,7 @@ name: "diagnosing-bugs"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["debugging", "performance", "root-cause"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnosing-bugs/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

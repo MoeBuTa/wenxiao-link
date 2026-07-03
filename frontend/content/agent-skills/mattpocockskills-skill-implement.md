@@ -3,7 +3,7 @@ name: "implement"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["implementation", "prd", "engineering"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/implement/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

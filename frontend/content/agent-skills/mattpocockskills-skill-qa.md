@@ -3,7 +3,7 @@ name: "qa"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["bug-reporting", "qa", "issue-tracking"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/deprecated/qa/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

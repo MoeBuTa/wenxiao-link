@@ -3,7 +3,7 @@ name: "design-an-interface"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["api-design", "architecture", "parallel-agents"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/deprecated/design-an-interface/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

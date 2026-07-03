@@ -3,7 +3,7 @@ name: "edit-article"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["writing", "editing", "clarity"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/personal/edit-article/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

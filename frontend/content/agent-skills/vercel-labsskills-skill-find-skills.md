@@ -3,7 +3,7 @@ name: "find-skills"
 source: "npx-package"
 origin: "vercel-labs/skills"
 category: "skill"
-tags: []
+tags: ["skill-discovery", "installation", "tooling"]
 url: "https://github.com/vercel-labs/skills/blob/main/skills/find-skills/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

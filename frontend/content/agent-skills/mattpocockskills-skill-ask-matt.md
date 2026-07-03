@@ -3,7 +3,7 @@ name: "ask-matt"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["routing", "skill-discovery", "productivity"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/ask-matt/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

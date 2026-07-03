@@ -3,7 +3,7 @@ name: "git-guardrails-claude-code"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["git", "safety", "hooks"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/misc/git-guardrails-claude-code/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

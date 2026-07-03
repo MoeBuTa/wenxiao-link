@@ -3,7 +3,7 @@ name: "receiving-code-review"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
-tags: []
+tags: ["code-review", "feedback", "verification"]
 url: "https://github.com/obra/superpowers"
 highlightBlurb: ""
 highlightOrder: null

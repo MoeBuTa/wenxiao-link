@@ -3,7 +3,7 @@ name: "resolving-merge-conflicts"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["git", "merge-conflicts", "version-control"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/resolving-merge-conflicts/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

@@ -3,7 +3,7 @@ name: "decision-mapping"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["planning", "investigation", "research"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/in-progress/decision-mapping/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

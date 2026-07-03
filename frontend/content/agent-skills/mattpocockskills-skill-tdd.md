@@ -3,7 +3,7 @@ name: "tdd"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["testing", "tdd", "engineering"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/tdd/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

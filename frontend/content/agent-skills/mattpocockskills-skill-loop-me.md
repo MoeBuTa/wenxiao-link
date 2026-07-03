@@ -3,7 +3,7 @@ name: "loop-me"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["planning", "interview", "workflow-design"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/in-progress/loop-me/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

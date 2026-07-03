@@ -3,7 +3,7 @@ name: "writing-plans"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
-tags: []
+tags: ["planning", "implementation", "tdd"]
 url: "https://github.com/obra/superpowers"
 highlightBlurb: ""
 highlightOrder: null

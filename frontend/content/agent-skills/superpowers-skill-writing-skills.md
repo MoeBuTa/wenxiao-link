@@ -3,7 +3,7 @@ name: "writing-skills"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
-tags: []
+tags: ["skill-authoring", "meta", "documentation"]
 url: "https://github.com/obra/superpowers"
 highlightBlurb: ""
 highlightOrder: null

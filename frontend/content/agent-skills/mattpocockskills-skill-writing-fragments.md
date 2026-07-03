@@ -3,7 +3,7 @@ name: "writing-fragments"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["writing", "brainstorming", "exploration"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/in-progress/writing-fragments/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

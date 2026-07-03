@@ -3,7 +3,7 @@ name: "executing-plans"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
-tags: []
+tags: ["execution", "planning", "review-checkpoints"]
 url: "https://github.com/obra/superpowers"
 highlightBlurb: ""
 highlightOrder: null

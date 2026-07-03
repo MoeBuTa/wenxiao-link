@@ -3,7 +3,7 @@ name: "triage"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["issue-tracking", "triage", "workflow"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/triage/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

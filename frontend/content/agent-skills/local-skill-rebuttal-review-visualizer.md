@@ -3,7 +3,7 @@ name: "rebuttal-review-visualizer"
 source: "self-authored"
 origin: ""
 category: "skill"
-tags: []
+tags: ["peer-review", "visualization", "research-tools"]
 url: ""
 highlightBlurb: ""
 highlightOrder: null

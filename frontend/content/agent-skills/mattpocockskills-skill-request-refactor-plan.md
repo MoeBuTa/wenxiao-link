@@ -3,7 +3,7 @@ name: "request-refactor-plan"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["refactoring", "planning", "github-issues"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/deprecated/request-refactor-plan/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

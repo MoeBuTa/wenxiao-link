@@ -3,7 +3,7 @@ name: "writing-great-skills"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["skill-authoring", "reference", "best-practices"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/productivity/writing-great-skills/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

@@ -3,7 +3,7 @@ name: "to-issues"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["planning", "github-issues", "breakdown"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/to-issues/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

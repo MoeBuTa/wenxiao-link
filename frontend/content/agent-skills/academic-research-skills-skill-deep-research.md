@@ -3,7 +3,7 @@ name: "deep-research"
 source: "plugin"
 origin: "academic-research-skills"
 category: "skill"
-tags: []
+tags: ["research", "multi-agent", "literature-review"]
 url: "https://github.com/Imbad0202/academic-research-skills"
 highlightBlurb: ""
 highlightOrder: null

@@ -3,7 +3,7 @@ name: "review"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["code-review", "standards", "spec-compliance"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/in-progress/review/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

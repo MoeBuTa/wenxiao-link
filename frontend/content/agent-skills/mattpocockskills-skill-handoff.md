@@ -3,7 +3,7 @@ name: "handoff"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["collaboration", "documentation", "context"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/productivity/handoff/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

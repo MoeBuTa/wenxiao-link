@@ -3,7 +3,7 @@ name: "setup-matt-pocock-skills"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["setup", "configuration", "tooling"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

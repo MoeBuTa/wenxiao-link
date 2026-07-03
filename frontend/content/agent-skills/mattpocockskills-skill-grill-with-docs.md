@@ -3,7 +3,7 @@ name: "grill-with-docs"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["planning", "interview", "documentation"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/grill-with-docs/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

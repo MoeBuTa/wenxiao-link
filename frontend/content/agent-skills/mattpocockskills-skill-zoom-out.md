@@ -3,7 +3,7 @@ name: "zoom-out"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["context", "architecture", "big-picture"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/zoom-out/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

@@ -3,7 +3,7 @@ name: "subagent-driven-development"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
-tags: []
+tags: ["multi-agent", "orchestration", "execution"]
 url: "https://github.com/obra/superpowers"
 highlightBlurb: ""
 highlightOrder: null

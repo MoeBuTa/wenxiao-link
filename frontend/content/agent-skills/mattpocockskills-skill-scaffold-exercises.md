@@ -3,7 +3,7 @@ name: "scaffold-exercises"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["scaffolding", "exercises", "education"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/misc/scaffold-exercises/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

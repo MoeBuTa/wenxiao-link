@@ -3,7 +3,7 @@ name: "work-canvas"
 source: "npx-package"
 origin: ""
 category: "skill"
-tags: []
+tags: ["dashboard", "visualization", "reporting"]
 url: ""
 highlightBlurb: ""
 highlightOrder: null

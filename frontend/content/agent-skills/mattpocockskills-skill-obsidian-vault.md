@@ -3,7 +3,7 @@ name: "obsidian-vault"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["notes", "knowledge-management", "wikilinks"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/personal/obsidian-vault/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

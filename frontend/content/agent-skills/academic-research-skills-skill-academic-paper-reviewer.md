@@ -3,7 +3,7 @@ name: "academic-paper-reviewer"
 source: "plugin"
 origin: "academic-research-skills"
 category: "skill"
-tags: []
+tags: ["peer-review", "academic-writing", "multi-agent"]
 url: "https://github.com/Imbad0202/academic-research-skills"
 highlightBlurb: ""
 highlightOrder: null

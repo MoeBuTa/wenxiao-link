@@ -3,7 +3,7 @@ name: "finishing-a-development-branch"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
-tags: []
+tags: ["git", "workflow", "completion"]
 url: "https://github.com/obra/superpowers"
 highlightBlurb: ""
 highlightOrder: null

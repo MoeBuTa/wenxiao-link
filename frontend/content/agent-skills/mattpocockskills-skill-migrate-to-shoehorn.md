@@ -3,7 +3,7 @@ name: "migrate-to-shoehorn"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["testing", "typescript", "migration"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/misc/migrate-to-shoehorn/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

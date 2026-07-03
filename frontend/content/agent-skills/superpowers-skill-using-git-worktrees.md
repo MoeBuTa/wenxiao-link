@@ -3,7 +3,7 @@ name: "using-git-worktrees"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
-tags: []
+tags: ["git", "isolation", "worktrees"]
 url: "https://github.com/obra/superpowers"
 highlightBlurb: ""
 highlightOrder: null

@@ -3,7 +3,7 @@ name: "academic-paper"
 source: "plugin"
 origin: "academic-research-skills"
 category: "skill"
-tags: []
+tags: ["academic-writing", "research", "drafting"]
 url: "https://github.com/Imbad0202/academic-research-skills"
 highlightBlurb: ""
 highlightOrder: null

@@ -3,7 +3,7 @@ name: "prototype"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
-tags: []
+tags: ["prototyping", "design", "cli"]
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/prototype/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

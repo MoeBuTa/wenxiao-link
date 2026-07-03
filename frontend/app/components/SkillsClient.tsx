@@ -32,20 +32,7 @@ import {
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
 
-import type { AgentSkillCategory, AgentSkillEntry, AgentSkillSource } from "../lib/types";
-
-const SOURCE_LABELS: Record<AgentSkillSource, string> = {
-  plugin: "Plugin",
-  "npx-package": "npx package",
-  "self-authored": "Self-authored",
-  "linked-project": "Linked project",
-};
-
-const CATEGORY_LABELS: Record<AgentSkillCategory, string> = {
-  skill: "Skill",
-  command: "Command",
-  agent: "Agent",
-};
+import type { AgentSkillCategory, AgentSkillEntry } from "../lib/types";
 
 const CATEGORY_ICONS: Record<AgentSkillCategory, IconType> = {
   skill: FaPuzzlePiece,
@@ -53,8 +40,51 @@ const CATEGORY_ICONS: Record<AgentSkillCategory, IconType> = {
   agent: FaRobot,
 };
 
-const SOURCES: AgentSkillSource[] = ["plugin", "npx-package", "self-authored", "linked-project"];
-const CATEGORIES: AgentSkillCategory[] = ["skill", "command", "agent"];
+// Repo-level presentation metadata, curated. `description` is normalized from
+// each repo's own GitHub description (kept to a similar ~13-word length so
+// cards line up); `tags` is a hand-picked trio that doubles as the filter
+// taxonomy. Keyed by the same value the cards group on (origin, or the skill
+// name for origin-less self-authored entries). A repo not listed here falls
+// back to its primary skill's DB description/tags.
+type RepoMeta = { description: string; tags: string[] };
+const REPO_META: Record<string, RepoMeta> = {
+  superpowers: {
+    description: "A software-development methodology and skills framework for coding agents — TDD, debugging, collaboration.",
+    tags: ["engineering", "methodology", "debugging"],
+  },
+  "mattpocock/skills": {
+    description: "Agent skills for engineers to improve code quality, alignment, and everyday workflow efficiency.",
+    tags: ["engineering", "code-quality", "workflow"],
+  },
+  "andrej-karpathy-skills": {
+    description: "Guidelines for better Claude Code behavior, drawn from Karpathy's notes on common LLM coding mistakes.",
+    tags: ["engineering", "code-quality", "guidelines"],
+  },
+  "academic-research-skills": {
+    description: "A Claude Code skill suite for academic research: literature review through peer review and publication.",
+    tags: ["academic", "research", "peer-review"],
+  },
+  reviewviz: {
+    description: "Turns peer-review comments into an interactive HTML page for planning rebuttals efficiently.",
+    tags: ["academic", "peer-review", "visualization"],
+  },
+  "work-canvas": {
+    description: "Turns an AI agent's work into self-contained, offline-viewable HTML pages for review.",
+    tags: ["visualization", "reporting", "productivity"],
+  },
+  "career-ops": {
+    description: "An AI-powered job-search system that evaluates offers, generates tailored CVs, and tracks applications.",
+    tags: ["job-search", "automation", "productivity"],
+  },
+  "claude-hud": {
+    description: "A Claude Code plugin showing real-time context usage, tool activity, and task progress in the statusline.",
+    tags: ["tooling", "monitoring", "statusline"],
+  },
+  "vercel-labs/skills": {
+    description: "The CLI for the open agent-skills ecosystem — install reusable instruction sets across 70+ coding agents.",
+    tags: ["tooling", "skill-discovery", "cli"],
+  },
+};
 
 function FilterChip({
   label,
@@ -87,15 +117,21 @@ type RepoGroup = {
   key: string;
   name: string;
   url: string;
-  isHighlighted: boolean;
-  highlightOrder: number;
+  description: string;
+  tags: string[];
   entries: AgentSkillEntry[];
 };
 
-// One card per repo, not per individual skill — a repo that ships many
-// skills (mattpocock/skills: ~40, superpowers: 14) would otherwise flood
-// the page with near-identical-looking cards. Repos with no public origin
-// (self-authored, no shared repo) are their own one-skill "repo".
+function repoDescription(key: string, entries: AgentSkillEntry[]): string {
+  return REPO_META[key]?.description || entries[0].highlightBlurb || entries[0].description;
+}
+
+function repoTags(key: string, entries: AgentSkillEntry[]): string[] {
+  return (REPO_META[key]?.tags ?? entries[0].tags).slice(0, 3);
+}
+
+// One card per repo, not per individual skill — a repo that ships many skills
+// (mattpocock/skills: 39, superpowers: 14) would otherwise flood the page.
 function groupByRepo(entries: AgentSkillEntry[]): RepoGroup[] {
   const byKey = new Map<string, AgentSkillEntry[]>();
   for (const entry of entries) {
@@ -107,30 +143,18 @@ function groupByRepo(entries: AgentSkillEntry[]): RepoGroup[] {
 
   const groups: RepoGroup[] = [];
   for (const [key, list] of byKey) {
-    list.sort((a, b) => {
-      const ao = a.highlightOrder ?? Number.POSITIVE_INFINITY;
-      const bo = b.highlightOrder ?? Number.POSITIVE_INFINITY;
-      if (ao !== bo) return ao - bo;
-      return a.name.localeCompare(b.name);
-    });
-    const highlightOrder = list.reduce(
-      (min, e) => (e.highlightOrder !== null ? Math.min(min, e.highlightOrder) : min),
-      Number.POSITIVE_INFINITY,
-    );
+    list.sort((a, b) => a.name.localeCompare(b.name));
     groups.push({
       key,
       name: key,
       url: list.find((e) => e.url)?.url ?? "",
-      isHighlighted: list.some((e) => Boolean(e.highlightBlurb)),
-      highlightOrder,
+      description: repoDescription(key, list),
+      tags: repoTags(key, list),
       entries: list,
     });
   }
 
-  groups.sort((a, b) => {
-    if (a.highlightOrder !== b.highlightOrder) return a.highlightOrder - b.highlightOrder;
-    return a.name.localeCompare(b.name);
-  });
+  groups.sort((a, b) => a.name.localeCompare(b.name));
   return groups;
 }
 
@@ -143,10 +167,9 @@ function RepoCard({
   expanded: boolean;
   onToggle: () => void;
 }) {
-  const { name, url, entries } = group;
+  const { name, url, description, tags, entries } = group;
   const single = entries.length === 1;
-  const primaryCategory = entries[0].category;
-  const CategoryIcon = CATEGORY_ICONS[primaryCategory];
+  const CategoryIcon = CATEGORY_ICONS[entries[0].category];
 
   return (
     <Box
@@ -194,19 +217,26 @@ function RepoCard({
         <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" ml="auto" flexShrink={0} />
       </Flex>
 
-      <Text fontSize="xs" color="fg.muted" mt={1.5} noOfLines={2}>
-        {entries[0].highlightBlurb || entries[0].description}
+      <Text fontSize="xs" color="fg.muted" mt={1.5}>
+        {description}
       </Text>
-      {entries[0].tags.length > 0 ? (
-        <Tag size="sm" bg="bg.subtle" color="fg.muted" fontSize="0.65em" px={1.5} py={0} mt={1.5}>
-          {entries[0].tags[0]}
-        </Tag>
+
+      {tags.length > 0 ? (
+        <Wrap spacing={1} mt={1.5}>
+          {tags.map((tag) => (
+            <WrapItem key={tag}>
+              <Tag size="sm" bg="bg.subtle" color="fg.muted" fontSize="0.65em" px={1.5} py={0}>
+                {tag}
+              </Tag>
+            </WrapItem>
+          ))}
+        </Wrap>
       ) : null}
 
       <Collapse in={expanded} animateOpacity>
         {single ? (
-          <Text fontSize="xs" color="fg.muted" mt={2} noOfLines={2}>
-            {entries[0].highlightBlurb || entries[0].description}
+          <Text fontSize="xs" color="fg.faint" mt={2}>
+            {entries[0].description}
           </Text>
         ) : (
           <VStack align="stretch" spacing={1.5} mt={2}>
@@ -215,7 +245,7 @@ function RepoCard({
                 <Text fontSize="xs" fontWeight="600" color="fg.default">
                   {entry.name}
                 </Text>
-                <Text fontSize="xs" color="fg.muted" noOfLines={2}>
+                <Text fontSize="xs" color="fg.muted">
                   {entry.highlightBlurb || entry.description}
                 </Text>
               </Box>
@@ -229,28 +259,37 @@ function RepoCard({
 
 export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
   const [search, setSearch] = useState("");
-  const [activeSources, setActiveSources] = useState<Set<AgentSkillSource>>(new Set());
-  const [activeCategories, setActiveCategories] = useState<Set<AgentSkillCategory>>(new Set());
+  const [activeTags, setActiveTags] = useState<Set<string>>(new Set());
 
-  function toggle<T>(set: Set<T>, value: T, setter: (s: Set<T>) => void) {
-    const next = new Set(set);
-    if (next.has(value)) next.delete(value);
-    else next.add(value);
-    setter(next);
+  const allGroups = useMemo(() => groupByRepo(skills), [skills]);
+
+  // Filter taxonomy = the union of every repo card's tags, sorted.
+  const allTags = useMemo(() => {
+    const set = new Set<string>();
+    for (const g of allGroups) for (const t of g.tags) set.add(t);
+    return [...set].sort();
+  }, [allGroups]);
+
+  function toggleTag(tag: string) {
+    setActiveTags((prev) => {
+      const next = new Set(prev);
+      if (next.has(tag)) next.delete(tag);
+      else next.add(tag);
+      return next;
+    });
   }
 
-  const filtered = useMemo(() => {
+  const groups = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return skills.filter((s) => {
-      if (activeSources.size > 0 && !activeSources.has(s.source)) return false;
-      if (activeCategories.size > 0 && !activeCategories.has(s.category)) return false;
+    return allGroups.filter((g) => {
+      if (activeTags.size > 0 && !g.tags.some((t) => activeTags.has(t))) return false;
       if (!q) return true;
-      const haystack = `${s.name} ${s.description} ${s.tags.join(" ")}`.toLowerCase();
+      const haystack = `${g.name} ${g.description} ${g.tags.join(" ")} ${g.entries
+        .map((e) => `${e.name} ${e.description} ${e.tags.join(" ")}`)
+        .join(" ")}`.toLowerCase();
       return haystack.includes(q);
     });
-  }, [skills, search, activeSources, activeCategories]);
-
-  const groups = useMemo(() => groupByRepo(filtered), [filtered]);
+  }, [allGroups, search, activeTags]);
 
   // Fixed column assignment (not CSS `column-count`) so expanding/collapsing
   // one card never reflows every other card into a different column.
@@ -261,7 +300,7 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
     return cols;
   }, [groups, columnCount]);
 
-  // Every card folds by default — no highlighting/auto-expand special case.
+  // Every card folds by default.
   const [expanded, setExpanded] = useState<Map<string, boolean>>(new Map());
 
   function toggleGroup(key: string) {
@@ -295,30 +334,13 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
         />
       </InputGroup>
 
-      <VStack align="stretch" spacing={2} mb={8}>
-        <Wrap spacing={2}>
-          {SOURCES.map((s) => (
-            <WrapItem key={s}>
-              <FilterChip
-                label={SOURCE_LABELS[s]}
-                active={activeSources.has(s)}
-                onClick={() => toggle(activeSources, s, setActiveSources)}
-              />
-            </WrapItem>
-          ))}
-        </Wrap>
-        <Wrap spacing={2}>
-          {CATEGORIES.map((c) => (
-            <WrapItem key={c}>
-              <FilterChip
-                label={CATEGORY_LABELS[c]}
-                active={activeCategories.has(c)}
-                onClick={() => toggle(activeCategories, c, setActiveCategories)}
-              />
-            </WrapItem>
-          ))}
-        </Wrap>
-      </VStack>
+      <Wrap spacing={2} mb={8}>
+        {allTags.map((tag) => (
+          <WrapItem key={tag}>
+            <FilterChip label={tag} active={activeTags.has(tag)} onClick={() => toggleTag(tag)} />
+          </WrapItem>
+        ))}
+      </Wrap>
 
       {groups.length === 0 ? (
         <Text color="fg.faint" fontSize="sm">

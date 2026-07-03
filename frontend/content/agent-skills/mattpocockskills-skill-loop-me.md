@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["planning", "interview", "workflow-design"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/in-progress/loop-me/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

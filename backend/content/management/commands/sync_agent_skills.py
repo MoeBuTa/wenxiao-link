@@ -10,6 +10,14 @@ survive re-syncs. `url` is detected-when-derivable rather than always
 detected: the scanner can only compute it for plugin/npx-package entries, so
 an empty scanned url never blanks an existing (e.g. hand-set) value.
 
+A second pass rolls up commands that are really just invocation-modes of one
+skill (e.g. academic-research-skills' ars-* commands each say `Skill entry:
+academic-paper/SKILL.md`) into that skill's `usage` list, then unpublishes
+those command rows — they're shown as usage on the skill's card, not as
+their own top-level cards. `usage` is curated like tags: set once (from
+whichever ≤3 command names sort first) and never overwritten by a re-sync,
+so hand-picking a better 3 via admin sticks.
+
     python manage.py sync_agent_skills --from-json /path/to/scan.json
 
 Run inside the API container (docker compose exec platform ...), since
@@ -75,9 +83,39 @@ class Command(BaseCommand):
             )
             created += 1
 
+        rolled_up, unpublished = self._roll_up_commands(entries)
+
         self.stdout.write(
-            self.style.SUCCESS(f"created {created}, updated {updated}, skipped {skipped} (of {len(entries)} scanned)")
+            self.style.SUCCESS(
+                f"created {created}, updated {updated}, skipped {skipped} (of {len(entries)} scanned); "
+                f"rolled up {rolled_up} commands into usage lists, unpublished {unpublished}"
+            )
         )
+
+    def _roll_up_commands(self, entries):
+        by_origin_skill = {}
+        for entry in entries:
+            parent = (entry.get("parentSkill") or "").strip()
+            cmd_name = (entry.get("name") or "").strip()
+            if not parent or not cmd_name:
+                continue
+            origin = (entry.get("origin") or "").strip()
+            by_origin_skill.setdefault((origin, parent), []).append(cmd_name)
+
+        rolled_up, unpublished = 0, 0
+        for (origin, skill_name), commands in by_origin_skill.items():
+            skill_row = AgentSkill.objects.filter(name=skill_name, origin=origin, category="skill").first()
+            if not skill_row:
+                continue
+            if not skill_row.usage:
+                skill_row.usage = sorted(commands)[:3]
+                skill_row.save(update_fields=["usage", "updated_at"])
+            rolled_up += len(commands)
+            unpublished += AgentSkill.objects.filter(
+                name__in=commands, origin=origin, category="command", published=True
+            ).update(published=False)
+
+        return rolled_up, unpublished
 
 
 def _unique_slug(base: str) -> str:

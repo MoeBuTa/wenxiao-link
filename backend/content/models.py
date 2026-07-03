@@ -129,6 +129,12 @@ class AgentSkill(models.Model):
     # command never blanks an existing value it can't currently detect, so
     # a hand-set url for a self-authored/linked-project entry survives.
     url = models.URLField(blank=True, default="")
+    # Detected: names of command entries (same origin) whose markdown body
+    # names this skill as their `Skill entry:` — e.g. academic-paper's usage
+    # is ["ars-plan", "ars-outline", ...]. Populated by sync_agent_skills;
+    # those command rows are then unpublished, since they're shown as usage
+    # here rather than as their own top-level cards.
+    usage = models.JSONField(default=list)  # list[str]
     tags = models.JSONField(default=list)  # list[str]
     highlight_blurb = models.TextField(blank=True, default="")
     highlight_order = models.IntegerField(null=True, blank=True)

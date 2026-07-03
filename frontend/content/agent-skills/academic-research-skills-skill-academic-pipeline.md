@@ -4,6 +4,7 @@ source: "plugin"
 origin: "academic-research-skills"
 category: "skill"
 tags: ["orchestration", "research", "academic-writing"]
+usage: ["ars-full"]
 url: "https://github.com/Imbad0202/academic-research-skills"
 highlightBlurb: ""
 highlightOrder: null

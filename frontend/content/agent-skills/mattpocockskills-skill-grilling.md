@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["planning", "interview", "design-review"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/productivity/grilling/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["planning", "prd", "product"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/to-prd/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

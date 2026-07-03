@@ -128,6 +128,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 class AgentSkillSerializer(serializers.ModelSerializer):
     tags = serializers.ListField(child=serializers.CharField(), required=False)
+    usage = serializers.ListField(child=serializers.CharField(), required=False)
     highlightBlurb = serializers.CharField(source="highlight_blurb", allow_blank=True, required=False)
     highlightOrder = serializers.IntegerField(source="highlight_order", allow_null=True, required=False)
 
@@ -142,6 +143,7 @@ class AgentSkillSerializer(serializers.ModelSerializer):
             "origin",
             "category",
             "tags",
+            "usage",
             "url",
             "highlightBlurb",
             "highlightOrder",

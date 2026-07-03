@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["bug-reporting", "qa", "issue-tracking"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/deprecated/qa/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

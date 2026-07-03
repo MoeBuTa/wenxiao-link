@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["communication", "token-efficiency", "productivity"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/productivity/caveman/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

@@ -65,6 +65,16 @@ function slugName(file) {
   return path.basename(file, ".md");
 }
 
+// Some plugins ship a "set" of commands that are really just different modes
+// of one underlying skill (e.g. academic-research-skills' ars-* commands
+// each say `Skill entry: \`academic-paper/SKILL.md\`.`). Detect that
+// convention so those commands can be rolled up into their parent skill's
+// "usage" list downstream, instead of showing as 10 disconnected cards.
+function parentSkillOf(body) {
+  const match = body.match(/Skill entry:\s*`([^/`]+)\/SKILL\.md`/);
+  return match ? match[1] : undefined;
+}
+
 // Plugin repo URL, best-effort: prefer the plugin's own manifest, fall back
 // to the marketplace it was installed from (~/.claude/plugins/cache/<marketplace>/...
 // maps to a `repo` entry in known_marketplaces.json) when the manifest itself
@@ -114,6 +124,7 @@ function collectPlugins() {
       (n, full) => n.endsWith(".md") && path.basename(path.dirname(full)) === "commands",
     )) {
       const fm = frontmatterOf(cmdFile);
+      const raw = fs.readFileSync(cmdFile, "utf-8");
       out.push({
         name: fm.name ?? slugName(cmdFile),
         description: fm.description ?? "",
@@ -121,6 +132,7 @@ function collectPlugins() {
         origin: pluginName,
         category: "command",
         url,
+        parentSkill: parentSkillOf(raw),
       });
     }
 

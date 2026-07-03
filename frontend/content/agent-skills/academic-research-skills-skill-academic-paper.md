@@ -4,6 +4,7 @@ source: "plugin"
 origin: "academic-research-skills"
 category: "skill"
 tags: ["academic-writing", "research", "drafting"]
+usage: ["ars-abstract", "ars-citation-check", "ars-disclosure"]
 url: "https://github.com/Imbad0202/academic-research-skills"
 highlightBlurb: ""
 highlightOrder: null

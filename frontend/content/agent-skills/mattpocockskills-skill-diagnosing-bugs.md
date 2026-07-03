@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["debugging", "performance", "root-cause"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/diagnosing-bugs/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

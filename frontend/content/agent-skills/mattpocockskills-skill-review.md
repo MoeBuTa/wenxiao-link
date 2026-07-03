@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["code-review", "standards", "spec-compliance"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/in-progress/review/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

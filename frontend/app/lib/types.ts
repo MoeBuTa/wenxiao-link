@@ -128,6 +128,7 @@ export type AgentSkillEntry = {
   origin: string;
   category: AgentSkillCategory;
   tags: string[];
+  usage: string[];
   url: string;
   highlightBlurb: string;
   highlightOrder: number | null;

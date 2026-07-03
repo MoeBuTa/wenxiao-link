@@ -4,6 +4,7 @@ source: "plugin"
 origin: "superpowers"
 category: "skill"
 tags: ["multi-agent", "parallelism", "orchestration"]
+usage: []
 url: "https://github.com/obra/superpowers"
 highlightBlurb: ""
 highlightOrder: null

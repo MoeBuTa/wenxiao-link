@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["planning", "investigation", "research"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/in-progress/decision-mapping/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

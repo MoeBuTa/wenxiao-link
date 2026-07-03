@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["architecture", "modules", "design"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/codebase-design/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["context", "architecture", "big-picture"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/zoom-out/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["ddd", "glossary", "terminology"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/deprecated/ubiquitous-language/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

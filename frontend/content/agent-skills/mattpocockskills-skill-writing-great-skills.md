@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["skill-authoring", "reference", "best-practices"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/productivity/writing-great-skills/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

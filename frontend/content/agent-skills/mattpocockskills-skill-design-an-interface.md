@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["api-design", "architecture", "parallel-agents"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/deprecated/design-an-interface/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

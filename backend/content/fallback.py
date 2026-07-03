@@ -173,6 +173,7 @@ def _agent_skill_frontmatter(skill) -> str:
         "origin": skill.origin,
         "category": skill.category,
         "tags": list(skill.tags or []),
+        "usage": list(skill.usage or []),
         "url": skill.url,
         "highlightBlurb": skill.highlight_blurb,
         "highlightOrder": skill.highlight_order,

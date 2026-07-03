@@ -21,25 +21,16 @@ import {
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import {
-  FaBolt,
-  FaBriefcase,
   FaChevronDown,
   FaChevronRight,
   FaCode,
-  FaCompass,
   FaExternalLinkAlt,
-  FaGraduationCap,
-  FaLayerGroup,
   FaMagic,
   FaPuzzlePiece,
   FaRobot,
   FaSearch,
-  FaTachometerAlt,
   FaTerminal,
-  FaToolbox,
-  FaUser,
 } from "react-icons/fa";
-import { GiBrain } from "react-icons/gi";
 import type { IconType } from "react-icons";
 
 import type { AgentSkillCategory, AgentSkillEntry, AgentSkillSource } from "../lib/types";
@@ -93,112 +84,27 @@ function FilterChip({
   );
 }
 
-// Compact row, not a card — a large catalog reads better as a dense list
-// than as a grid of boxes, which eats vertical space fast at 75+ entries.
-function SkillRow({ entry }: { entry: AgentSkillEntry }) {
-  const CategoryIcon = CATEGORY_ICONS[entry.category];
-  const isHighlighted = Boolean(entry.highlightBlurb);
-  return (
-    <HStack
-      align="start"
-      spacing={2}
-      py={1.5}
-      borderBottomWidth="1px"
-      borderColor="border.muted"
-      _last={{ borderBottomWidth: 0 }}
-    >
-      <Icon as={CategoryIcon} color={isHighlighted ? "accent" : "fg.faint"} boxSize={3} mt={1} flexShrink={0} />
-      <Box minW={0} flex={1}>
-        <HStack spacing={1.5}>
-          {entry.url ? (
-            <Link
-              href={entry.url}
-              isExternal
-              onClick={(e) => e.stopPropagation()}
-              fontSize="sm"
-              fontWeight={isHighlighted ? "700" : "600"}
-              color="fg.default"
-              noOfLines={1}
-              _hover={{ color: "accent", textDecoration: "underline" }}
-            >
-              {entry.name}
-            </Link>
-          ) : (
-            <Text fontSize="sm" fontWeight={isHighlighted ? "700" : "600"} color="fg.default" noOfLines={1}>
-              {entry.name}
-            </Text>
-          )}
-          {entry.url ? <Icon as={FaExternalLinkAlt} color="fg.faint" boxSize={2} flexShrink={0} /> : null}
-          {isHighlighted ? <Icon as={FaMagic} color="accent" boxSize={2.5} flexShrink={0} /> : null}
-        </HStack>
-        <Text fontSize="xs" color="fg.muted" noOfLines={1}>
-          {isHighlighted ? entry.highlightBlurb : entry.description}
-        </Text>
-        {entry.tags.length > 0 ? (
-          <Wrap spacing={1} mt={0.5}>
-            {entry.tags.slice(0, 3).map((tag) => (
-              <WrapItem key={tag}>
-                <Tag size="sm" bg="bg.subtle" color="fg.muted" fontSize="0.65em" px={1.5} py={0}>
-                  {tag}
-                </Tag>
-              </WrapItem>
-            ))}
-          </Wrap>
-        ) : null}
-      </Box>
-    </HStack>
-  );
-}
-
-function originLabel(origin: string): string {
-  return origin.trim() || "Personal";
-}
-
-// One-line summary of what each source actually is, shown under the group
-// name so a visitor doesn't have to guess what e.g. "mattpocock/skills"
-// means. Hand-curated (small, stable set of origins) rather than pulled
-// from any one entry's description.
-const ORIGIN_SUMMARIES: Record<string, string> = {
-  Personal: "Skills I wrote myself, or link in from other projects of mine.",
-  superpowers:
-    "Core skills library for Claude Code — TDD, systematic debugging, brainstorming, and other proven collaboration patterns.",
-  "academic-research-skills":
-    "A multi-agent pipeline for academic research and paper writing — literature review, drafting, and peer review.",
-  "andrej-karpathy-skills": "Behavioral guidelines distilled from Andrej Karpathy's notes on common LLM coding mistakes.",
-  "claude-hud": "A real-time statusline HUD for Claude Code — context health, tool activity, and todo progress at a glance.",
-  "mattpocock/skills": "A general-purpose skill library, installed via npx, spanning engineering, writing, and productivity workflows.",
-  "career-ops": "My own job-search command center, linked in from a separate project.",
-  "vercel-labs/skills": "Vercel Labs' skill-discovery tooling for finding and installing other agent skills.",
-};
-
-// A small teaser icon per source so groups are visually distinguishable at
-// a glance, not just by name. Falls back to a generic "layers" icon for any
-// origin not in this hand-curated set (e.g. a newly installed plugin before
-// someone adds it here).
-const ORIGIN_ICONS: Record<string, IconType> = {
-  Personal: FaUser,
-  superpowers: FaBolt,
-  "academic-research-skills": FaGraduationCap,
-  "andrej-karpathy-skills": GiBrain,
-  "claude-hud": FaTachometerAlt,
-  "mattpocock/skills": FaToolbox,
-  "career-ops": FaBriefcase,
-  "vercel-labs/skills": FaCompass,
-};
-
-function GroupBlock({
-  origin,
-  entries,
+// Each skill is its own top-level card: name (linked) + up to 3 tags always
+// visible; the description only shows once expanded, so a 75-entry catalog
+// stays scannable at a glance.
+function SkillCard({
+  entry,
   expanded,
   onToggle,
 }: {
-  origin: string;
-  entries: AgentSkillEntry[];
+  entry: AgentSkillEntry;
   expanded: boolean;
   onToggle: () => void;
 }) {
-  const summary = ORIGIN_SUMMARIES[origin];
-  const GroupIcon = ORIGIN_ICONS[origin] ?? FaLayerGroup;
+  const CategoryIcon = CATEGORY_ICONS[entry.category];
+  const isHighlighted = Boolean(entry.highlightBlurb);
+  // A skill invoked via a documented set of commands (e.g. academic-paper,
+  // triggered by ars-plan/ars-outline/...) is shown under its repo name —
+  // the internal skill id isn't meaningful on its own once several skills
+  // from the same repo all have their own usage lists. A skill with no such
+  // set (brainstorming, tdd, career-ops...) keeps its own name.
+  const hasUsageSet = entry.usage.length > 0;
+  const displayName = hasUsageSet && entry.origin ? entry.origin : entry.name;
   return (
     <Box
       role="button"
@@ -211,43 +117,61 @@ function GroupBlock({
         }
       }}
       borderWidth="1px"
-      borderColor="border.muted"
+      borderColor={isHighlighted ? "accent" : "border.muted"}
       borderRadius="lg"
       bg="bg.card"
-      p={4}
-      mb={4}
+      p={3}
+      mb={3}
       w="full"
       cursor="pointer"
       textAlign="left"
+      boxShadow={isHighlighted ? "0 0 0 1px rgba(249,115,22,0.25)" : undefined}
       _hover={{ borderColor: "accent" }}
     >
-      <Flex align="center" gap={2} mb={1}>
-        <Flex
-          align="center"
-          justify="center"
-          boxSize={7}
-          borderRadius="md"
-          bg="rgba(249,115,22,0.12)"
-          flexShrink={0}
-        >
-          <Icon as={GroupIcon} color="accent" boxSize={3.5} />
-        </Flex>
-        <Heading size="sm" color="fg.default">
-          {origin}
-        </Heading>
-        <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" ml="auto" />
+      <Flex align="center" gap={2}>
+        <Icon as={CategoryIcon} color={isHighlighted ? "accent" : "fg.faint"} boxSize={3} flexShrink={0} />
+        {entry.url ? (
+          <Link
+            href={entry.url}
+            isExternal
+            onClick={(e) => e.stopPropagation()}
+            fontSize="sm"
+            fontWeight={isHighlighted ? "700" : "600"}
+            color="fg.default"
+            noOfLines={1}
+            _hover={{ color: "accent", textDecoration: "underline" }}
+          >
+            {displayName}
+          </Link>
+        ) : (
+          <Text fontSize="sm" fontWeight={isHighlighted ? "700" : "600"} color="fg.default" noOfLines={1}>
+            {displayName}
+          </Text>
+        )}
+        {entry.url ? <Icon as={FaExternalLinkAlt} color="fg.faint" boxSize={2} flexShrink={0} /> : null}
+        {isHighlighted ? <Icon as={FaMagic} color="accent" boxSize={2.5} flexShrink={0} /> : null}
+        <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" ml="auto" flexShrink={0} />
       </Flex>
-      {summary ? (
-        <Text fontSize="xs" color="fg.faint" mb={expanded ? 2 : 0}>
-          {summary}
+      {entry.tags.length > 0 ? (
+        <Wrap spacing={1} mt={1.5}>
+          {entry.tags.slice(0, 3).map((tag) => (
+            <WrapItem key={tag}>
+              <Tag size="sm" bg="bg.subtle" color="fg.muted" fontSize="0.65em" px={1.5} py={0}>
+                {tag}
+              </Tag>
+            </WrapItem>
+          ))}
+        </Wrap>
+      ) : null}
+      {hasUsageSet ? (
+        <Text fontSize="xs" color="fg.faint" mt={1.5}>
+          Usage: {entry.usage.slice(0, 3).join(", ")}
         </Text>
       ) : null}
       <Collapse in={expanded} animateOpacity>
-        <VStack align="stretch" spacing={0} mt={1}>
-          {entries.map((entry) => (
-            <SkillRow key={entry.slug} entry={entry} />
-          ))}
-        </VStack>
+        <Text fontSize="xs" color="fg.muted" mt={2}>
+          {isHighlighted ? entry.highlightBlurb : entry.description}
+        </Text>
       </Collapse>
     </Box>
   );
@@ -276,60 +200,41 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
     });
   }, [skills, search, activeSources, activeCategories]);
 
-  const grouped = useMemo(() => {
-    const byOrigin = new Map<string, AgentSkillEntry[]>();
-    for (const entry of filtered) {
-      const key = originLabel(entry.origin);
-      const list = byOrigin.get(key) ?? [];
-      list.push(entry);
-      byOrigin.set(key, list);
-    }
-    for (const list of byOrigin.values()) {
-      list.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-    }
-    return [...byOrigin.entries()].sort(([a], [b]) => {
-      if (a === "Personal") return 1;
-      if (b === "Personal") return -1;
-      return a.localeCompare(b);
+  // Curated highlights first (by highlightOrder), then everything else
+  // alphabetically — there's no origin grouping anymore, so this ordering is
+  // what surfaces the featured entries up top.
+  const sorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      const ao = a.highlightOrder ?? Number.POSITIVE_INFINITY;
+      const bo = b.highlightOrder ?? Number.POSITIVE_INFINITY;
+      if (ao !== bo) return ao - bo;
+      return a.name.localeCompare(b.name);
     });
   }, [filtered]);
 
-  // CSS `column-count` masonry re-flows every item (top-to-bottom, column by
-  // column) whenever ANY item's height changes, so folding one group could
-  // visibly jump every other group into a different column. Assigning each
-  // group a fixed column by index instead means a group's column membership
-  // never depends on rendered heights — only re-computed when the group
-  // list or column count itself changes.
+  // Fixed column assignment (not CSS `column-count`) so expanding/collapsing
+  // one card never reflows every other card into a different column.
   const columnCount = useBreakpointValue({ base: 1, md: 2, lg: 3 }) ?? 3;
   const columns = useMemo(() => {
-    const cols: Array<[string, AgentSkillEntry[]][]> = Array.from({ length: columnCount }, () => []);
-    grouped.forEach(([origin, entries], i) => {
-      cols[i % columnCount].push([origin, entries]);
-    });
+    const cols: AgentSkillEntry[][] = Array.from({ length: columnCount }, () => []);
+    sorted.forEach((entry, i) => cols[i % columnCount].push(entry));
     return cols;
-  }, [grouped, columnCount]);
+  }, [sorted, columnCount]);
 
-  // Groups fold by default; a group with a curated highlight starts open
-  // since that's the content worth seeing first. Seeded synchronously from
-  // the full `skills` prop (not `grouped`, which depends on filter state)
-  // so the first render already reflects the right state — no flash of
-  // every group expanded before a later effect collapses them. Origins not
-  // yet in the map (only possible if `skills` itself changes, which this
-  // page never does after mount) default to expanded via the `?? true`
-  // fallback below.
+  // Each card folds to name + tags by default; a curated highlight starts
+  // expanded since that's the content worth seeing first. Seeded
+  // synchronously from the full `skills` prop so the first render is
+  // already correct.
   const [expanded, setExpanded] = useState<Map<string, boolean>>(() => {
     const seed = new Map<string, boolean>();
-    for (const entry of skills) {
-      const key = originLabel(entry.origin);
-      seed.set(key, (seed.get(key) ?? false) || Boolean(entry.highlightBlurb));
-    }
+    for (const entry of skills) seed.set(entry.slug, Boolean(entry.highlightBlurb));
     return seed;
   });
 
-  function toggleGroup(origin: string) {
+  function toggleCard(slug: string) {
     setExpanded((prev) => {
       const next = new Map(prev);
-      next.set(origin, !(next.get(origin) ?? true));
+      next.set(slug, !(next.get(slug) ?? false));
       return next;
     });
   }
@@ -382,7 +287,7 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
         </Wrap>
       </VStack>
 
-      {grouped.length === 0 ? (
+      {sorted.length === 0 ? (
         <Text color="fg.faint" fontSize="sm">
           No skills match the current filters.
         </Text>
@@ -390,13 +295,12 @@ export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
         <Flex gap={4} align="start">
           {columns.map((col, i) => (
             <VStack key={i} align="stretch" spacing={0} flex={1} minW={0}>
-              {col.map(([origin, entries]) => (
-                <GroupBlock
-                  key={origin}
-                  origin={origin}
-                  entries={entries}
-                  expanded={expanded.get(origin) ?? true}
-                  onToggle={() => toggleGroup(origin)}
+              {col.map((entry) => (
+                <SkillCard
+                  key={entry.slug}
+                  entry={entry}
+                  expanded={expanded.get(entry.slug) ?? false}
+                  onToggle={() => toggleCard(entry.slug)}
                 />
               ))}
             </VStack>

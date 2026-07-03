@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["routing", "skill-discovery", "productivity"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/ask-matt/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

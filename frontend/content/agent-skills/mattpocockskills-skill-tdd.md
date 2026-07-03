@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: ["testing", "tdd", "engineering"]
+usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/tdd/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null

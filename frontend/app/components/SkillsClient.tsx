@@ -206,9 +206,6 @@ function GroupBlock({
         <Heading size="sm" color="fg.default">
           {origin}
         </Heading>
-        <Text fontSize="xs" color="fg.faint">
-          ({entries.length})
-        </Text>
         <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" ml="auto" />
       </Flex>
       {summary ? (

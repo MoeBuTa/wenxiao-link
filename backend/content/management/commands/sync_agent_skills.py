@@ -3,10 +3,12 @@
 Reads the JSON array produced by frontend/scripts/export-agent-skills.mjs
 (run on the host, since only the host has access to ~/.claude and
 ~/.agents) and upserts it into the DB. "Detected" fields (name, description,
-source, origin, category) are refreshed on every run; "curated" fields
+source, origin, category, url) are refreshed on every run; "curated" fields
 (tags, highlight_blurb, highlight_order, published, order) are set only
 when a row is first created and are never touched on update, so admin edits
-survive re-syncs.
+survive re-syncs. `url` is detected-when-derivable rather than always
+detected: the scanner can only compute it for plugin/npx-package entries, so
+an empty scanned url never blanks an existing (e.g. hand-set) value.
 
     python manage.py sync_agent_skills --from-json /path/to/scan.json
 
@@ -50,12 +52,15 @@ class Command(BaseCommand):
             origin = (entry.get("origin") or "").strip()
             source = entry.get("source") or "self-authored"
             description = entry.get("description") or ""
+            url = (entry.get("url") or "").strip()
 
             existing = AgentSkill.objects.filter(name=name, category=category, origin=origin).first()
             if existing:
                 existing.description = description
                 existing.source = source
-                existing.save(update_fields=["description", "source", "updated_at"])
+                if url:
+                    existing.url = url
+                existing.save(update_fields=["description", "source", "url", "updated_at"])
                 updated += 1
                 continue
 
@@ -66,6 +71,7 @@ class Command(BaseCommand):
                 source=source,
                 origin=origin,
                 category=category,
+                url=url,
             )
             created += 1
 

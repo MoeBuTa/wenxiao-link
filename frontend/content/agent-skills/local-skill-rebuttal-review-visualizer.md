@@ -4,6 +4,7 @@ source: "self-authored"
 origin: ""
 category: "skill"
 tags: []
+url: ""
 highlightBlurb: ""
 highlightOrder: null
 order: 0

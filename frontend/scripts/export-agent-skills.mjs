@@ -65,6 +65,25 @@ function slugName(file) {
   return path.basename(file, ".md");
 }
 
+// Plugin repo URL, best-effort: prefer the plugin's own manifest, fall back
+// to the marketplace it was installed from (~/.claude/plugins/cache/<marketplace>/...
+// maps to a `repo` entry in known_marketplaces.json) when the manifest itself
+// doesn't list one (e.g. a plugin with no repository/homepage field).
+function marketplaceRepoUrl(installPath) {
+  const marketplaces = readJsonSafe(path.join(CLAUDE_DIR, "plugins", "known_marketplaces.json")) ?? {};
+  const marker = `${path.sep}cache${path.sep}`;
+  const idx = installPath.indexOf(marker);
+  if (idx < 0) return "";
+  const rest = installPath.slice(idx + marker.length);
+  const marketplaceKey = rest.split(path.sep)[0];
+  const repo = marketplaces[marketplaceKey]?.source?.repo;
+  return repo ? `https://github.com/${repo}` : "";
+}
+
+function pluginUrl(installPath, manifest) {
+  return manifest?.repository || manifest?.homepage || marketplaceRepoUrl(installPath);
+}
+
 function collectPlugins() {
   const installed = readJsonSafe(path.join(CLAUDE_DIR, "plugins", "installed_plugins.json"));
   const out = [];
@@ -76,6 +95,7 @@ function collectPlugins() {
     const installPath = install.installPath;
     const manifest = readJsonSafe(path.join(installPath, ".claude-plugin", "plugin.json"));
     const pluginName = manifest?.name ?? key.split("@")[0];
+    const url = pluginUrl(installPath, manifest);
 
     for (const skillFile of walk(installPath, (n) => n === "SKILL.md")) {
       const fm = frontmatterOf(skillFile);
@@ -85,6 +105,7 @@ function collectPlugins() {
         source: "plugin",
         origin: pluginName,
         category: "skill",
+        url,
       });
     }
 
@@ -99,6 +120,7 @@ function collectPlugins() {
         source: "plugin",
         origin: pluginName,
         category: "command",
+        url,
       });
     }
 
@@ -113,6 +135,7 @@ function collectPlugins() {
         source: "plugin",
         origin: pluginName,
         category: "agent",
+        url,
       });
     }
   }
@@ -136,11 +159,20 @@ function collectUserSkills() {
 
     let source = "self-authored";
     let origin = "";
+    let url = "";
     if (stat.isSymbolicLink()) {
       const resolved = fs.realpathSync(entryPath);
       if (resolved.startsWith(npxSkillsRoot)) {
         source = "npx-package";
-        origin = lockSkills[entry.name]?.source ?? "";
+        const lockEntry = lockSkills[entry.name];
+        origin = lockEntry?.source ?? "";
+        // Deep-link to the skill's own file in its source repo, e.g.
+        // https://github.com/mattpocock/skills/blob/main/skills/.../SKILL.md
+        // Best-effort: assumes the repo's default branch is "main".
+        if (lockEntry?.sourceUrl && lockEntry?.skillPath) {
+          const repoUrl = lockEntry.sourceUrl.replace(/\.git$/, "");
+          url = `${repoUrl}/blob/main/${lockEntry.skillPath}`;
+        }
       } else {
         source = "linked-project";
         // Use the project directory name, not the full local filesystem
@@ -159,6 +191,7 @@ function collectUserSkills() {
       source,
       origin,
       category: "skill",
+      url,
     });
   }
   return out;

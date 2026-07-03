@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
 tags: []
+url: "https://github.com/mattpocock/skills/blob/main/skills/personal/edit-article/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null
 order: 0

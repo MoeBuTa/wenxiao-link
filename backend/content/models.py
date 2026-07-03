@@ -125,6 +125,10 @@ class AgentSkill(models.Model):
     source = models.CharField(max_length=20, choices=SOURCE_CHOICES)
     origin = models.CharField(max_length=255, blank=True, default="")
     category = models.CharField(max_length=10, choices=CATEGORY_CHOICES)
+    # Detected when derivable (plugin/npx-package repo metadata); the sync
+    # command never blanks an existing value it can't currently detect, so
+    # a hand-set url for a self-authored/linked-project entry survives.
+    url = models.URLField(blank=True, default="")
     tags = models.JSONField(default=list)  # list[str]
     highlight_blurb = models.TextField(blank=True, default="")
     highlight_order = models.IntegerField(null=True, blank=True)

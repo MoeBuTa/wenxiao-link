@@ -4,6 +4,7 @@ source: "npx-package"
 origin: "vercel-labs/skills"
 category: "skill"
 tags: []
+url: "https://github.com/vercel-labs/skills/blob/main/skills/find-skills/SKILL.md"
 highlightBlurb: ""
 highlightOrder: null
 order: 0

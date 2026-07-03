@@ -4,6 +4,7 @@ source: "plugin"
 origin: "superpowers"
 category: "skill"
 tags: ["planning", "design-review", "superpowers"]
+url: "https://github.com/obra/superpowers"
 highlightBlurb: "I gate every non-trivial change behind this: it forces the agent to externalize its design reasoning and get my explicit sign-off before any code gets written, catching wrong assumptions and scope creep before they cost an implementation cycle."
 highlightOrder: 1
 order: 0

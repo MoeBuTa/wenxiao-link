@@ -185,6 +185,7 @@ function agentSkillFromFrontmatter(
     origin: String(data.origin ?? ""),
     category: (typeof data.category === "string" ? data.category : "skill") as AgentSkillCategory,
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+    url: String(data.url ?? ""),
     highlightBlurb: String(data.highlightBlurb ?? ""),
     highlightOrder: typeof data.highlightOrder === "number" ? data.highlightOrder : null,
     order: typeof data.order === "number" ? data.order : 0,

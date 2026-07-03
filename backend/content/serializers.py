@@ -142,6 +142,7 @@ class AgentSkillSerializer(serializers.ModelSerializer):
             "origin",
             "category",
             "tags",
+            "url",
             "highlightBlurb",
             "highlightOrder",
             "published",

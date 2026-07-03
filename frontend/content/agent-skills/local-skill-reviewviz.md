@@ -4,6 +4,7 @@ source: "self-authored"
 origin: ""
 category: "skill"
 tags: ["peer-review", "self-authored", "visualization"]
+url: "https://github.com/MoeBuTa/Reviewviz"
 highlightBlurb: "A skill I wrote myself: turns a pile of pasted peer-review comments into a colour-coded, click-through HTML page (per-reviewer tabs, grouped by rebuttal point, a focus mode for must-reply sentences) so I can plan a rebuttal letter without losing track of what still needs a response."
 highlightOrder: 5
 order: 0

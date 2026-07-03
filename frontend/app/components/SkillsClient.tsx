@@ -11,6 +11,7 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  Link,
   Tag,
   Text,
   VStack,
@@ -26,6 +27,7 @@ import {
   FaChevronRight,
   FaCode,
   FaCompass,
+  FaExternalLinkAlt,
   FaGraduationCap,
   FaLayerGroup,
   FaMagic,
@@ -108,14 +110,41 @@ function SkillRow({ entry }: { entry: AgentSkillEntry }) {
       <Icon as={CategoryIcon} color={isHighlighted ? "accent" : "fg.faint"} boxSize={3} mt={1} flexShrink={0} />
       <Box minW={0} flex={1}>
         <HStack spacing={1.5}>
-          <Text fontSize="sm" fontWeight={isHighlighted ? "700" : "600"} color="fg.default" noOfLines={1}>
-            {entry.name}
-          </Text>
+          {entry.url ? (
+            <Link
+              href={entry.url}
+              isExternal
+              onClick={(e) => e.stopPropagation()}
+              fontSize="sm"
+              fontWeight={isHighlighted ? "700" : "600"}
+              color="fg.default"
+              noOfLines={1}
+              _hover={{ color: "accent", textDecoration: "underline" }}
+            >
+              {entry.name}
+            </Link>
+          ) : (
+            <Text fontSize="sm" fontWeight={isHighlighted ? "700" : "600"} color="fg.default" noOfLines={1}>
+              {entry.name}
+            </Text>
+          )}
+          {entry.url ? <Icon as={FaExternalLinkAlt} color="fg.faint" boxSize={2} flexShrink={0} /> : null}
           {isHighlighted ? <Icon as={FaMagic} color="accent" boxSize={2.5} flexShrink={0} /> : null}
         </HStack>
         <Text fontSize="xs" color="fg.muted" noOfLines={1}>
           {isHighlighted ? entry.highlightBlurb : entry.description}
         </Text>
+        {entry.tags.length > 0 ? (
+          <Wrap spacing={1} mt={0.5}>
+            {entry.tags.slice(0, 3).map((tag) => (
+              <WrapItem key={tag}>
+                <Tag size="sm" bg="bg.subtle" color="fg.muted" fontSize="0.65em" px={1.5} py={0}>
+                  {tag}
+                </Tag>
+              </WrapItem>
+            ))}
+          </Wrap>
+        ) : null}
       </Box>
     </HStack>
   );

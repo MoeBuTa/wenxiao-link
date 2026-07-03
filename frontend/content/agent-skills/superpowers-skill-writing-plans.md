@@ -4,6 +4,7 @@ source: "plugin"
 origin: "superpowers"
 category: "skill"
 tags: []
+url: "https://github.com/obra/superpowers"
 highlightBlurb: ""
 highlightOrder: null
 order: 0

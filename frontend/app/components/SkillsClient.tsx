@@ -145,7 +145,6 @@ function RepoCard({
 }) {
   const { name, url, entries } = group;
   const single = entries.length === 1;
-  const topNames = entries.slice(0, 3).map((e) => e.name);
   const primaryCategory = entries[0].category;
   const CategoryIcon = CATEGORY_ICONS[primaryCategory];
 
@@ -195,21 +194,13 @@ function RepoCard({
         <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" ml="auto" flexShrink={0} />
       </Flex>
 
-      {!single ? (
-        <Text fontSize="xs" color="fg.faint" mt={1.5}>
-          Usage: {topNames.join(", ")}
-          {entries.length > 3 ? ` +${entries.length - 3} more` : ""}
-        </Text>
-      ) : entries[0].tags.length > 0 ? (
-        <Wrap spacing={1} mt={1.5}>
-          {entries[0].tags.slice(0, 3).map((tag) => (
-            <WrapItem key={tag}>
-              <Tag size="sm" bg="bg.subtle" color="fg.muted" fontSize="0.65em" px={1.5} py={0}>
-                {tag}
-              </Tag>
-            </WrapItem>
-          ))}
-        </Wrap>
+      <Text fontSize="xs" color="fg.muted" mt={1.5} noOfLines={2}>
+        {entries[0].highlightBlurb || entries[0].description}
+      </Text>
+      {entries[0].tags.length > 0 ? (
+        <Tag size="sm" bg="bg.subtle" color="fg.muted" fontSize="0.65em" px={1.5} py={0} mt={1.5}>
+          {entries[0].tags[0]}
+        </Tag>
       ) : null}
 
       <Collapse in={expanded} animateOpacity>

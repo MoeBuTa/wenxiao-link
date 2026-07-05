@@ -16,6 +16,86 @@ const AGENTS_DIR = path.join(HOME, ".agents");
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const OUT_FILE = path.join(SCRIPT_DIR, "..", "..", "backend", "scripts", ".agent-skills-scan.json");
 
+// ---- Workflow-category seed -------------------------------------------------
+// The /skills page groups skills by research/engineering workflow function
+// (see AgentSkill.WORKFLOW_CATEGORY_CHOICES), adapted from
+// JingbiaoMei/my-agent-skills. This seed places skills into those sections; the
+// sync backfills it onto rows that have no category yet and never overwrites an
+// admin-set one, so hand-tuning in the DB sticks. A skill in neither map gets
+// no category and stays unpublished (the long tail — generic doc skills, plugin
+// sub-commands — is hidden until curated).
+//
+// ORIGIN_CATEGORY covers single-purpose repos wholesale; NAME_CATEGORY overrides
+// it per-skill for multi-purpose toolkit repos (softaworks, K-Dense, anthropics)
+// whose skills span several functions.
+const ORIGIN_CATEGORY = {
+  "kthorn/research-superpower": "literature",
+  "kerim/zotero-code-execution": "literature",
+  "ComposioHQ/awesome-claude-skills": "literature",
+  "weklica/Firecrawl-cli": "literature",
+  "vercel-labs/skills": "literature",
+  "SipengXie2024/Helios-Writing": "writing",
+  "nextlevelbuilder/ui-ux-pro-max-skill": "web",
+  "mattpocock/skills": "engineering",
+  superpowers: "engineering",
+  "academic-research-skills": "literature",
+  "andrej-karpathy-skills": "engineering",
+  "claude-hud": "engineering",
+  "career-ops": "engineering",
+};
+const NAME_CATEGORY = {
+  // K-Dense-AI/claude-scientific-skills (spans research, diagramming, slides)
+  "scientific-critical-thinking": "literature",
+  "scientific-brainstorming": "literature",
+  "scientific-schematics": "diagramming",
+  "latex-posters": "slides",
+  // softaworks/agent-toolkit (spans diagramming, slides, writing, engineering)
+  "draw-io": "diagramming",
+  "mermaid-diagrams": "diagramming",
+  "marp-slide": "slides",
+  "writing-clearly-and-concisely": "writing",
+  "agent-md-refactor": "writing",
+  "session-handoff": "engineering",
+  "dependency-updater": "engineering",
+  // ZhanlinCui/Ultimate-Agent-Skills-Collection
+  "obsidian-helper": "writing",
+  "obsidian-bases": "writing",
+  "vercel-deploy": "web",
+  // anthropics/skills — publish the CV-relevant subset only
+  "frontend-design": "web",
+  "web-artifacts-builder": "web",
+  "webapp-testing": "web",
+  "canvas-design": "diagramming",
+  "algorithmic-art": "diagramming",
+  "doc-coauthoring": "writing",
+  "mcp-builder": "engineering",
+  "skill-creator": "engineering",
+  "claude-api": "engineering",
+  pptx: "slides",
+  // ingpoc/SKILLS
+  "tufte-slide-design": "slides",
+  // nextlevelbuilder (origin → web; this one is really a slides skill)
+  slides: "slides",
+  // JingbiaoMei/work-canvas-skill
+  "work-canvas": "diagramming",
+  // mattpocock/skills — origin defaults to engineering; these are writing
+  "edit-article": "writing",
+  "writing-beats": "writing",
+  "writing-fragments": "writing",
+  "writing-great-skills": "writing",
+  "writing-shape": "writing",
+  "obsidian-vault": "writing",
+};
+
+// Only real skills carry a workflow category; commands/agents are rolled up or
+// stay hidden. Match on the local folder name (kebab) and the frontmatter name.
+function workflowCategoryOf({ name, folder, origin, category }) {
+  if (category !== "skill") return "";
+  const keys = [folder, name].filter(Boolean).map((s) => s.toLowerCase());
+  for (const k of keys) if (NAME_CATEGORY[k]) return NAME_CATEGORY[k];
+  return ORIGIN_CATEGORY[origin] ?? "";
+}
+
 function readJsonSafe(p) {
   try {
     return JSON.parse(fs.readFileSync(p, "utf-8"));
@@ -79,14 +159,19 @@ function parentSkillOf(body) {
 // to the marketplace it was installed from (~/.claude/plugins/cache/<marketplace>/...
 // maps to a `repo` entry in known_marketplaces.json) when the manifest itself
 // doesn't list one (e.g. a plugin with no repository/homepage field).
-function marketplaceRepoUrl(installPath) {
-  const marketplaces = readJsonSafe(path.join(CLAUDE_DIR, "plugins", "known_marketplaces.json")) ?? {};
+// The marketplace a plugin was installed from is the first path segment under
+// ~/.claude/plugins/cache/<marketplace>/... — it's both the key into
+// known_marketplaces.json and the `@marketplace` half of the install command.
+function marketplaceKeyOf(installPath) {
   const marker = `${path.sep}cache${path.sep}`;
   const idx = installPath.indexOf(marker);
   if (idx < 0) return "";
-  const rest = installPath.slice(idx + marker.length);
-  const marketplaceKey = rest.split(path.sep)[0];
-  const repo = marketplaces[marketplaceKey]?.source?.repo;
+  return installPath.slice(idx + marker.length).split(path.sep)[0];
+}
+
+function marketplaceRepoUrl(installPath) {
+  const marketplaces = readJsonSafe(path.join(CLAUDE_DIR, "plugins", "known_marketplaces.json")) ?? {};
+  const repo = marketplaces[marketplaceKeyOf(installPath)]?.source?.repo;
   return repo ? `https://github.com/${repo}` : "";
 }
 
@@ -106,16 +191,23 @@ function collectPlugins() {
     const manifest = readJsonSafe(path.join(installPath, ".claude-plugin", "plugin.json"));
     const pluginName = manifest?.name ?? key.split("@")[0];
     const url = pluginUrl(installPath, manifest);
+    // Repo-level install shortcut: one `/plugin install name@marketplace` per
+    // plugin (mirrors the repo-level `npx skills add` for npx packages).
+    const marketplaceKey = marketplaceKeyOf(installPath);
+    const installCommand = marketplaceKey ? `/plugin install ${pluginName}@${marketplaceKey}` : "";
 
     for (const skillFile of walk(installPath, (n) => n === "SKILL.md")) {
       const fm = frontmatterOf(skillFile);
+      const folder = path.basename(path.dirname(skillFile));
       out.push({
-        name: fm.name ?? path.basename(path.dirname(skillFile)),
+        name: fm.name ?? folder,
         description: fm.description ?? "",
         source: "plugin",
         origin: pluginName,
         category: "skill",
         url,
+        installCommand,
+        workflowCategory: workflowCategoryOf({ name: fm.name, folder, origin: pluginName, category: "skill" }),
       });
     }
 
@@ -204,7 +296,17 @@ function collectUserSkills() {
       origin,
       category: "skill",
       url,
+      folder: entry.name,
+      workflowCategory: workflowCategoryOf({ name: fm.name, folder: entry.name, origin, category: "skill" }),
     });
+  }
+
+  // Repo-level install shortcut: one `npx skills add <repo>` per source repo
+  // (not per fine-grained skill), so a card for a 39-skill toolkit like
+  // mattpocock/skills shows a single high-level command.
+  for (const e of out) {
+    if (e.source === "npx-package" && e.origin) e.installCommand = `npx skills add ${e.origin}`;
+    delete e.folder;
   }
   return out;
 }

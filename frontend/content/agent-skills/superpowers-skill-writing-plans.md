@@ -3,6 +3,8 @@ name: "writing-plans"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "/plugin install superpowers@claude-plugins-official"
 tags: ["planning", "implementation", "tdd"]
 usage: []
 url: "https://github.com/obra/superpowers"

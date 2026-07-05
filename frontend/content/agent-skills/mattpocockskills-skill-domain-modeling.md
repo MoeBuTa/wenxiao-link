@@ -3,6 +3,8 @@ name: "domain-modeling"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["ddd", "terminology", "architecture"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/domain-modeling/SKILL.md"

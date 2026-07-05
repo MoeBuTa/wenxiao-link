@@ -3,6 +3,8 @@ name: "scaffold-exercises"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["scaffolding", "exercises", "education"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/misc/scaffold-exercises/SKILL.md"

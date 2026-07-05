@@ -3,6 +3,8 @@ name: "implement"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["implementation", "prd", "engineering"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/implement/SKILL.md"

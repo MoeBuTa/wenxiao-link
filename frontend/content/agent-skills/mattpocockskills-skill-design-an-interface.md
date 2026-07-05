@@ -3,6 +3,8 @@ name: "design-an-interface"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["api-design", "architecture", "parallel-agents"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/deprecated/design-an-interface/SKILL.md"

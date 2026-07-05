@@ -3,6 +3,8 @@ name: "work-canvas"
 source: "npx-package"
 origin: ""
 category: "skill"
+workflowCategory: "diagramming"
+installCommand: ""
 tags: ["dashboard", "visualization", "reporting"]
 usage: []
 url: "https://github.com/JingbiaoMei/work-canvas-skill"

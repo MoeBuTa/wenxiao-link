@@ -3,6 +3,8 @@ name: "academic-pipeline"
 source: "plugin"
 origin: "academic-research-skills"
 category: "skill"
+workflowCategory: "literature"
+installCommand: "/plugin install academic-research-skills@academic-research-skills"
 tags: ["orchestration", "research", "academic-writing"]
 usage: ["ars-full"]
 url: "https://github.com/Imbad0202/academic-research-skills"

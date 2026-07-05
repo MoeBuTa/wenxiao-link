@@ -3,6 +3,8 @@ name: "using-git-worktrees"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "/plugin install superpowers@claude-plugins-official"
 tags: ["git", "isolation", "worktrees"]
 usage: []
 url: "https://github.com/obra/superpowers"

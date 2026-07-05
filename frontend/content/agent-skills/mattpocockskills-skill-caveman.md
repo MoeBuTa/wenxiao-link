@@ -3,6 +3,8 @@ name: "caveman"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["communication", "token-efficiency", "productivity"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/productivity/caveman/SKILL.md"

@@ -3,6 +3,8 @@ name: "qa"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["bug-reporting", "qa", "issue-tracking"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/deprecated/qa/SKILL.md"

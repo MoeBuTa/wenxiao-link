@@ -3,6 +3,8 @@ name: "academic-paper"
 source: "plugin"
 origin: "academic-research-skills"
 category: "skill"
+workflowCategory: "literature"
+installCommand: "/plugin install academic-research-skills@academic-research-skills"
 tags: ["academic-writing", "research", "drafting"]
 usage: ["ars-abstract", "ars-citation-check", "ars-disclosure"]
 url: "https://github.com/Imbad0202/academic-research-skills"

@@ -103,8 +103,10 @@ class AgentSkill(models.Model):
     machine, shown on the /skills page. `slug`/`name`/`description`/
     `source`/`origin`/`category` are "detected" fields refreshed by the
     `sync_agent_skills` management command; `tags`/`highlight_blurb`/
-    `highlight_order`/`published`/`order` are "curated" fields set once via
-    admin and never overwritten by a re-sync.
+    `highlight_order`/`published`/`order`/`workflow_category` are "curated"
+    fields set once and never overwritten by a re-sync. `url` and
+    `install_command` are "detected-when-derivable": refreshed when the scan
+    can compute them, but an empty scan value never blanks an existing one.
     """
 
     SOURCE_CHOICES = [
@@ -117,6 +119,18 @@ class AgentSkill(models.Model):
         ("skill", "Skill"),
         ("command", "Command"),
         ("agent", "Agent"),
+    ]
+    # Research/engineering-workflow grouping (the /skills page's primary
+    # sections, adapted from JingbiaoMei/my-agent-skills). Blank = uncategorized
+    # (hidden from the page). Seeded by the scanner's name/origin map, then
+    # curated in admin — treated like `url`: set when derivable, never blanked.
+    WORKFLOW_CATEGORY_CHOICES = [
+        ("literature", "Literature & Research"),
+        ("writing", "Writing & Editing"),
+        ("diagramming", "Diagramming & Visualization"),
+        ("slides", "Slides & Posters"),
+        ("web", "Web & UI/UX"),
+        ("engineering", "Engineering & Agent Workflow"),
     ]
 
     slug = models.SlugField(max_length=220, unique=True)
@@ -135,6 +149,13 @@ class AgentSkill(models.Model):
     # those command rows are then unpublished, since they're shown as usage
     # here rather than as their own top-level cards.
     usage = models.JSONField(default=list)  # list[str]
+    workflow_category = models.CharField(
+        max_length=20, choices=WORKFLOW_CATEGORY_CHOICES, blank=True, default=""
+    )
+    # Copy-to-clipboard install command shown on the page, e.g.
+    # "npx skills add softaworks/agent-toolkit -s draw-io". Detected for
+    # npx-package entries; blank otherwise (never blanks an existing value).
+    install_command = models.CharField(max_length=300, blank=True, default="")
     tags = models.JSONField(default=list)  # list[str]
     highlight_blurb = models.TextField(blank=True, default="")
     highlight_order = models.IntegerField(null=True, blank=True)

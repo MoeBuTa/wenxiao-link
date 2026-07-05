@@ -172,6 +172,8 @@ def _agent_skill_frontmatter(skill) -> str:
         "source": skill.source,
         "origin": skill.origin,
         "category": skill.category,
+        "workflowCategory": skill.workflow_category,
+        "installCommand": skill.install_command,
         "tags": list(skill.tags or []),
         "usage": list(skill.usage or []),
         "url": skill.url,

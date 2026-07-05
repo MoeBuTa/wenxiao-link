@@ -3,6 +3,8 @@ name: "review"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["code-review", "standards", "spec-compliance"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/in-progress/review/SKILL.md"

@@ -3,6 +3,8 @@ name: "edit-article"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "writing"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["writing", "editing", "clarity"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/personal/edit-article/SKILL.md"

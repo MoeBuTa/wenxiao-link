@@ -3,6 +3,8 @@ name: "requesting-code-review"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "/plugin install superpowers@claude-plugins-official"
 tags: ["code-review", "verification", "quality"]
 usage: []
 url: "https://github.com/obra/superpowers"

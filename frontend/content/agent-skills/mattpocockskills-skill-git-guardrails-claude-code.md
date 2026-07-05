@@ -3,6 +3,8 @@ name: "git-guardrails-claude-code"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["git", "safety", "hooks"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/misc/git-guardrails-claude-code/SKILL.md"

@@ -3,6 +3,8 @@ name: "writing-skills"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "/plugin install superpowers@claude-plugins-official"
 tags: ["skill-authoring", "meta", "documentation"]
 usage: []
 url: "https://github.com/obra/superpowers"

@@ -131,6 +131,8 @@ class AgentSkillSerializer(serializers.ModelSerializer):
     usage = serializers.ListField(child=serializers.CharField(), required=False)
     highlightBlurb = serializers.CharField(source="highlight_blurb", allow_blank=True, required=False)
     highlightOrder = serializers.IntegerField(source="highlight_order", allow_null=True, required=False)
+    workflowCategory = serializers.CharField(source="workflow_category", allow_blank=True, required=False)
+    installCommand = serializers.CharField(source="install_command", allow_blank=True, required=False)
 
     class Meta:
         model = AgentSkill
@@ -142,6 +144,8 @@ class AgentSkillSerializer(serializers.ModelSerializer):
             "source",
             "origin",
             "category",
+            "workflowCategory",
+            "installCommand",
             "tags",
             "usage",
             "url",

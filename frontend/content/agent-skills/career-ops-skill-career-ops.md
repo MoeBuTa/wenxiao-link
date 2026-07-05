@@ -3,6 +3,8 @@ name: "career-ops"
 source: "linked-project"
 origin: "career-ops"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "npx @santifer/career-ops init"
 tags: ["job-search", "automation", "linked-project"]
 usage: []
 url: "https://github.com/santifer/career-ops"

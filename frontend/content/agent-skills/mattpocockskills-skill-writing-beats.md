@@ -3,6 +3,8 @@ name: "writing-beats"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "writing"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["writing", "narrative", "structure"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/in-progress/writing-beats/SKILL.md"

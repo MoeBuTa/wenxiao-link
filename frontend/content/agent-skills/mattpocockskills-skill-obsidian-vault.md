@@ -3,6 +3,8 @@ name: "obsidian-vault"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "writing"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["notes", "knowledge-management", "wikilinks"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/personal/obsidian-vault/SKILL.md"

@@ -3,6 +3,8 @@ name: "brainstorming"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "/plugin install superpowers@claude-plugins-official"
 tags: ["planning", "design-review", "superpowers"]
 usage: []
 url: "https://github.com/obra/superpowers"

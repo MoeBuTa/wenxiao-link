@@ -119,6 +119,17 @@ export type AgentSkillSource = "plugin" | "npx-package" | "self-authored" | "lin
 
 export type AgentSkillCategory = "skill" | "command" | "agent";
 
+// Research/engineering workflow grouping — the /skills page's primary sections.
+// "" = uncategorized (never rendered). Mirrors AgentSkill.WORKFLOW_CATEGORY_CHOICES.
+export type WorkflowCategory =
+  | "literature"
+  | "writing"
+  | "diagramming"
+  | "slides"
+  | "web"
+  | "engineering"
+  | "";
+
 export type AgentSkillEntry = {
   id: number;
   slug: string;
@@ -127,6 +138,8 @@ export type AgentSkillEntry = {
   source: AgentSkillSource;
   origin: string;
   category: AgentSkillCategory;
+  workflowCategory: WorkflowCategory;
+  installCommand: string;
   tags: string[];
   usage: string[];
   url: string;

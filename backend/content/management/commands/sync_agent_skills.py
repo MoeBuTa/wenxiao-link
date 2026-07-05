@@ -3,12 +3,17 @@
 Reads the JSON array produced by frontend/scripts/export-agent-skills.mjs
 (run on the host, since only the host has access to ~/.claude and
 ~/.agents) and upserts it into the DB. "Detected" fields (name, description,
-source, origin, category, url) are refreshed on every run; "curated" fields
-(tags, highlight_blurb, highlight_order, published, order) are set only
-when a row is first created and are never touched on update, so admin edits
-survive re-syncs. `url` is detected-when-derivable rather than always
-detected: the scanner can only compute it for plugin/npx-package entries, so
-an empty scanned url never blanks an existing (e.g. hand-set) value.
+source, origin, category) are refreshed on every run; "curated" fields
+(tags, highlight_blurb, highlight_order, published, order, workflow_category)
+are set only when a row is first created and are never touched on update, so
+admin edits survive re-syncs. `url` and `install_command` are
+detected-when-derivable rather than always detected: the scanner can only
+compute them for some entries, so an empty scanned value never blanks an
+existing (e.g. hand-set) value. `workflow_category` is a curated exception:
+the scanner seeds it, and the sync backfills that seed onto existing rows
+while they have none, but never overwrites a category already set. A newly
+scanned skill auto-publishes only if the scanner gave it a workflow category,
+so re-syncs never flood the page with the uncategorized long tail.
 
 A second pass rolls up commands that are really just invocation-modes of one
 skill (e.g. academic-research-skills' ars-* commands each say `Skill entry:
@@ -61,14 +66,27 @@ class Command(BaseCommand):
             source = entry.get("source") or "self-authored"
             description = entry.get("description") or ""
             url = (entry.get("url") or "").strip()
+            install_command = (entry.get("installCommand") or "").strip()
+            workflow_category = (entry.get("workflowCategory") or "").strip()
 
             existing = AgentSkill.objects.filter(name=name, category=category, origin=origin).first()
             if existing:
                 existing.description = description
                 existing.source = source
+                fields = ["description", "source", "updated_at"]
+                # Detected-when-derivable: only overwrite when the scan has a value.
                 if url:
                     existing.url = url
-                existing.save(update_fields=["description", "source", "url", "updated_at"])
+                    fields.append("url")
+                if install_command:
+                    existing.install_command = install_command
+                    fields.append("install_command")
+                # Curated: backfill the scanner's category seed only while the
+                # row has none, so a hand-set category via admin survives.
+                if workflow_category and not existing.workflow_category:
+                    existing.workflow_category = workflow_category
+                    fields.append("workflow_category")
+                existing.save(update_fields=fields)
                 updated += 1
                 continue
 
@@ -80,6 +98,13 @@ class Command(BaseCommand):
                 origin=origin,
                 category=category,
                 url=url,
+                install_command=install_command,
+                workflow_category=workflow_category,
+                # A newly-scanned skill only auto-publishes if the scanner
+                # placed it in a workflow category; the long tail (plugin
+                # sub-commands, generic doc skills) stays unpublished until
+                # curated, so a re-sync never floods the page.
+                published=bool(workflow_category),
             )
             created += 1
 

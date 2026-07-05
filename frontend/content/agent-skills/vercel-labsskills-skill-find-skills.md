@@ -3,6 +3,8 @@ name: "find-skills"
 source: "npx-package"
 origin: "vercel-labs/skills"
 category: "skill"
+workflowCategory: "literature"
+installCommand: "npx skills add vercel-labs/skills"
 tags: ["skill-discovery", "installation", "tooling"]
 usage: []
 url: "https://github.com/vercel-labs/skills/blob/main/skills/find-skills/SKILL.md"

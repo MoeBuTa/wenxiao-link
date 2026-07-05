@@ -17,355 +17,454 @@ import {
   VStack,
   Wrap,
   WrapItem,
-  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import {
+  FaBookOpen,
+  FaCheck,
+  FaChalkboardTeacher,
   FaChevronDown,
   FaChevronRight,
   FaCode,
   FaExternalLinkAlt,
-  FaPuzzlePiece,
-  FaRobot,
+  FaGlobe,
+  FaPenNib,
+  FaProjectDiagram,
+  FaRegCopy,
   FaSearch,
-  FaTerminal,
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
 
-import type { AgentSkillCategory, AgentSkillEntry } from "../lib/types";
+import type { AgentSkillEntry, WorkflowCategory } from "../lib/types";
 
-const CATEGORY_ICONS: Record<AgentSkillCategory, IconType> = {
-  skill: FaPuzzlePiece,
-  command: FaTerminal,
-  agent: FaRobot,
-};
+// ---- Taxonomy ---------------------------------------------------------------
+// The page's primary sections, one per AgentSkill.workflow_category. Order is
+// the narrative flow (discover → write → visualize → present → build). Adapted
+// from JingbiaoMei/my-agent-skills' six research-workflow categories.
+type CategoryMeta = { key: Exclude<WorkflowCategory, "">; label: string; goal: string; icon: IconType };
+const CATEGORIES: CategoryMeta[] = [
+  {
+    key: "literature",
+    label: "Literature & Research",
+    goal: "Systematic discovery, citation management, and evidence appraisal.",
+    icon: FaBookOpen,
+  },
+  {
+    key: "writing",
+    label: "Writing & Editing",
+    goal: "Publication-quality drafting, editing, and prose automation.",
+    icon: FaPenNib,
+  },
+  {
+    key: "diagramming",
+    label: "Diagramming & Visualization",
+    goal: "Vector figures, schematics, and reviewable visual artifacts.",
+    icon: FaProjectDiagram,
+  },
+  {
+    key: "slides",
+    label: "Slides & Posters",
+    goal: "Conference decks and research posters.",
+    icon: FaChalkboardTeacher,
+  },
+  {
+    key: "web",
+    label: "Web & UI/UX",
+    goal: "Project pages, interactive demos, and deployment.",
+    icon: FaGlobe,
+  },
+  {
+    key: "engineering",
+    label: "Engineering & Agent Workflow",
+    goal: "TDD, debugging, and the agent-driven development loop.",
+    icon: FaCode,
+  },
+];
 
-// Repo-level presentation metadata, curated. `description` is normalized from
-// each repo's own GitHub description (kept to a similar ~13-word length so
-// cards line up); `tags` is a hand-picked trio that doubles as the filter
-// taxonomy. Keyed by the same value the cards group on (origin, or the skill
-// name for origin-less self-authored entries). A repo not listed here falls
-// back to its primary skill's DB description/tags.
-type RepoMeta = { description: string; tags: string[] };
-const REPO_META: Record<string, RepoMeta> = {
-  superpowers: {
-    description: "A software-development methodology and skills framework for coding agents — TDD, debugging, collaboration.",
-    tags: ["engineering", "methodology", "debugging"],
-  },
-  "mattpocock/skills": {
-    description: "Agent skills for engineers to improve code quality, alignment, and everyday workflow efficiency.",
-    tags: ["engineering", "code-quality", "workflow"],
-  },
-  "andrej-karpathy-skills": {
-    description: "Guidelines for better Claude Code behavior, drawn from Karpathy's notes on common LLM coding mistakes.",
-    tags: ["engineering", "code-quality", "guidelines"],
-  },
-  "academic-research-skills": {
-    description: "A Claude Code skill suite for academic research: literature review through peer review and publication.",
-    tags: ["academic", "research", "peer-review"],
-  },
-  reviewviz: {
-    description: "Turns peer-review comments into an interactive HTML page for planning rebuttals efficiently.",
-    tags: ["academic", "peer-review", "visualization"],
-  },
-  "work-canvas": {
-    description: "Turns an AI agent's work into self-contained, offline-viewable HTML pages for review.",
-    tags: ["visualization", "reporting", "productivity"],
-  },
-  "career-ops": {
-    description: "An AI-powered job-search system that evaluates offers, generates tailored CVs, and tracks applications.",
-    tags: ["job-search", "automation", "productivity"],
-  },
-  "claude-hud": {
-    description: "A Claude Code plugin showing real-time context usage, tool activity, and task progress in the statusline.",
-    tags: ["tooling", "monitoring", "statusline"],
-  },
-  "vercel-labs/skills": {
-    description: "The CLI for the open agent-skills ecosystem — install reusable instruction sets across 70+ coding agents.",
-    tags: ["tooling", "skill-discovery", "cli"],
-  },
-};
+// The four-phase strategy strip: a narrative overview that doubles as a filter.
+// Clicking a phase selects exactly its categories.
+type Phase = { label: string; blurb: string; categories: CategoryMeta["key"][] };
+const PHASES: Phase[] = [
+  { label: "1 · Discover", blurb: "Find & appraise the literature.", categories: ["literature"] },
+  { label: "2 · Create", blurb: "Draft, reason, and build.", categories: ["writing", "engineering"] },
+  { label: "3 · Visualize", blurb: "Turn results into figures.", categories: ["diagramming"] },
+  { label: "4 · Present", blurb: "Ship decks, posters & pages.", categories: ["slides", "web"] },
+];
 
-function FilterChip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
+// A repo shipping owner/repo-shaped origins links straight to GitHub; plugins
+// and linked projects fall back to a member skill's own deep link.
+function repoUrl(origin: string, skills: AgentSkillEntry[]): string {
+  if (/^[\w.-]+\/[\w.-]+$/.test(origin)) return `https://github.com/${origin}`;
+  return skills.find((s) => s.url)?.url ?? "";
+}
+
+async function copyText(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ---- Install chip -----------------------------------------------------------
+// Shows the actual repo-level command (so the method — `npx skills add …` vs
+// `/plugin install …` — is self-evident) and copies it on click. The method
+// prefix leads the string, so end-truncation never hides it.
+
+function InstallChip({ command }: { command: string }) {
+  const [copied, setCopied] = useState(false);
   return (
-    <Tag
+    <Flex
       as="button"
-      onClick={onClick}
-      size="md"
-      cursor="pointer"
-      bg={active ? "accent" : "bg.card"}
-      color={active ? "coal.900" : "fg.muted"}
+      onClick={(e) => {
+        e.stopPropagation();
+        copyText(command).then((ok) => {
+          if (!ok) return;
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1200);
+        });
+      }}
+      align="center"
+      gap={1.5}
+      maxW={{ base: "180px", sm: "300px" }}
+      px={2}
+      py={1}
       borderWidth="1px"
-      borderColor={active ? "accent" : "border.muted"}
-      fontWeight={active ? "700" : "500"}
-      _hover={{ borderColor: "accent" }}
+      borderColor="border.muted"
+      borderRadius="md"
+      bg="bg.subtle"
+      color={copied ? "accent" : "fg.muted"}
+      _hover={{ borderColor: "accent", color: "accent" }}
+      title={`Copy: ${command}`}
+      flexShrink={0}
     >
-      {label}
-    </Tag>
+      <Icon as={copied ? FaCheck : FaRegCopy} boxSize={2.5} flexShrink={0} />
+      <Text fontFamily="mono" fontSize="0.7em" fontWeight="500" noOfLines={1}>
+        {copied ? "copied!" : command}
+      </Text>
+    </Flex>
   );
 }
 
-type RepoGroup = {
-  key: string;
-  name: string;
-  url: string;
-  description: string;
-  tags: string[];
-  entries: AgentSkillEntry[];
-};
+// ---- One skill row ----------------------------------------------------------
 
-function repoDescription(key: string, entries: AgentSkillEntry[]): string {
-  return REPO_META[key]?.description || entries[0].highlightBlurb || entries[0].description;
-}
-
-function repoTags(key: string, entries: AgentSkillEntry[]): string[] {
-  return (REPO_META[key]?.tags ?? entries[0].tags).slice(0, 3);
-}
-
-// One card per repo, not per individual skill — a repo that ships many skills
-// (mattpocock/skills: 39, superpowers: 14) would otherwise flood the page.
-function groupByRepo(entries: AgentSkillEntry[]): RepoGroup[] {
-  const byKey = new Map<string, AgentSkillEntry[]>();
-  for (const entry of entries) {
-    const key = entry.origin.trim() || entry.name;
-    const list = byKey.get(key) ?? [];
-    list.push(entry);
-    byKey.set(key, list);
-  }
-
-  const groups: RepoGroup[] = [];
-  for (const [key, list] of byKey) {
-    list.sort((a, b) => a.name.localeCompare(b.name));
-    groups.push({
-      key,
-      name: key,
-      url: list.find((e) => e.url)?.url ?? "",
-      description: repoDescription(key, list),
-      tags: repoTags(key, list),
-      entries: list,
-    });
-  }
-
-  groups.sort((a, b) => a.name.localeCompare(b.name));
-  return groups;
-}
-
-function RepoCard({
-  group,
-  expanded,
-  onToggle,
-}: {
-  group: RepoGroup;
-  expanded: boolean;
-  onToggle: () => void;
-}) {
-  const { name, url, description, tags, entries } = group;
-  const single = entries.length === 1;
-  const CategoryIcon = CATEGORY_ICONS[entries[0].category];
+function SkillRow({ skill, indent, install }: { skill: AgentSkillEntry; indent?: boolean; install?: string }) {
+  const [open, setOpen] = useState(false);
+  const hasDetail = Boolean(skill.description || skill.usage.length || skill.tags.length);
 
   return (
-    <Box
-      role="button"
-      tabIndex={0}
-      onClick={onToggle}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onToggle();
-        }
-      }}
-      borderWidth="1px"
-      borderColor="border.muted"
-      borderRadius="lg"
-      bg="bg.card"
-      p={3}
-      mb={3}
-      w="full"
-      cursor="pointer"
-      textAlign="left"
-      _hover={{ borderColor: "accent" }}
-    >
+    <Box pl={indent ? 5 : 0} py={1.5} borderTopWidth={indent ? "1px" : 0} borderColor="border.muted">
       <Flex align="center" gap={2}>
-        <Icon as={CategoryIcon} color="fg.faint" boxSize={3} flexShrink={0} />
-        {url ? (
-          <Link
-            href={url}
-            isExternal
-            onClick={(e) => e.stopPropagation()}
-            fontSize="sm"
-            fontWeight="600"
-            color="fg.default"
-            noOfLines={1}
-            _hover={{ color: "accent", textDecoration: "underline" }}
-          >
-            {name}
+        <Box
+          as={hasDetail ? "button" : "div"}
+          onClick={hasDetail ? () => setOpen((v) => !v) : undefined}
+          flex="1"
+          minW={0}
+          textAlign="left"
+          cursor={hasDetail ? "pointer" : "default"}
+        >
+          <Flex align="center" gap={1.5}>
+            {hasDetail ? (
+              <Icon as={open ? FaChevronDown : FaChevronRight} boxSize={2} color="fg.faint" flexShrink={0} />
+            ) : null}
+            <Text fontSize="sm" fontWeight="600" color="fg.default" noOfLines={1}>
+              {skill.name}
+            </Text>
+          </Flex>
+        </Box>
+        {install ? <InstallChip command={install} /> : null}
+        {skill.url ? (
+          <Link href={skill.url} isExternal onClick={(e) => e.stopPropagation()} color="fg.faint" _hover={{ color: "accent" }}>
+            <Icon as={FaExternalLinkAlt} boxSize={2.5} />
           </Link>
-        ) : (
-          <Text fontSize="sm" fontWeight="600" color="fg.default" noOfLines={1}>
-            {name}
-          </Text>
-        )}
-        {url ? <Icon as={FaExternalLinkAlt} color="fg.faint" boxSize={2} flexShrink={0} /> : null}
-        <Icon as={expanded ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" ml="auto" flexShrink={0} />
+        ) : null}
       </Flex>
 
-      <Text fontSize="xs" color="fg.muted" mt={1.5}>
-        {description}
-      </Text>
-
-      {tags.length > 0 ? (
-        <Wrap spacing={1} mt={1.5}>
-          {tags.map((tag) => (
-            <WrapItem key={tag}>
-              <Tag size="sm" bg="bg.subtle" color="fg.muted" fontSize="0.65em" px={1.5} py={0}>
-                {tag}
-              </Tag>
-            </WrapItem>
-          ))}
-        </Wrap>
-      ) : null}
-
-      <Collapse in={expanded} animateOpacity>
-        {single ? (
-          <Text fontSize="xs" color="fg.faint" mt={2}>
-            {entries[0].description}
+      <Collapse in={open} animateOpacity>
+        <Box pl={hasDetail ? 3.5 : 0} pt={1.5} pb={1}>
+          <Text fontSize="xs" color="fg.muted" whiteSpace="pre-wrap">
+            {skill.description}
           </Text>
-        ) : (
-          <VStack align="stretch" spacing={1.5} mt={2}>
-            {entries.map((entry) => (
-              <Box key={entry.slug}>
-                <Text fontSize="xs" fontWeight="600" color="fg.default">
-                  {entry.name}
-                </Text>
-                <Text fontSize="xs" color="fg.muted">
-                  {entry.highlightBlurb || entry.description}
-                </Text>
-              </Box>
-            ))}
-          </VStack>
-        )}
+          {skill.usage.length > 0 ? (
+            <Wrap spacing={1} mt={2}>
+              {skill.usage.map((u) => (
+                <WrapItem key={u}>
+                  <Tag size="sm" bg="bg.subtle" color="fg.muted" fontFamily="mono" fontSize="0.65em" px={1.5} py={0}>
+                    {u}
+                  </Tag>
+                </WrapItem>
+              ))}
+            </Wrap>
+          ) : null}
+        </Box>
       </Collapse>
     </Box>
   );
 }
 
-export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
-  const [search, setSearch] = useState("");
-  const [activeTags, setActiveTags] = useState<Set<string>>(new Set());
+// ---- A repo sub-group within a category -------------------------------------
+// Single-skill origins render as one plain row; multi-skill origins collapse
+// under a repo header so a big toolkit (mattpocock: 39) never floods a section.
 
-  const allGroups = useMemo(() => groupByRepo(skills), [skills]);
+type RepoBlock = { origin: string; url: string; skills: AgentSkillEntry[] };
 
-  // Filter taxonomy = the union of every repo card's tags, sorted.
-  const allTags = useMemo(() => {
-    const set = new Set<string>();
-    for (const g of allGroups) for (const t of g.tags) set.add(t);
-    return [...set].sort();
-  }, [allGroups]);
-
-  function toggleTag(tag: string) {
-    setActiveTags((prev) => {
-      const next = new Set(prev);
-      if (next.has(tag)) next.delete(tag);
-      else next.add(tag);
-      return next;
-    });
+function groupByOrigin(skills: AgentSkillEntry[]): RepoBlock[] {
+  const byOrigin = new Map<string, AgentSkillEntry[]>();
+  for (const s of skills) {
+    const key = s.origin.trim() || s.name;
+    (byOrigin.get(key) ?? byOrigin.set(key, []).get(key)!).push(s);
   }
-
-  const groups = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return allGroups.filter((g) => {
-      if (activeTags.size > 0 && !g.tags.some((t) => activeTags.has(t))) return false;
-      if (!q) return true;
-      const haystack = `${g.name} ${g.description} ${g.tags.join(" ")} ${g.entries
-        .map((e) => `${e.name} ${e.description} ${e.tags.join(" ")}`)
-        .join(" ")}`.toLowerCase();
-      return haystack.includes(q);
-    });
-  }, [allGroups, search, activeTags]);
-
-  // Fixed column assignment (not CSS `column-count`) so expanding/collapsing
-  // one card never reflows every other card into a different column.
-  const columnCount = useBreakpointValue({ base: 1, md: 2, lg: 3 }) ?? 3;
-  const columns = useMemo(() => {
-    const cols: RepoGroup[][] = Array.from({ length: columnCount }, () => []);
-    groups.forEach((group, i) => cols[i % columnCount].push(group));
-    return cols;
-  }, [groups, columnCount]);
-
-  // Every card folds by default.
-  const [expanded, setExpanded] = useState<Map<string, boolean>>(new Map());
-
-  function toggleGroup(key: string) {
-    setExpanded((prev) => {
-      const next = new Map(prev);
-      next.set(key, !(next.get(key) ?? false));
-      return next;
-    });
+  const blocks: RepoBlock[] = [];
+  for (const [origin, list] of byOrigin) {
+    list.sort((a, b) => a.name.localeCompare(b.name));
+    blocks.push({ origin, url: repoUrl(origin, list), skills: list });
   }
+  // Multi-skill repos first (they anchor the section), then singles A→Z.
+  blocks.sort((a, b) => b.skills.length - a.skills.length || a.origin.localeCompare(b.origin));
+  return blocks;
+}
+
+function RepoBlockView({ block, defaultOpen }: { block: RepoBlock; defaultOpen: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  // All skills in a repo share one repo-level install command.
+  const install = block.skills.find((s) => s.installCommand)?.installCommand ?? "";
+  if (block.skills.length === 1) return <SkillRow skill={block.skills[0]} install={install} />;
 
   return (
-    <Container maxW="6xl" py={{ base: 8, md: 12 }} px={{ base: 6, md: 10 }}>
+    <Box>
+      <Flex align="center" gap={1.5} py={1.5}>
+        <Flex
+          as="button"
+          onClick={() => setOpen((v) => !v)}
+          align="center"
+          gap={1.5}
+          flex="1"
+          minW={0}
+          textAlign="left"
+          cursor="pointer"
+          _hover={{ "& .repo-name": { color: "accent" } }}
+        >
+          <Icon as={open ? FaChevronDown : FaChevronRight} boxSize={2.5} color="fg.faint" flexShrink={0} />
+          <Text className="repo-name" fontSize="sm" fontWeight="700" color="fg.default" fontFamily="mono" noOfLines={1}>
+            {block.origin}
+          </Text>
+          <Text fontSize="xs" color="fg.faint" flexShrink={0}>
+            {block.skills.length} skills
+          </Text>
+        </Flex>
+        {install ? <InstallChip command={install} /> : null}
+        {block.url ? (
+          <Link href={block.url} isExternal color="fg.faint" _hover={{ color: "accent" }} flexShrink={0}>
+            <Icon as={FaExternalLinkAlt} boxSize={2.5} />
+          </Link>
+        ) : null}
+      </Flex>
+      <Collapse in={open} animateOpacity>
+        <Box>
+          {block.skills.map((s) => (
+            <SkillRow key={s.slug} skill={s} indent />
+          ))}
+        </Box>
+      </Collapse>
+    </Box>
+  );
+}
+
+// ---- Page -------------------------------------------------------------------
+
+export function SkillsClient({ skills }: { skills: AgentSkillEntry[] }) {
+  const [search, setSearch] = useState("");
+  const [activeCats, setActiveCats] = useState<Set<string>>(new Set());
+  const [byRepo, setByRepo] = useState(false);
+
+  function toggleCat(key: string) {
+    setActiveCats((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
+
+  function selectPhase(p: Phase) {
+    setActiveCats((prev) => {
+      const same = prev.size === p.categories.length && p.categories.every((c) => prev.has(c));
+      return same ? new Set() : new Set<string>(p.categories);
+    });
+  }
+
+  // Search + category filter, applied once; both views read from this.
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return skills.filter((s) => {
+      if (activeCats.size > 0 && !activeCats.has(s.workflowCategory)) return false;
+      if (!q) return true;
+      return `${s.name} ${s.origin} ${s.description} ${s.usage.join(" ")}`.toLowerCase().includes(q);
+    });
+  }, [skills, search, activeCats]);
+
+  const sections = useMemo(
+    () =>
+      CATEGORIES.map((cat) => ({
+        cat,
+        blocks: groupByOrigin(filtered.filter((s) => s.workflowCategory === cat.key)),
+      })).filter((sec) => sec.blocks.length > 0),
+    [filtered],
+  );
+
+  const repoBlocks = useMemo(() => groupByOrigin(filtered), [filtered]);
+
+  return (
+    <Container maxW="5xl" py={{ base: 8, md: 12 }} px={{ base: 6, md: 10 }}>
       <Heading size="lg" mb={2}>
         Skills
       </Heading>
       <Text color="fg.muted" fontSize="sm" mb={6}>
-        Claude Code plugins, agent skills, and tooling installed and in active use — how I extend
-        and work with AI coding agents.
+        Claude Code plugins, agent skills, and tooling installed and in active use — organized by where
+        they fit in a research and engineering workflow. Each repo links to its source and shows its
+        one-line install command (<Box as="span" fontFamily="mono" fontSize="0.85em" color="fg.default">npx skills add …</Box>{" "}
+        or <Box as="span" fontFamily="mono" fontSize="0.85em" color="fg.default">/plugin install …</Box>) — click it to copy.
       </Text>
 
-      <InputGroup mb={4} maxW="sm">
-        <InputLeftElement pointerEvents="none">
-          <Icon as={FaSearch} color="fg.faint" boxSize={3.5} />
-        </InputLeftElement>
-        <Input
-          placeholder="Search skills..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          bg="bg.card"
-          borderColor="border.muted"
-        />
-      </InputGroup>
+      {/* Workflow-phase strategy strip */}
+      <Flex gap={2} mb={6} direction={{ base: "column", sm: "row" }}>
+        {PHASES.map((p) => {
+          const active = p.categories.every((c) => activeCats.has(c)) && activeCats.size === p.categories.length;
+          return (
+            <Box
+              key={p.label}
+              as="button"
+              onClick={() => selectPhase(p)}
+              flex="1"
+              textAlign="left"
+              borderWidth="1px"
+              borderColor={active ? "accent" : "border.muted"}
+              bg={active ? "bg.subtle" : "bg.card"}
+              borderRadius="md"
+              px={3}
+              py={2}
+              cursor="pointer"
+              _hover={{ borderColor: "accent" }}
+            >
+              <Text fontSize="xs" fontWeight="700" color={active ? "accent" : "fg.default"}>
+                {p.label}
+              </Text>
+              <Text fontSize="0.7em" color="fg.muted" mt={0.5}>
+                {p.blurb}
+              </Text>
+            </Box>
+          );
+        })}
+      </Flex>
 
+      {/* Search + view toggle */}
+      <Flex gap={3} mb={3} align="center" wrap="wrap">
+        <InputGroup maxW="sm" flex="1" minW="200px">
+          <InputLeftElement pointerEvents="none">
+            <Icon as={FaSearch} color="fg.faint" boxSize={3.5} />
+          </InputLeftElement>
+          <Input
+            placeholder="Search skills..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            bg="bg.card"
+            borderColor="border.muted"
+          />
+        </InputGroup>
+        <HStack spacing={0} borderWidth="1px" borderColor="border.muted" borderRadius="md" overflow="hidden">
+          {[
+            { key: false, label: "By workflow" },
+            { key: true, label: "By repo" },
+          ].map((v) => (
+            <Box
+              key={String(v.key)}
+              as="button"
+              onClick={() => setByRepo(v.key)}
+              px={3}
+              py={1.5}
+              fontSize="xs"
+              fontWeight="600"
+              bg={byRepo === v.key ? "accent" : "bg.card"}
+              color={byRepo === v.key ? "coal.900" : "fg.muted"}
+              _hover={byRepo === v.key ? {} : { bg: "bg.subtle" }}
+            >
+              {v.label}
+            </Box>
+          ))}
+        </HStack>
+      </Flex>
+
+      {/* Category filter chips */}
       <Wrap spacing={2} mb={8}>
-        {allTags.map((tag) => (
-          <WrapItem key={tag}>
-            <FilterChip label={tag} active={activeTags.has(tag)} onClick={() => toggleTag(tag)} />
-          </WrapItem>
-        ))}
+        {CATEGORIES.map((c) => {
+          const active = activeCats.has(c.key);
+          return (
+            <WrapItem key={c.key}>
+              <Tag
+                as="button"
+                onClick={() => toggleCat(c.key)}
+                size="md"
+                cursor="pointer"
+                bg={active ? "accent" : "bg.card"}
+                color={active ? "coal.900" : "fg.muted"}
+                borderWidth="1px"
+                borderColor={active ? "accent" : "border.muted"}
+                fontWeight={active ? "700" : "500"}
+                _hover={{ borderColor: "accent" }}
+              >
+                <Icon as={c.icon} boxSize={3} mr={1.5} />
+                {c.label}
+              </Tag>
+            </WrapItem>
+          );
+        })}
       </Wrap>
 
-      {groups.length === 0 ? (
+      {filtered.length === 0 ? (
         <Text color="fg.faint" fontSize="sm">
           No skills match the current filters.
         </Text>
-      ) : (
-        <Flex gap={4} align="start">
-          {columns.map((col, i) => (
-            <VStack key={i} align="stretch" spacing={0} flex={1} minW={0}>
-              {col.map((group) => (
-                <RepoCard
-                  key={group.key}
-                  group={group}
-                  expanded={expanded.get(group.key) ?? false}
-                  onToggle={() => toggleGroup(group.key)}
-                />
-              ))}
-            </VStack>
+      ) : byRepo ? (
+        // ---- By-repo view: flat list of repo groups ----
+        <VStack align="stretch" spacing={1} divider={<Box borderTopWidth="1px" borderColor="border.muted" />}>
+          {repoBlocks.map((block) => (
+            <RepoBlockView key={block.origin} block={block} defaultOpen={false} />
           ))}
-        </Flex>
+        </VStack>
+      ) : (
+        // ---- By-workflow view: category sections ----
+        <VStack align="stretch" spacing={10}>
+          {sections.map(({ cat, blocks }) => (
+            <Box key={cat.key}>
+              <Flex align="center" gap={2} mb={1}>
+                <Icon as={cat.icon} color="accent" boxSize={4} />
+                <Heading size="sm" color="fg.default">
+                  {cat.label}
+                </Heading>
+                <Text fontSize="xs" color="fg.faint">
+                  {blocks.reduce((n, b) => n + b.skills.length, 0)}
+                </Text>
+              </Flex>
+              <Text fontSize="xs" color="fg.muted" fontStyle="italic" mb={2}>
+                {cat.goal}
+              </Text>
+              <VStack align="stretch" spacing={0} divider={<Box borderTopWidth="1px" borderColor="border.muted" />}>
+                {blocks.map((block) => (
+                  <RepoBlockView key={block.origin} block={block} defaultOpen={false} />
+                ))}
+              </VStack>
+            </Box>
+          ))}
+        </VStack>
       )}
 
-      <HStack mt={10} spacing={1} color="fg.faint" fontSize="xs">
+      <HStack mt={12} spacing={1} color="fg.faint" fontSize="xs">
         <Icon as={FaCode} boxSize={3} />
-        <Text>{skills.length} total, generated from this machine's Claude Code setup.</Text>
+        <Text>
+          {skills.length} skills across {sections.length || CATEGORIES.length} workflow categories, generated from
+          this machine's Claude Code setup.
+        </Text>
       </HStack>
     </Container>
   );

@@ -3,6 +3,8 @@ name: "test-driven-development"
 source: "plugin"
 origin: "superpowers"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "/plugin install superpowers@claude-plugins-official"
 tags: ["testing", "tdd", "superpowers"]
 usage: []
 url: "https://github.com/obra/superpowers"

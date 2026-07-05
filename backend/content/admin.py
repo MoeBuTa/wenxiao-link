@@ -19,9 +19,10 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(AgentSkill)
 class AgentSkillAdmin(admin.ModelAdmin):
-    list_display = ("name", "source", "category", "origin", "published", "order")
-    list_filter = ("source", "category", "published")
-    list_editable = ("published", "order")
+    list_display = ("name", "workflow_category", "source", "category", "origin", "published", "order")
+    list_filter = ("workflow_category", "source", "category", "published")
+    list_editable = ("workflow_category", "published", "order")
+    search_fields = ("name", "origin", "description")
     prepopulated_fields = {"slug": ("origin", "name")}
 
 

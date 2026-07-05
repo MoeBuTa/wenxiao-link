@@ -3,6 +3,8 @@ name: "ubiquitous-language"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["ddd", "glossary", "terminology"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/deprecated/ubiquitous-language/SKILL.md"

@@ -3,6 +3,8 @@ name: "karpathy-guidelines"
 source: "plugin"
 origin: "andrej-karpathy-skills"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "/plugin install andrej-karpathy-skills@karpathy-skills"
 tags: ["code-quality", "best-practices"]
 usage: []
 url: "https://github.com/forrestchang/andrej-karpathy-skills"

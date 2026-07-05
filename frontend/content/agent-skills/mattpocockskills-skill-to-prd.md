@@ -3,6 +3,8 @@ name: "to-prd"
 source: "npx-package"
 origin: "mattpocock/skills"
 category: "skill"
+workflowCategory: "engineering"
+installCommand: "npx skills add mattpocock/skills"
 tags: ["planning", "prd", "product"]
 usage: []
 url: "https://github.com/mattpocock/skills/blob/main/skills/engineering/to-prd/SKILL.md"

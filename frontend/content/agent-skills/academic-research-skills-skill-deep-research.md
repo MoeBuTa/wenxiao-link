@@ -3,6 +3,8 @@ name: "deep-research"
 source: "plugin"
 origin: "academic-research-skills"
 category: "skill"
+workflowCategory: "literature"
+installCommand: "/plugin install academic-research-skills@academic-research-skills"
 tags: ["research", "multi-agent", "literature-review"]
 usage: []
 url: "https://github.com/Imbad0202/academic-research-skills"

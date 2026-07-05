@@ -18,7 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { MdDragIndicator } from "react-icons/md";
 
 import { revalidateContent } from "../../actions";
@@ -120,7 +120,9 @@ export function Reorderable<T extends { id: number }>({
   if (!enabled) {
     return (
       <Container {...defaults} {...containerProps}>
-        {items.map(renderItem)}
+        {items.map((item) => (
+          <Fragment key={item.id}>{renderItem(item)}</Fragment>
+        ))}
       </Container>
     );
   }

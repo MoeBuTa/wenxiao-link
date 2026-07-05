@@ -31,3 +31,23 @@ Gotchas:
 - `sync_scholar` refuses to run if it parses 0 rows (markup-change guard).
 - CORE rank table is ordered — first matching pattern wins; add specific
   patterns above generic ones.
+
+## Coding guidelines
+
+Apply these to all coding work (adapted from Karpathy's LLM-pitfall notes;
+use judgment on trivial tasks):
+
+1. **Think before coding** — State assumptions explicitly; ask when uncertain.
+   Present multiple interpretations rather than silently picking one. Push back
+   when a simpler approach exists.
+2. **Simplicity first** — Minimum code that solves the problem. No speculative
+   features, single-use abstractions, unrequested configurability, or error
+   handling for impossible cases. If it could be 50 lines instead of 200,
+   rewrite it.
+3. **Surgical changes** — Touch only what the request needs. Don't refactor,
+   reformat, or "improve" adjacent code. Match existing style. Remove only the
+   orphans your own changes create; mention pre-existing dead code, don't
+   delete it.
+4. **Goal-driven execution** — Turn tasks into verifiable criteria (e.g. "fix
+   the bug" → "write a failing test that reproduces it, then make it pass").
+   State a brief plan with a verify step for multi-step work.

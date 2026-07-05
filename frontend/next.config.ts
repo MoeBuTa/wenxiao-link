@@ -8,6 +8,10 @@ import type { NextConfig } from "next";
 const BACKEND = process.env.BACKEND_INTERNAL_URL ?? "http://127.0.0.1:8002";
 
 const nextConfig: NextConfig = {
+  // Next's dev server only trusts "localhost" for HMR/RSC requests by
+  // default; hitting it via 127.0.0.1 or a LAN IP gets cross-origin-blocked
+  // (WS handshake fails, effects never hydrate, avatar/interactivity break).
+  allowedDevOrigins: ["127.0.0.1", "192.168.0.44", "192.168.*.*"],
   // Django URLs end in "/" — without this Next 308-redirects them to the
   // slash-less form before the rewrite gets a chance to proxy.
   skipTrailingSlashRedirect: true,
